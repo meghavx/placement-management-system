@@ -1,4 +1,4 @@
-package com.application.placementManagementSystem;
+package com.application.placementmanagementsystem;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

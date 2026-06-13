@@ -1,4 +1,4 @@
-package com.application.placementManagementSystem;
+package com.application.placementmanagementsystem;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
