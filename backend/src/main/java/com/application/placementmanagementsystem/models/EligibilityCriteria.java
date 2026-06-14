@@ -1,5 +1,6 @@
 package com.application.placementmanagementsystem.models;
 
+import com.application.placementmanagementsystem.models.enums.Department;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -31,8 +32,9 @@ public class EligibilityCriteria {
     @Column(name = "min_cgpa", nullable = false)
     private Double minCgpa;
 
-    @Column(nullable = false)
-    private String department;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 100)
+    private Department department;
 
     @Column(name = "max_backlogs", nullable = false)
     private Integer maxBacklogs;

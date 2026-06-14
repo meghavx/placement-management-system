@@ -1,5 +1,6 @@
 package com.application.placementmanagementsystem.models;
 
+import com.application.placementmanagementsystem.models.enums.Department;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,8 +23,9 @@ public class Student {
     @Column(name = "roll_number", nullable = false, unique = true)
     private String rollNumber;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 100)
-    private String department;
+    private Department department;
 
     @Column(name = "graduation_year", nullable = false)
     private Integer graduationYear;
