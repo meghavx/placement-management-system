@@ -4,6 +4,8 @@ import com.application.placementmanagementsystem.models.enums.Department;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "students")
 @Getter
@@ -24,14 +26,14 @@ public class Student {
     private String rollNumber;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false)
     private Department department;
 
     @Column(name = "graduation_year", nullable = false)
     private Integer graduationYear;
 
-    @Column(nullable = false)
-    private Double cgpa;
+    @Column(nullable = false, precision = 4, scale = 2)
+    private BigDecimal cgpa;
 
     @Column(name = "current_backlogs", nullable = false)
     private Integer currentBacklogs = 0;

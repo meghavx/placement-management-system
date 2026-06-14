@@ -28,6 +28,7 @@ public class Company {
     @Column(nullable = false)
     private String location;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)

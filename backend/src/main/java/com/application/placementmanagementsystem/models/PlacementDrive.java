@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -32,8 +33,8 @@ public class PlacementDrive {
     @Column(name = "job_description", columnDefinition = "TEXT")
     private String jobDescription;
 
-    @Column(name = "package_offered", nullable = false)
-    private Double packageOffered;
+    @Column(name = "package_offered", nullable = false, precision = 10, scale = 2)
+    private BigDecimal packageOffered;
 
     private String location;
 
@@ -54,5 +55,4 @@ public class PlacementDrive {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
 }

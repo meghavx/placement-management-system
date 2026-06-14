@@ -9,7 +9,13 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "application")
+@Table(name = "applications",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_student_drive",
+                        columnNames = {"student_id", "drive_id"}
+                )
+        })
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,12 +26,12 @@ public class Application {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "student_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 
-    @OneToOne
-    @JoinColumn(name = "drive_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "drive_id", nullable = false)
     private PlacementDrive placementDrive;
 
     @Enumerated(EnumType.STRING)

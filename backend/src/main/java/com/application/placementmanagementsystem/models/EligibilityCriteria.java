@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,28 +17,25 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class EligibilityCriteria {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
-    @JoinColumn(
-            name = "drive_id",
-            nullable = false,
-            unique = true
-    )
+    @JoinColumn(name = "drive_id", nullable = false, unique = true)
     private PlacementDrive placementDrive;
 
-    @Column(name = "min_cgpa", nullable = false)
-    private Double minCgpa;
+    @Column(name = "min_cgpa", nullable = false, precision = 4, scale = 2)
+    private BigDecimal minCgpa;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 100)
     private Department department;
 
     @Column(name = "max_backlogs", nullable = false)
     private Integer maxBacklogs;
+
+    @Column(name = "graduation_year")
+    private Integer graduationYear;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

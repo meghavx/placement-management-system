@@ -24,7 +24,7 @@ public class User {
     @Column(nullable = false)
     private RoleType role;
 
-    @Column(name = "fullname", nullable = false, length = 100)
+    @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
 
     @Column(unique = true, nullable = false)
