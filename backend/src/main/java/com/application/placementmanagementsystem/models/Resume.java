@@ -8,34 +8,30 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "companies")
+@Table(name = "resume")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Company {
+public class Resume {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "company_name", nullable = false)
-    private String companyName;
+    @OneToOne
+    @JoinColumn(name = "student_id", nullable = false, unique = true)
+    private Student student;
 
-    @Column(nullable = false)
-    private String website;
+    @Column(name = "file_name", nullable = false)
+    private String fileName;
 
-    @Column(nullable = false)
-    private String location;
-
-    private String description;
-
-    @Column(nullable = false)
-    private String industry;
+    @Column(name = "file_path", nullable = false)
+    private String filePath;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "uploaded_at", updatable = false)
+    private LocalDateTime uploadedAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
