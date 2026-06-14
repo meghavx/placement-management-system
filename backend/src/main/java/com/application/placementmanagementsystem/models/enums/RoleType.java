@@ -1,4 +1,4 @@
-package com.application.placementmanagementsystem.models;
+package com.application.placementmanagementsystem.models.enums;
 
 public enum RoleType {
     SUPER_ADMIN,
