@@ -1,33 +1,32 @@
 /*
 Purpose
 
-Temporary Student Dashboard.
+Student Dashboard Page.
 
-Later:
-
-Profile
-
-Placement Drives
-
-Resume Upload
-
-Application Status
-
-will be added here.
+Will contain:
+- Profile Summary
+- Placement Drives
+- Applications
 */
 
+import DashboardLayout from "../../layouts/DashboardLayout";
 
 function StudentDashboard() {
 
   return (
 
-    <div>
+    <DashboardLayout>
 
-      <h1>
+      <h1
+        className="
+        text-2xl
+        font-bold
+        "
+      >
         Student Dashboard
       </h1>
 
-    </div>
+    </DashboardLayout>
 
   );
 }

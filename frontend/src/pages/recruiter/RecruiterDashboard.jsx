@@ -1,33 +1,32 @@
 /*
 Purpose
 
-Temporary Recruiter Dashboard.
+Recruiter Dashboard.
 
-Later:
-
-Job Posting
-
-Applicants
-
-Shortlisting
-
-Result Publication
-
-will be added here.
+Will contain:
+- Job Postings
+- Applicants
+- Shortlisting
 */
 
+import DashboardLayout from "../../layouts/DashboardLayout";
 
 function RecruiterDashboard() {
 
   return (
 
-    <div>
+    <DashboardLayout>
 
-      <h1>
+      <h1
+        className="
+        text-2xl
+        font-bold
+        "
+      >
         Recruiter Dashboard
       </h1>
 
-    </div>
+    </DashboardLayout>
 
   );
 }

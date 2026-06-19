@@ -1,33 +1,32 @@
 /*
 Purpose
 
-Temporary Admin Dashboard.
+Placement Admin Dashboard.
 
-Later:
-
-Student Management
-
-Recruiter Management
-
-Placement Drives
-
-Reports
-
-will be added here.
+Will contain:
+- Student Management
+- Recruiter Management
+- Placement Drives
 */
 
+import DashboardLayout from "../../layouts/DashboardLayout";
 
 function AdminDashboard() {
 
   return (
 
-    <div>
+    <DashboardLayout>
 
-      <h1>
+      <h1
+        className="
+        text-2xl
+        font-bold
+        "
+      >
         Admin Dashboard
       </h1>
 
-    </div>
+    </DashboardLayout>
 
   );
 }
