@@ -1,16 +1,21 @@
-// import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from './assets/vite.svg'
-// import heroImg from './assets/hero.png'
-// import './App.css'
+/*
+Purpose
+
+Acts as the root component.
+
+Instead of placing all routes here, we delegate routing responsibility to AppRoutes.
+*/
+
+// Contains all application routes
+import AppRoutes from "./routes/AppRoutes";
 
 function App() {
+
   return (
-    <div className="p-10">
-      <h1 className="text-4xl font-bold text-red-600">
-        Tailwind Working
-      </h1>
-    </div>
+
+    // Render route configuration
+    <AppRoutes />
+
   );
 }
 
