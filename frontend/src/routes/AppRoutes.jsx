@@ -17,11 +17,27 @@ Current Routes:
 // React Router components
 import { Routes, Route } from "react-router-dom";
 
+
 // Import pages
 import Login from "../pages/auth/Login";
 import StudentDashboard from "../pages/student/StudentDashboard";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import RecruiterDashboard from "../pages/recruiter/RecruiterDashboard";
+
+/*
+Purpose
+
+Import admin management pages.
+
+These pages will be accessible
+through the Admin Dashboard.
+*/
+
+import StudentManagement from "../pages/admin/StudentManagement";
+
+import RecruiterManagement from "../pages/admin/RecruiterManagement";
+
+import CompanyManagement from "../pages/admin/CompanyManagement";
 
 function AppRoutes() {
 
@@ -52,6 +68,27 @@ function AppRoutes() {
         path="/recruiter"
         element={<RecruiterDashboard />}
       />
+
+      {/* Student Management */}
+
+<Route
+  path="/admin/students"
+  element={<StudentManagement />}
+/>
+
+{/* Recruiter Management */}
+
+<Route
+  path="/admin/recruiters"
+  element={<RecruiterManagement />}
+/>
+
+{/* Company Management */}
+
+<Route
+  path="/admin/companies"
+  element={<CompanyManagement />}
+/>
 
     </Routes>
 
