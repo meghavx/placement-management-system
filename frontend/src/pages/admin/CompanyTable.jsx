@@ -1,23 +1,23 @@
 /*
 Purpose
 
-Displays all recruiters.
+Displays all companies.
 
 Current Features:
 
-- Recruiter Name
-- Company
-- Designation
+- Company Name
+- Industry
+- Location
 - Edit Button
 - Delete Button
 
 Future Features:
 
 - Backend integration
-- Dynamic recruiter data
+- Dynamic company data
 */
 
-export default function RecruiterTable() {
+export default function CompanyTable() {
 
   return (
 
@@ -44,19 +44,19 @@ export default function RecruiterTable() {
 
             <th className="py-3">
 
-              Name
-
-            </th>
-
-            <th className="py-3">
-
               Company
 
             </th>
 
             <th className="py-3">
 
-              Designation
+              Industry
+
+            </th>
+
+            <th className="py-3">
+
+              Location
 
             </th>
 
@@ -74,17 +74,11 @@ export default function RecruiterTable() {
 
         <tbody>
 
-          {/* Recruiter 1 */}
+          {/* Company 1 */}
 
           <tr className="border-b">
 
             <td className="py-4">
-
-              Jane Smith
-
-            </td>
-
-            <td>
 
               TCS
 
@@ -92,7 +86,13 @@ export default function RecruiterTable() {
 
             <td>
 
-              HR
+              IT Services
+
+            </td>
+
+            <td>
+
+              Mumbai
 
             </td>
 
@@ -150,17 +150,11 @@ export default function RecruiterTable() {
 
           </tr>
 
-          {/* Recruiter 2 */}
+          {/* Company 2 */}
 
           <tr>
 
             <td className="py-4">
-
-              Rahul Sharma
-
-            </td>
-
-            <td>
 
               Infosys
 
@@ -168,7 +162,13 @@ export default function RecruiterTable() {
 
             <td>
 
-              Hiring Manager
+              IT Services
+
+            </td>
+
+            <td>
+
+              Pune
 
             </td>
 

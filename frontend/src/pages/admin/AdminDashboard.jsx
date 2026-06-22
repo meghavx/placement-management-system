@@ -37,10 +37,10 @@ function AdminDashboard() {
 
             onClick={() => navigate("/admin/students")}
 
-            className="bg-blue-600 text-white p-6 rounded shadow hover:scale-105 transition"
+            className="bg-blue-600 h-32 text-lg font-semibold text-white rounded-xl shadow-lg hover:scale-105 transition duration-300"
           >
 
-            Student Management
+            📚 Student Management
 
           </button>
 
@@ -50,10 +50,10 @@ function AdminDashboard() {
 
             onClick={() => navigate("/admin/recruiters")}
 
-            className=" bg-green-600 text-white p-6 rounded shadow hover:scale-105 transition"
+            className="bg-green-600 h-32 text-lg font-semibold text-white rounded-xl shadow-lg hover:scale-105 transition duration-300"
           >
 
-            Recruiter Management
+            👨‍💼 Recruiter Management
 
           </button>
 
@@ -63,12 +63,55 @@ function AdminDashboard() {
 
             onClick={() => navigate("/admin/companies")}
 
-            className=" bg-purple-600 text-white p-6 rounded shadow hover:scale-105 transition"
+            className="bg-purple-600 h-32 text-lg font-semibold text-white rounded-xl shadow-lg hover:scale-105 transition duration-300"
           >
 
-            Company Management
+            🏢 Company Management
 
           </button>
+
+          {/* Placement Drive Management */}
+
+<button
+
+  onClick={() => navigate("/admin/drives")}
+
+  className="bg-orange-600 h-32 text-lg font-semibold text-white rounded-xl shadow-lg hover:scale-105 transition duration-300"
+
+>
+
+  🚀 Placement Drives
+
+</button>
+
+{/* Eligibility Management */}
+
+<button
+
+  onClick={() => navigate("/admin/eligibility")}
+
+  className="bg-pink-600 h-32 text-lg font-semibold text-white rounded-xl shadow-lg hover:scale-105 transition duration-300"
+
+>
+
+  🎯 Eligibility Management
+
+</button>
+
+
+{/* Application Monitoring */}
+
+<button
+
+  onClick={() => navigate("/admin/applications")}
+
+  className="bg-cyan-600 h-32 text-lg font-semibold text-white rounded-xl shadow-lg hover:scale-105 transition duration-300"
+
+>
+
+  📄 Application Monitoring
+
+</button>
 
         </div>
 

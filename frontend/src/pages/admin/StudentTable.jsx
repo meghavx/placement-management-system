@@ -1,43 +1,239 @@
+/*
+Purpose
+
+Displays all students.
+
+Current Features:
+
+- Student Name
+- Department
+- CGPA
+- Edit Button
+- Delete Button
+
+Future Features:
+
+- Backend integration
+- Dynamic student data
+*/
+
 export default function StudentTable() {
 
   return (
 
+    // Enables horizontal scrolling on small screens
     <div className="overflow-x-auto">
-    <table className="w-full">
 
-      <thead>
+      <table className="w-full">
 
-        <tr>
+        {/* Table Header */}
 
-          <th>Name</th>
+        <thead>
 
-          <th>Department</th>
+          <tr
 
-          <th>CGPA</th>
+            className="
 
-          <th>Actions</th>
+            border-b
 
-        </tr>
+            text-left
 
-      </thead>
+            "
 
-      <tbody>
+          >
 
-        <tr>
+            <th className="py-3">
 
-          <td>John Doe</td>
+              Name
 
-          <td>CSE</td>
+            </th>
 
-          <td>8.7</td>
+            <th className="py-3">
 
-          <td>Edit</td>
+              Department
 
-        </tr>
+            </th>
 
-      </tbody>
+            <th className="py-3">
 
-    </table>
+              CGPA
+
+            </th>
+
+            <th className="py-3">
+
+              Actions
+
+            </th>
+
+          </tr>
+
+        </thead>
+
+        {/* Table Body */}
+
+        <tbody>
+
+          {/* Student 1 */}
+
+          <tr className="border-b">
+
+            <td className="py-4">
+
+              John Doe
+
+            </td>
+
+            <td>
+
+              CSE
+
+            </td>
+
+            <td>
+
+              8.7
+
+            </td>
+
+            <td>
+
+              <div className="flex gap-2">
+
+                {/* Edit Button */}
+
+                <button
+
+                  className="
+
+                  bg-yellow-500
+
+                  text-white
+
+                  px-3
+
+                  py-1
+
+                  rounded
+
+                  "
+
+                >
+
+                  Edit
+
+                </button>
+
+                {/* Delete Button */}
+
+                <button
+
+                  className="
+
+                  bg-red-600
+
+                  text-white
+
+                  px-3
+
+                  py-1
+
+                  rounded
+
+                  "
+
+                >
+
+                  Delete
+
+                </button>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+          {/* Student 2 */}
+
+          <tr>
+
+            <td className="py-4">
+
+              Jane Doe
+
+            </td>
+
+            <td>
+
+              AIML
+
+            </td>
+
+            <td>
+
+              9.1
+
+            </td>
+
+            <td>
+
+              <div className="flex gap-2">
+
+                <button
+
+                  className="
+
+                  bg-yellow-500
+
+                  text-white
+
+                  px-3
+
+                  py-1
+
+                  rounded
+
+                  "
+
+                >
+
+                  Edit
+
+                </button>
+
+                <button
+
+                  className="
+
+                  bg-red-600
+
+                  text-white
+
+                  px-3
+
+                  py-1
+
+                  rounded
+
+                  "
+
+                >
+
+                  Delete
+
+                </button>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
     </div>
 
   );

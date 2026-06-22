@@ -24,6 +24,7 @@ import StudentDashboard from "../pages/student/StudentDashboard";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import RecruiterDashboard from "../pages/recruiter/RecruiterDashboard";
 
+
 /*
 Purpose
 
@@ -38,6 +39,12 @@ import StudentManagement from "../pages/admin/StudentManagement";
 import RecruiterManagement from "../pages/admin/RecruiterManagement";
 
 import CompanyManagement from "../pages/admin/CompanyManagement";
+
+import PlacementDriveManagement from "../pages/admin/PlacementDriveManagement";
+
+import EligibilityManagement from "../pages/admin/EligibilityManagement";
+
+import ApplicationMonitoring from "../pages/admin/ApplicationMonitoring";
 
 function AppRoutes() {
 
@@ -88,6 +95,32 @@ function AppRoutes() {
 <Route
   path="/admin/companies"
   element={<CompanyManagement />}
+/>
+
+{/* Placement Drive Management */}
+
+<Route
+
+  path="/admin/drives"
+
+  element={<PlacementDriveManagement />}
+
+/>
+
+<Route
+
+  path="/admin/eligibility"
+
+  element={<EligibilityManagement />}
+
+/>
+
+<Route
+
+  path="/admin/applications"
+
+  element={<ApplicationMonitoring />}
+
 />
 
     </Routes>
