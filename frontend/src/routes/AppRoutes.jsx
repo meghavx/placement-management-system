@@ -46,6 +46,18 @@ import EligibilityManagement from "../pages/admin/EligibilityManagement";
 
 import ApplicationMonitoring from "../pages/admin/ApplicationMonitoring";
 
+
+//These pages will be accessible through the Recruiter Dashboard
+import CreateDrive from "../pages/recruiter/CreateDrive";
+
+import ViewDrives from "../pages/recruiter/ViewDrives";
+
+import ViewApplicants from "../pages/recruiter/ViewApplicants";
+
+import ShortlistStudents from "../pages/recruiter/ShortlistStudents";
+
+import SelectedStudents from "../pages/recruiter/SelectedStudents";
+
 function AppRoutes() {
 
   return (
@@ -120,6 +132,60 @@ function AppRoutes() {
   path="/admin/applications"
 
   element={<ApplicationMonitoring />}
+
+/>
+
+{/* Create Drive */}
+
+<Route
+
+  path="/recruiter/create-drive"
+
+  element={<CreateDrive />}
+
+/>
+
+
+{/* View Drives */}
+
+<Route
+
+  path="/recruiter/view-drives"
+
+  element={<ViewDrives />}
+
+/>
+
+
+{/* View Applicants */}
+
+<Route
+
+  path="/recruiter/view-applicants"
+
+  element={<ViewApplicants />}
+
+/>
+
+
+{/* Shortlist Students */}
+
+<Route
+
+  path="/recruiter/shortlist"
+
+  element={<ShortlistStudents />}
+
+/>
+
+
+{/* Selected Students */}
+
+<Route
+
+  path="/recruiter/selected"
+
+  element={<SelectedStudents />}
 
 />
 
