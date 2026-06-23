@@ -9,6 +9,7 @@ Instead of placing all routes here, we delegate routing responsibility to AppRou
 // Contains all application routes
 import AppRoutes from "./routes/AppRoutes";
 
+
 function App() {
 
   return (
