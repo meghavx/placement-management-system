@@ -35,9 +35,6 @@ function DashboardLayout({ children }) {
       <div
         className="
         flex
-
-        flex-col
-        md:flex-row
         "
       >
 

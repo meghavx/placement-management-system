@@ -38,7 +38,7 @@ function Navbar() {
         {/* Project Title */}
         <h1
           className="
-          text-lg
+          text-base
           md:text-xl
           font-bold
           "
@@ -47,7 +47,12 @@ function Navbar() {
         </h1>
 
         {/* Placeholder User */}
-        <p>
+        <p
+          className="
+          text-sm
+          md:text-base
+          "
+        >
           Welcome User
         </p>
 

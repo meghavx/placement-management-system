@@ -26,13 +26,23 @@ function Sidebar() {
 
   return (
 
-    <aside className="w-full md:w-64 bg-gray-100 p-4 flex flex-col min-h-screen">
+      <aside
+      className="
+      w-56
+      bg-gray-100
+      p-4
+      flex
+      flex-col
+      min-h-screen
+      shrink-0
+      "
+    >
 
       <div className="flex flex-col gap-4">
         <ul
           className="
           flex
-          md:flex-col
+          flex-col
           gap-4
           "
         >
