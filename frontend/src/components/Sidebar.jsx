@@ -4,29 +4,142 @@ Purpose
 Common Sidebar.
 
 Current Features:
-- Placeholder Menu
+- Navigation Between Student Pages
 
 Future Features:
-- Dynamic Menu based on Role
+- Dynamic Sidebar Based On Role
 - Icons
-- Navigation Links
+- Collapsible Sidebar
 */
+
+import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function Sidebar() {
 
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
   return (
 
-    <aside className="w-full md:w-64 bg-gray-100 p-4">
+    <aside className="w-full md:w-64 bg-gray-100 p-4 flex flex-col min-h-screen">
 
-      <ul className="flex md:flex-col gap-4">
+      <div className="flex flex-col gap-4">
+        <ul
+          className="
+          flex
+          md:flex-col
+          gap-4
+          "
+        >
 
-        <li>Dashboard</li>
+          {/* Dashboard Page */}
 
-        <li>Profile</li>
+          <li>
+              <NavLink
+                to="/student"
+                end
+                className={({ isActive }) =>
+                  isActive
+                    ? "font-bold text-blue-600"
+                    : "text-black"
+                }
+              >
+                Dashboard
+              </NavLink>
+            
+          </li>
 
-        <li>Settings</li>
+          {/* Profile Page */}
 
-      </ul>
+          <li>
+            <NavLink
+              to="/student/profile"
+              className={({ isActive }) =>
+                isActive
+                  ? "font-bold text-blue-600"
+                  : "text-black"
+              }
+            >
+              Profile
+            </NavLink>
+          </li>
+
+          {/* Placement Drives Page */}
+
+          <li>
+            <NavLink
+              to="/student/drives"
+              className={({ isActive }) =>
+                isActive
+                  ? "font-bold text-blue-600"
+                  : "text-black"
+              }
+            >
+              Drives
+            </NavLink>
+          </li>
+
+          {/* Applications Page */}
+
+          <li>
+            <NavLink
+              to="/student/applications"
+              className={({ isActive }) =>
+                isActive
+                  ? "font-bold text-blue-600"
+                  : "text-black"
+              }
+            >
+              Applications
+            </NavLink>
+          </li>
+
+          {/* Resume Page */}
+
+          <li>
+            <NavLink
+              to="/student/resume"
+              className={({ isActive }) =>
+                isActive
+                  ? "font-bold text-blue-600"
+                  : "text-black"
+              }
+            >
+              Resume
+            </NavLink>
+          </li>
+
+          {/* Notifications Page */}
+
+          <li>
+            <NavLink
+              to="/student/notifications"
+              className={({ isActive }) =>
+                isActive
+                  ? "font-bold text-blue-600"
+                  : "text-black"
+              }
+            >
+              Notifications
+            </NavLink>
+          </li>
+
+        </ul>
+
+      
+      </div>
+
+      <button
+        onClick={handleLogout}
+        className="mt-auto text-left text-red-600 font-semibold mt-auto cursor-pointer"
+      >
+        Logout
+      </button>
 
     </aside>
 
