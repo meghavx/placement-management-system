@@ -2,7 +2,7 @@ package com.application.placementmanagementsystem.company.mapper;
 
 import com.application.placementmanagementsystem.company.dtos.CompanyCreateRequest;
 import com.application.placementmanagementsystem.company.dtos.CompanyResponse;
-import com.application.placementmanagementsystem.models.Company;
+import com.application.placementmanagementsystem.company.model.Company;
 import org.springframework.stereotype.Component;
 
 @Component

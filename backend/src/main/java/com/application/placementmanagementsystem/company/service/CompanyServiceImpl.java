@@ -6,8 +6,8 @@ import com.application.placementmanagementsystem.company.dtos.CompanyUpdateReque
 import com.application.placementmanagementsystem.exceptions.DuplicateResourceException;
 import com.application.placementmanagementsystem.exceptions.ResourceNotFoundException;
 import com.application.placementmanagementsystem.company.mapper.CompanyMapper;
-import com.application.placementmanagementsystem.models.Company;
-import com.application.placementmanagementsystem.repositories.CompanyRepository;
+import com.application.placementmanagementsystem.company.model.Company;
+import com.application.placementmanagementsystem.company.repository.CompanyRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
