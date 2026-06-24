@@ -18,12 +18,13 @@ Future Features:
 
 // Import Placement Drive Table component
 import PlacementDriveTable from "./PlacementDriveTable";
+import DashboardLayout from "../../layouts/DashboardLayout";
 
 function PlacementDriveManagement() {
 
   return (
-
-  <div className="p-6">
+    <DashboardLayout role="admin">
+      <div className="p-6">
 
     {/* Page Title */}
 
@@ -206,6 +207,8 @@ function PlacementDriveManagement() {
     </div>
 
   </div>
+
+  </DashboardLayout>
 
 );
 

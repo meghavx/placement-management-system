@@ -27,7 +27,7 @@ function ViewDrives() {
 
   return (
 
-    <DashboardLayout>
+    <DashboardLayout role="recruiter">
 
       <div className="p-6">
 

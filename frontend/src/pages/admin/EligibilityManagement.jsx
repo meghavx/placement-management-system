@@ -18,12 +18,16 @@ Future Features:
 - Eligibility validation
 */
 
+import DashboardLayout from "../../layouts/DashboardLayout";
+
 
 function EligibilityManagement() {
 
   return (
 
-    <div className="p-6">
+    <DashboardLayout role="admin">
+
+      <div className="p-6">
 
       {/* Page Title */}
 
@@ -303,6 +307,8 @@ function EligibilityManagement() {
       </div>
 
     </div>
+
+  </DashboardLayout>
 
   );
 

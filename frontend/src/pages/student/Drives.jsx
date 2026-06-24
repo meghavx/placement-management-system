@@ -31,7 +31,7 @@ function Drives() {
 
   return (
 
-    <DashboardLayout>
+    <DashboardLayout role="student">
 
       <h1
         className="

@@ -30,7 +30,7 @@ function RecruiterDashboard() {
 
   return (
 
-    <DashboardLayout>
+    <DashboardLayout role="recruiter">
 
       <div
 

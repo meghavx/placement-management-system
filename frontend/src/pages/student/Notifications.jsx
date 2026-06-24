@@ -18,7 +18,7 @@ function Notifications() {
 
   return (
 
-    <DashboardLayout>
+    <DashboardLayout role="student">
 
       <h1
         className="

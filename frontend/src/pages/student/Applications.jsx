@@ -29,7 +29,7 @@ function Applications() {
 
   return (
 
-    <DashboardLayout>
+    <DashboardLayout role="student">
 
       <h1
         className="

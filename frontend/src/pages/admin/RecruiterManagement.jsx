@@ -22,11 +22,15 @@ Future Features:
 
 import RecruiterTable from "./RecruiterTable";
 
+import DashboardLayout from "../../layouts/DashboardLayout";
+
 
 export default function RecruiterManagement() {
 
   return (
 
+
+    <DashboardLayout role="admin">
     <div className="p-6">
 
       {/* Page Title */}
@@ -216,6 +220,8 @@ export default function RecruiterManagement() {
       </div>
 
     </div>
+
+    </DashboardLayout>
 
   );
 

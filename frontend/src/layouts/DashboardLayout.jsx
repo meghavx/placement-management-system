@@ -17,9 +17,36 @@ Used By:
 */
 
 import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
 
-function DashboardLayout({ children }) {
+import StudentSidebar from "../components/StudentSidebar";
+import AdminSidebar from "../components/AdminSidebar";
+import RecruiterSidebar from "../components/RecruiterSidebar";
+
+function DashboardLayout({ role, children }) {
+
+
+
+  // Selects sidebar based on role.
+
+  let sidebar;
+
+  if (role === "student") {
+
+    sidebar = <StudentSidebar />;
+
+  }
+
+  else if (role === "admin") {
+
+    sidebar = <AdminSidebar />;
+
+  }
+
+  else if (role === "recruiter") {
+
+    sidebar = <RecruiterSidebar />;
+
+  }
 
   return (
 
@@ -39,7 +66,7 @@ function DashboardLayout({ children }) {
       >
 
         {/* Left Sidebar */}
-        <Sidebar />
+        {sidebar}
 
         {/* Page Content */}
         <main

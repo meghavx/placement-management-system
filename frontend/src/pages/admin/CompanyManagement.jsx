@@ -22,12 +22,16 @@ Future Features:
 
 import CompanyTable from "./CompanyTable";
 
+import DashboardLayout from "../../layouts/DashboardLayout";
+
 
 export default function CompanyManagement() {
 
   return (
 
-    <div className="p-6">
+    <DashboardLayout role="admin">
+
+      <div className="p-6">
 
       {/* Page Title */}
 
@@ -216,6 +220,8 @@ export default function CompanyManagement() {
       </div>
 
     </div>
+
+  </DashboardLayout>
 
   );
 

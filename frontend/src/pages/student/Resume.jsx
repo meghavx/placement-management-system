@@ -18,7 +18,7 @@ function Resume() {
 
   return (
 
-    <DashboardLayout>
+    <DashboardLayout role="student">
 
       <h1
         className="

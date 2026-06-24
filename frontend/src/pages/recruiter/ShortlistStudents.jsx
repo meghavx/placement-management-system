@@ -25,7 +25,7 @@ function ShortlistStudents() {
 
   return (
 
-    <DashboardLayout>
+    <DashboardLayout role="recruiter">
 
       <div className="p-6">
 

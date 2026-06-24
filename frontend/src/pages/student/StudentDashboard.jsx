@@ -46,7 +46,7 @@ function StudentDashboard() {
 
   return (
 
-    <DashboardLayout>
+    <DashboardLayout role="student">
 
       {/* Page Heading */}
 

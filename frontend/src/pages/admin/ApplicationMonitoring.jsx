@@ -18,10 +18,12 @@ Future Features:
 - Application Tracking
 */
 
+import DashboardLayout from "../../layouts/DashboardLayout";
 
 function ApplicationMonitoring() {
 
   return (
+    <DashboardLayout role="admin">
 
     <div className="p-6">
 
@@ -381,6 +383,7 @@ function ApplicationMonitoring() {
 
     </div>
 
+  </DashboardLayout>
   );
 
 }

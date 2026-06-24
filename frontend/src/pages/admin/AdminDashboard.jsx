@@ -9,7 +9,7 @@ function AdminDashboard() {
 
   return (
 
-    <DashboardLayout>
+    <DashboardLayout role="admin">
 
       <div
         className="flex flex-col gap-6"

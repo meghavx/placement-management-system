@@ -21,57 +21,38 @@ Future Features:
 // Import Student Table
 
 import StudentTable from "./StudentTable";
+import DashboardLayout from "../../layouts/DashboardLayout";
 
 
 export default function StudentManagement() {
 
   return (
 
-    <div className="p-6">
+    <DashboardLayout role="admin">
 
-      {/* Page Title */}
+      <div className="p-6">
 
-      <h1
+        {/* Page Title */}
 
-        className="
+        <h1
 
-        text-3xl
+          className="
 
-        font-bold
+          text-3xl
 
-        mb-6
+          font-bold
 
-        "
+          mb-6
 
-      >
+          "
 
-        Student Management
+        >
 
-      </h1>
+          Student Management
 
-      {/* Toolbar */}
+        </h1>
 
-      <div
-
-        className="
-
-        flex
-
-        flex-col
-
-        lg:flex-row
-
-        justify-between
-
-        gap-4
-
-        mb-6
-
-        "
-
-      >
-
-        {/* Left Side */}
+        {/* Toolbar */}
 
         <div
 
@@ -81,135 +62,159 @@ export default function StudentManagement() {
 
           flex-col
 
-          md:flex-row
+          lg:flex-row
+
+          justify-between
 
           gap-4
+
+          mb-6
 
           "
 
         >
 
-          {/* Search Input */}
+          {/* Left Side */}
 
-          <input
-
-            type="text"
-
-            placeholder="Search Student"
+          <div
 
             className="
 
-            border
+            flex
 
-            rounded-lg
+            flex-col
 
-            p-2
+            md:flex-row
 
-            w-full
-
-            md:w-72
-
-            "
-
-          />
-
-          {/* Department Filter */}
-
-          <select
-
-            className="
-
-            border
-
-            rounded-lg
-
-            p-2
-
-            w-full
-
-            md:w-56
+            gap-4
 
             "
 
           >
 
-            <option>
+            {/* Search Input */}
 
-              All Departments
+            <input
 
-            </option>
+              type="text"
 
-            <option>
+              placeholder="Search Student"
 
-              CSE
+              className="
 
-            </option>
+              border
 
-            <option>
+              rounded-lg
 
-              AIML
+              p-2
 
-            </option>
+              w-full
 
-            <option>
+              md:w-72
 
-              ETC
+              "
 
-            </option>
+            />
 
-          </select>
+            {/* Department Filter */}
+
+            <select
+
+              className="
+
+              border
+
+              rounded-lg
+
+              p-2
+
+              w-full
+
+              md:w-56
+
+              "
+
+            >
+
+              <option>
+
+                All Departments
+
+              </option>
+
+              <option>
+
+                CSE
+
+              </option>
+
+              <option>
+
+                AIML
+
+              </option>
+
+              <option>
+
+                ETC
+
+              </option>
+
+            </select>
+
+          </div>
+
+          {/* Add Student Button */}
+
+          <button
+
+            className="
+
+            bg-blue-600
+
+            text-white
+
+            px-4
+
+            py-2
+
+            rounded-lg
+
+            "
+
+          >
+
+            Add Student
+
+          </button>
 
         </div>
 
-        {/* Add Student Button */}
+        {/* Table Container */}
 
-        <button
+        <div
 
           className="
 
-          bg-blue-600
-
-          text-white
-
-          px-4
-
-          py-2
+          bg-white
 
           rounded-lg
+
+          shadow
+
+          p-4
 
           "
 
         >
 
-          Add Student
+          <StudentTable />
 
-        </button>
-
-      </div>
-
-      {/* Table Container */}
-
-      <div
-
-        className="
-
-        bg-white
-
-        rounded-lg
-
-        shadow
-
-        p-4
-
-        "
-
-      >
-
-        <StudentTable />
+        </div>
 
       </div>
 
-    </div>
+    </DashboardLayout>
 
   );
 
