@@ -39,6 +39,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
             var principal = new CustomUserPrincipal(
                     jwt.getUserId(),
+                    jwt.getName(),
                     jwt.getEmail(),
                     null,
                     jwt.getRole()

@@ -16,6 +16,7 @@ import java.util.List;
 public class CustomUserPrincipal implements UserDetails {
 
     private final Long id;
+    private final String fullName;
     private final String email;
     private final String password;
     private final RoleType role;
@@ -23,6 +24,7 @@ public class CustomUserPrincipal implements UserDetails {
     public static CustomUserPrincipal fromUser(User user) {
         return new CustomUserPrincipal(
                 user.getId(),
+                user.getFullName(),
                 user.getEmail(),
                 user.getPassword(),
                 user.getRole()
