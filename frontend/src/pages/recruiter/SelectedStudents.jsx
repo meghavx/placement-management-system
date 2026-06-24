@@ -27,11 +27,11 @@ function SelectedStudents() {
 
     <DashboardLayout role="recruiter">
 
-      <div className="p-6">
+      <div className="p-4 md:p-6">
 
         {/* Page Title */}
 
-        <h1 className="text-3xl font-bold mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold mb-6">
 
           Selected Students
 
@@ -97,8 +97,7 @@ function SelectedStudents() {
 
           <button
 
-            className="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition"
-
+            className="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition w-full lg:w-auto"
           >
 
             Export
@@ -111,7 +110,7 @@ function SelectedStudents() {
 
         <div className="bg-white rounded-lg shadow p-4 overflow-x-auto">
 
-          <table className="w-full">
+          <table className="w-full text-sm md:text-base">
 
             {/* Table Header */}
 
@@ -119,32 +118,30 @@ function SelectedStudents() {
 
               <tr className="border-b text-left">
 
-                <th className="py-3">
+                <th className="py-3 font-semibold">
 
                   Student
 
                 </th>
 
-                <th className="py-3">
+                <th className="py-3 font-semibold">
 
                   Company
 
                 </th>
 
-                <th className="py-3">
+                <th className="py-3 font-semibold">
 
                   Job Role
 
                 </th>
 
-                <th className="py-3">
-
+                <th className="py-3 font-semibold">
                   Package
 
                 </th>
 
-                <th className="py-3">
-
+                <th className="py-3 font-semibold">
                   Actions
 
                 </th>

@@ -120,7 +120,7 @@ function RecruiterDashboard() {
 
           >
 
-            ✅ Shortlisted Students
+            ✅ Selected Students
 
           </button>
 
