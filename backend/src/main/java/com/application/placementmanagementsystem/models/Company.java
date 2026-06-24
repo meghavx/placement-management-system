@@ -1,4 +1,4 @@
-package com.application.placementmanagementsystem.company.model;
+package com.application.placementmanagementsystem.models;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,10 +1,10 @@
-package com.application.placementmanagementsystem.company.controller;
+package com.application.placementmanagementsystem.controllers;
 
 import com.application.placementmanagementsystem.common.ApiResponse;
-import com.application.placementmanagementsystem.company.dtos.CompanyCreateRequest;
-import com.application.placementmanagementsystem.company.dtos.CompanyResponse;
-import com.application.placementmanagementsystem.company.dtos.CompanyUpdateRequest;
-import com.application.placementmanagementsystem.company.service.CompanyService;
+import com.application.placementmanagementsystem.dtos.company.CompanyCreateRequest;
+import com.application.placementmanagementsystem.dtos.company.CompanyResponse;
+import com.application.placementmanagementsystem.dtos.company.CompanyUpdateRequest;
+import com.application.placementmanagementsystem.services.company.CompanyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

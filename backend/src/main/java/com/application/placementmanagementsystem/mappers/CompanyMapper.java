@@ -1,8 +1,8 @@
-package com.application.placementmanagementsystem.company.mapper;
+package com.application.placementmanagementsystem.mappers;
 
-import com.application.placementmanagementsystem.company.dtos.CompanyCreateRequest;
-import com.application.placementmanagementsystem.company.dtos.CompanyResponse;
-import com.application.placementmanagementsystem.company.model.Company;
+import com.application.placementmanagementsystem.dtos.company.CompanyCreateRequest;
+import com.application.placementmanagementsystem.dtos.company.CompanyResponse;
+import com.application.placementmanagementsystem.models.Company;
 import org.springframework.stereotype.Component;
 
 @Component

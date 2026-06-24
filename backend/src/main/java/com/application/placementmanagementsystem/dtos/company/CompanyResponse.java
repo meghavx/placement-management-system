@@ -1,4 +1,4 @@
-package com.application.placementmanagementsystem.company.dtos;
+package com.application.placementmanagementsystem.dtos.company;
 
 import lombok.Builder;
 import lombok.Data;

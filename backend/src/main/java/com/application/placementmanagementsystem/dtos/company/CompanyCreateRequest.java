@@ -1,4 +1,4 @@
-package com.application.placementmanagementsystem.company.dtos;
+package com.application.placementmanagementsystem.dtos.company;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

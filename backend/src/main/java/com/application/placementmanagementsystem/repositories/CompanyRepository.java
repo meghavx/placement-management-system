@@ -1,6 +1,6 @@
-package com.application.placementmanagementsystem.company.repository;
+package com.application.placementmanagementsystem.repositories;
 
-import com.application.placementmanagementsystem.company.model.Company;
+import com.application.placementmanagementsystem.models.Company;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

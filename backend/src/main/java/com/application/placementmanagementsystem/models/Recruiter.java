@@ -1,6 +1,5 @@
 package com.application.placementmanagementsystem.models;
 
-import com.application.placementmanagementsystem.company.model.Company;
 import jakarta.persistence.*;
 import lombok.*;
 
