@@ -29,48 +29,21 @@ function CreateDrive() {
 
     <DashboardLayout>
 
-      <div className="p-6">
+      {/* Main Page Container */}
+
+      <div className="p-4 md:p-6">
 
         {/* Page Title */}
 
-        <h1
-
-          className="
-
-          text-3xl
-
-          font-bold
-
-          mb-8
-
-          "
-
-        >
+        <h1 className="text-2xl md:text-3xl font-bold mb-8">
 
           Create Placement Drive
 
         </h1>
 
+        {/* Main Form Container */}
 
-        {/* Main Form */}
-
-        <div
-
-          className="
-
-          bg-white
-
-          rounded-lg
-
-          shadow
-
-          p-6
-
-          max-w-3xl
-
-          "
-
-        >
+        <div className="w-full max-w-3xl bg-white rounded-lg shadow p-4 md:p-6">
 
           {/* Company Name */}
 
@@ -88,17 +61,7 @@ function CreateDrive() {
 
               placeholder="Enter Company Name"
 
-              className="
-
-              border
-
-              rounded-lg
-
-              p-3
-
-              w-full
-
-              "
+              className="border rounded-lg p-3 w-full"
 
             />
 
@@ -121,17 +84,7 @@ function CreateDrive() {
 
               placeholder="Enter Job Role"
 
-              className="
-
-              border
-
-              rounded-lg
-
-              p-3
-
-              w-full
-
-              "
+              className="border rounded-lg p-3 w-full"
 
             />
 
@@ -154,17 +107,7 @@ function CreateDrive() {
 
               placeholder="Enter Package"
 
-              className="
-
-              border
-
-              rounded-lg
-
-              p-3
-
-              w-full
-
-              "
+              className="border rounded-lg p-3 w-full"
 
             />
 
@@ -187,24 +130,14 @@ function CreateDrive() {
 
               placeholder="Enter Location"
 
-              className="
-
-              border
-
-              rounded-lg
-
-              p-3
-
-              w-full
-
-              "
+              className="border rounded-lg p-3 w-full"
 
             />
 
           </div>
 
 
-          {/* Deadline */}
+          {/* Application Deadline */}
 
           <div className="mb-8">
 
@@ -218,17 +151,7 @@ function CreateDrive() {
 
               type="date"
 
-              className="
-
-              border
-
-              rounded-lg
-
-              p-3
-
-              w-full
-
-              "
+              className="border rounded-lg p-3 w-full"
 
             />
 
@@ -237,29 +160,13 @@ function CreateDrive() {
 
           {/* Buttons */}
 
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
 
-            {/* Create */}
+            {/* Create Button */}
 
             <button
 
-              className="
-
-              bg-green-600
-
-              text-white
-
-              px-4
-
-              py-2
-
-              rounded-lg
-
-              hover:bg-green-700
-
-              transition
-
-              "
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition w-full sm:w-auto"
 
             >
 
@@ -268,27 +175,11 @@ function CreateDrive() {
             </button>
 
 
-            {/* Reset */}
+            {/* Reset Button */}
 
             <button
 
-              className="
-
-              bg-gray-500
-
-              text-white
-
-              px-4
-
-              py-2
-
-              rounded-lg
-
-              hover:bg-gray-600
-
-              transition
-
-              "
+              className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition w-full sm:w-auto"
 
             >
 

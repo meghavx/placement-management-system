@@ -27,12 +27,11 @@ function ShortlistStudents() {
 
     <DashboardLayout>
 
-      <div className="p-6">
+      <div className="p-4 md:p-6">
 
         {/* Page Title */}
 
-        <h1 className="text-3xl font-bold mb-6">
-
+        <h1 className="text-2xl md:text-3xl font-bold mb-6">
           Shortlist Students
 
         </h1>
@@ -97,8 +96,7 @@ function ShortlistStudents() {
 
           <button
 
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
-
+            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition w-full lg:w-auto"
           >
 
             Shortlist
@@ -111,33 +109,32 @@ function ShortlistStudents() {
 
         <div className="bg-white rounded-lg shadow p-4 overflow-x-auto">
 
-          <table className="w-full">
-
+          <table className="w-full text-sm md:text-base">
             {/* Table Header */}
 
             <thead>
 
               <tr className="border-b text-left">
 
-                <th className="py-3">
+                <th className="py-3 font-semibold">
 
                   Student
 
                 </th>
 
-                <th className="py-3">
+                <th className="py-3 font-semibold">
 
                   Department
 
                 </th>
 
-                <th className="py-3">
+                <th className="py-3 font-semibold">
 
                   CGPA
 
                 </th>
 
-                <th className="py-3">
+                <th className="py-3 font-semibold">
 
                   Actions
 

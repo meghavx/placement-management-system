@@ -33,15 +33,7 @@ export default function CompanyManagement() {
 
       <h1
 
-        className="
-
-        text-3xl
-
-        font-bold
-
-        mb-6
-
-        "
+        className="text-3xl font-bold mb-6"
 
       >
 
@@ -53,21 +45,7 @@ export default function CompanyManagement() {
 
       <div
 
-        className="
-
-        flex
-
-        flex-col
-
-        lg:flex-row
-
-        justify-between
-
-        gap-4
-
-        mb-6
-
-        "
+        className="flex flex-col lg:flex-row justify-between gap-4 mb-6"
 
       >
 
@@ -75,17 +53,7 @@ export default function CompanyManagement() {
 
         <div
 
-          className="
-
-          flex
-
-          flex-col
-
-          md:flex-row
-
-          gap-4
-
-          "
+          className="flex flex-col md:flex-row gap-4"
 
         >
 
@@ -97,19 +65,7 @@ export default function CompanyManagement() {
 
             placeholder="Search Company"
 
-            className="
-
-            border
-
-            rounded-lg
-
-            p-2
-
-            w-full
-
-            md:w-72
-
-            "
+            className="border rounded-lg p-2 w-full md:w-72"
 
           />
 
@@ -117,19 +73,7 @@ export default function CompanyManagement() {
 
           <select
 
-            className="
-
-            border
-
-            rounded-lg
-
-            p-2
-
-            w-full
-
-            md:w-56
-
-            "
+            className="border rounded-lg p-2 w-full md:w-56"
 
           >
 
@@ -165,25 +109,7 @@ export default function CompanyManagement() {
 
         <button
 
-          className="
-
-          bg-purple-600
-
-          text-white
-
-          px-4
-
-          py-2
-
-          rounded-lg
-
-          hover:bg-purple-700
-
-          transition
-
-          duration-300
-
-          "
+          className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition duration-300"
 
         >
 
@@ -197,17 +123,7 @@ export default function CompanyManagement() {
 
       <div
 
-        className="
-
-        bg-white
-
-        rounded-lg
-
-        shadow
-
-        p-4
-
-        "
+        className="bg-white rounded-lg shadow p-4"
 
       >
 

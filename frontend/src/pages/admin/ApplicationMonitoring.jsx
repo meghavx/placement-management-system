@@ -29,15 +29,7 @@ function ApplicationMonitoring() {
 
       <h1
 
-        className="
-
-        text-3xl
-
-        font-bold
-
-        mb-6
-
-        "
+        className=" text-3xl font-bold mb-6"
 
       >
 
@@ -49,21 +41,7 @@ function ApplicationMonitoring() {
 
       <div
 
-        className="
-
-        flex
-
-        flex-col
-
-        lg:flex-row
-
-        justify-between
-
-        gap-4
-
-        mb-6
-
-        "
+        className=" flex flex-col lg:flex-row justify-between gap-4 mb-6"
 
       >
 
@@ -71,17 +49,7 @@ function ApplicationMonitoring() {
 
         <div
 
-          className="
-
-          flex
-
-          flex-col
-
-          md:flex-row
-
-          gap-4
-
-          "
+          className="flex flex-col md:flex-row gap-4"
 
         >
 
@@ -93,19 +61,7 @@ function ApplicationMonitoring() {
 
             placeholder="Search Student"
 
-            className="
-
-            border
-
-            rounded-lg
-
-            p-2
-
-            w-full
-
-            md:w-72
-
-            "
+            className="border rounded-lg p-2 w-full md:w-72"
 
           />
 
@@ -113,19 +69,7 @@ function ApplicationMonitoring() {
 
           <select
 
-            className="
-
-            border
-
-            rounded-lg
-
-            p-2
-
-            w-full
-
-            md:w-56
-
-            "
+            className="border rounded-lg p-2 w-full md:w-56"
 
           >
 
@@ -161,25 +105,7 @@ function ApplicationMonitoring() {
 
         <button
 
-          className="
-
-          bg-cyan-600
-
-          text-white
-
-          px-4
-
-          py-2
-
-          rounded-lg
-
-          hover:bg-cyan-700
-
-          transition
-
-          duration-300
-
-          "
+          className="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 transition duration-300"
 
         >
 
@@ -193,19 +119,7 @@ function ApplicationMonitoring() {
 
       <div
 
-        className="
-
-        bg-white
-
-        rounded-lg
-
-        shadow
-
-        p-4
-
-        overflow-x-auto
-
-        "
+        className="bg-white rounded-lg shadow p-4 overflow-x-auto"
 
       >
 
@@ -217,13 +131,7 @@ function ApplicationMonitoring() {
 
             <tr
 
-              className="
-
-              border-b
-
-              text-left
-
-              "
+              className="border-b text-left"
 
             >
 
@@ -295,19 +203,7 @@ function ApplicationMonitoring() {
 
                 <button
 
-                  className="
-
-                  bg-blue-600
-
-                  text-white
-
-                  px-3
-
-                  py-1
-
-                  rounded
-
-                  "
+                  className="bg-blue-600 text-white px-3 py-1 rounded"
 
                 >
 
@@ -349,19 +245,7 @@ function ApplicationMonitoring() {
 
                 <button
 
-                  className="
-
-                  bg-blue-600
-
-                  text-white
-
-                  px-3
-
-                  py-1
-
-                  rounded
-
-                  "
+                  className="bg-blue-600 text-white px-3 py-1 rounded"
 
                 >
 
