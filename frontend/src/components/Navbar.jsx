@@ -13,7 +13,7 @@ Future Features:
 - Logout
 */
 
-function Navbar() {
+function Navbar({ toggleSidebar }) {
 
   return (
 
@@ -32,15 +32,29 @@ function Navbar() {
         flex
         justify-between
         items-center
+        gap-4
         "
       >
+        {/* Mobile Hamburger Button */}
+
+        <button
+          onClick={toggleSidebar}
+          className="
+          md:hidden
+          text-2xl
+          cursor-pointer
+          "
+        >
+          ☰
+        </button>
 
         {/* Project Title */}
         <h1
           className="
-          text-base
+          text-sm
           md:text-xl
           font-bold
+          whitespace-nowrap
           "
         >
           Placement Management System
@@ -51,6 +65,7 @@ function Navbar() {
           className="
           text-sm
           md:text-base
+          whitespace-nowrap
           "
         >
           Welcome User

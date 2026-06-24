@@ -14,7 +14,7 @@ Used By:
 
 import { NavLink, useNavigate } from "react-router-dom";
 
-function StudentSidebar() {
+function StudentSidebar({ isSidebarOpen }) {
 
   const navigate = useNavigate();
 
@@ -28,15 +28,32 @@ function StudentSidebar() {
   return (
 
     <aside
-      className="
-      w-56
-      bg-gray-100
-      p-4
-      flex
-      flex-col
-      min-h-screen
-      shrink-0
-      "
+      className={`
+        bg-gray-100
+        p-4
+        flex
+        flex-col
+        h-[calc(100vh-64px)]
+        shrink-0
+        w-56
+
+        fixed
+        md:static
+
+        top-16
+        left-0
+
+        z-50
+
+        transition-transform
+        duration-300
+
+        ${
+          isSidebarOpen
+            ? "translate-x-0"
+            : "-translate-x-full md:translate-x-0"
+        }
+      `}
     >
 
       <ul

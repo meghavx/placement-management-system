@@ -22,29 +22,46 @@ import StudentSidebar from "../components/StudentSidebar";
 import AdminSidebar from "../components/AdminSidebar";
 import RecruiterSidebar from "../components/RecruiterSidebar";
 
+import { useState } from "react";
+
 function DashboardLayout({ role, children }) {
 
 
-
+  // Controls mobile sidebar visibility.
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  
   // Selects sidebar based on role.
 
   let sidebar;
 
   if (role === "student") {
 
-    sidebar = <StudentSidebar />;
+    sidebar = (
+      <StudentSidebar
+        isSidebarOpen={isSidebarOpen}
+      />
+    );
 
   }
 
   else if (role === "admin") {
 
-    sidebar = <AdminSidebar />;
+    sidebar = (
+      <AdminSidebar
+        isSidebarOpen={isSidebarOpen}
+      />
+    );
 
   }
 
   else if (role === "recruiter") {
 
-    sidebar = <RecruiterSidebar />;
+    sidebar = (
+      <RecruiterSidebar
+        isSidebarOpen={isSidebarOpen}
+      />
+    );
 
   }
 
@@ -57,7 +74,11 @@ function DashboardLayout({ role, children }) {
     >
 
       {/* Top Navbar */}
-      <Navbar />
+      <Navbar
+        toggleSidebar={() =>
+          setIsSidebarOpen(!isSidebarOpen)
+        }
+      />
 
       <div
         className="
