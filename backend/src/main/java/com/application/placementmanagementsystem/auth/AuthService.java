@@ -57,13 +57,9 @@ public class AuthService {
                 .build();
     }
 
+    // Mostly symbolic in a stateless JWT setup since
+    // the token itself remains valid until it expires.
     public void logout() {
-        /*
-         * JWT authentication is stateless so the server does not maintain any session
-         * information. Clearing the SecurityContext affects only the current request.
-         *
-         * So, logout is effectively handled on the client-side by removing the stored token.
-         */
         SecurityContextHolder.clearContext();
     }
 }
