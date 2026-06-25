@@ -11,7 +11,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "placement_drives")
+@Table(
+        name = "placement_drives",
+        indexes = {
+                @Index(
+                        name = "idx_drive_status_date",
+                        columnList = "status, drive_date"
+                )
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor
