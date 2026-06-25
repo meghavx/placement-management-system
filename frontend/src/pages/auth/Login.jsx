@@ -5,124 +5,149 @@ Current Dummy Login Page.
 
 Right now:
 
-Takes User ID
-Takes Password
-Takes Role
-Redirects based on selected role
+- Takes User ID
+- Takes Password
+- Takes Role
+- Redirects based on selected role
 
 No backend integration yet.
 */
 
-
-
 // Import useState hook
-// Used to store the selected role
 import { useState } from "react";
 
 // Import useNavigate hook
-// Used for page navigation
 import { useNavigate } from "react-router-dom";
 
 function Login() {
 
-  // Creates a navigate function
-  // Example:
-  // navigate("/student")
+  // Navigation hook
   const navigate = useNavigate();
 
-  // role variable stores:
-  // student
-  // admin
-  // recruiter
+  // Stores selected role
   const [role, setRole] = useState("");
 
-  // Runs when Login button is clicked
+  // Login Handler
   const handleLogin = () => {
 
-    // Prevent login without selecting role
-    if(role === ""){
-        alert("Please select a role");
-        return;
+    if (role === "") {
+      alert("Please select a role");
+      return;
     }
 
-    // If student selected
-    if(role === "student"){
+    if (role === "student") {
       navigate("/student");
     }
 
-    // If admin selected
-    if(role === "admin"){
+    if (role === "admin") {
       navigate("/admin");
     }
 
-    // If recruiter selected
-    if(role === "recruiter"){
+    if (role === "recruiter") {
       navigate("/recruiter");
     }
+
   };
 
   return (
 
-    // Full screen container
-    // flex-col -> place items vertically
-    // items-center -> center horizontally
-    // justify-center -> center vertically
-    // min-h-screen -> take full screen height
-    <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
 
-      {/* Main heading */}
-      <h1 className="text-3xl font-bold">
-        Placement Management System
-      </h1>
+      {/* Login Card */}
 
-      {/* User ID input */}
-      <input
-        type="text"
-        placeholder="User ID"
-        className="border p-2 rounded"
-      />
+      <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md">
 
-      {/* Password input */}
-      <input
-        type="password"
-        placeholder="Password"
-        className="border p-2 rounded"
-      />
+        {/* Heading */}
 
-      {/* Role dropdown */}
-      <select
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
-        className="border p-2 rounded"
-      >
-        <option value="">
-          Select Role
-        </option>
+        <h1 className="text-3xl font-bold text-center mb-2">
 
-        <option value="student">
-          Student
-        </option>
+          🎓 Placement Management System
 
-        <option value="admin">
-          Placement Admin
-        </option>
+        </h1>
 
-        <option value="recruiter">
-          Recruiter
-        </option>
+        {/* Subtitle */}
 
-      </select>
+        <p className="text-gray-500 text-center mb-8">
 
-      {/* Login button */}
-      <button
-        onClick={handleLogin}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-      >
-        Login
-      </button>
+          Campus Recruitment Portal
+
+        </p>
+
+        {/* Form */}
+
+        <div className="space-y-4">
+
+          {/* User ID */}
+
+          <input
+            type="text"
+            placeholder="User ID"
+            className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+
+          {/* Password */}
+
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+
+          {/* Role */}
+
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+
+            <option value="">
+              Select Role
+            </option>
+
+            
+
+            <option value="admin">
+              Placement Admin
+            </option>
+
+            <option value="recruiter">
+              Recruiter
+            </option>
+
+            <option value="student">
+              Student
+            </option>
+
+          </select>
+
+          {/* Login Button */}
+
+          <button
+            onClick={handleLogin}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+          >
+
+            Login
+
+          </button>
+
+        </div>
+
+        {/* Footer */}
+
+        <p className="text-xs text-gray-400 text-center mt-8">
+
+          © 2026 Placement Management System
+
+        </p>
+
+      </div>
 
     </div>
+
   );
+
 }
 
 export default Login;
