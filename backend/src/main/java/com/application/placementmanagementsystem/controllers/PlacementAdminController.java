@@ -56,10 +56,10 @@ public class PlacementAdminController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<ApiResponse<PlacementAdminResponse>> updatePlacementAdminStatus(
             @PathVariable Long id,
-            @RequestParam boolean status
+            @RequestParam boolean active
     ) {
-        PlacementAdminResponse placementAdmin = placementAdminService.updatePlacementAdminStatus(id, status);
-        String statusMessage = status ? "activated" : "deactivated";
+        PlacementAdminResponse placementAdmin = placementAdminService.updatePlacementAdminStatus(id, active);
+        String statusMessage = active ? "activated" : "deactivated";
         return ResponseEntity.ok(
                 ApiResponse.<PlacementAdminResponse>builder()
                         .success(true)

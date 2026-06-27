@@ -15,4 +15,6 @@ public interface CompanyService {
     CompanyResponse getCompanyById(Long id);
 
     List<CompanyResponse> getAllCompanies();
+
+    CompanyResponse updateCompanyStatus(Long id, boolean active);
 }
