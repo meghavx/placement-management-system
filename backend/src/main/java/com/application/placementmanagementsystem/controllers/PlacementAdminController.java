@@ -1,6 +1,7 @@
 package com.application.placementmanagementsystem.controllers;
 
 import com.application.placementmanagementsystem.common.ApiResponse;
+import com.application.placementmanagementsystem.common.ResponseBuilder;
 import com.application.placementmanagementsystem.dtos.placementAdmin.CreatePlacementAdminRequest;
 import com.application.placementmanagementsystem.dtos.placementAdmin.PlacementAdminResponse;
 import com.application.placementmanagementsystem.dtos.placementAdmin.UpdatePlacementAdminRequest;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -28,12 +28,10 @@ public class PlacementAdminController {
     ) {
         PlacementAdminResponse response = placementAdminService.createPlacementAdmin(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.<PlacementAdminResponse>builder()
-                        .success(true)
-                        .message("Placement Admin created successfully")
-                        .data(response)
-                        .timestamp(LocalDateTime.now())
-                        .build()
+                ResponseBuilder.success(
+                        "Placement Admin created successfully",
+                        response
+                )
         );
     }
 
@@ -44,12 +42,10 @@ public class PlacementAdminController {
     ) {
         PlacementAdminResponse response = placementAdminService.updatePlacementAdmin(id, request);
         return ResponseEntity.ok(
-                ApiResponse.<PlacementAdminResponse>builder()
-                        .success(true)
-                        .message("Placement Admin details updated")
-                        .data(response)
-                        .timestamp(LocalDateTime.now())
-                        .build()
+                ResponseBuilder.success(
+                        "Placement Admin details updated",
+                        response
+                )
         );
     }
 
@@ -58,28 +54,26 @@ public class PlacementAdminController {
             @PathVariable Long id,
             @RequestParam boolean active
     ) {
-        PlacementAdminResponse placementAdmin = placementAdminService.updatePlacementAdminStatus(id, active);
+        PlacementAdminResponse response = placementAdminService.updatePlacementAdminStatus(id, active);
         String statusMessage = active ? "activated" : "deactivated";
         return ResponseEntity.ok(
-                ApiResponse.<PlacementAdminResponse>builder()
-                        .success(true)
-                        .message("Placement Admin " + statusMessage + " successfully")
-                        .data(placementAdmin)
-                        .timestamp(LocalDateTime.now())
-                        .build()
+                ResponseBuilder.success(
+                        "Placement Admin " + statusMessage + " successfully",
+                        response
+                )
         );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<PlacementAdminResponse>> getPlacementAdminById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<PlacementAdminResponse>> getPlacementAdminById(
+            @PathVariable Long id
+    ) {
         PlacementAdminResponse response = placementAdminService.getPlacementAdminById(id);
         return ResponseEntity.ok(
-                ApiResponse.<PlacementAdminResponse>builder()
-                        .success(true)
-                        .message("Placement Admin fetched successfully")
-                        .data(response)
-                        .timestamp(LocalDateTime.now())
-                        .build()
+                ResponseBuilder.success(
+                        "Placement Admin fetched successfully",
+                        response
+                )
         );
     }
 
@@ -87,12 +81,10 @@ public class PlacementAdminController {
     public ResponseEntity<ApiResponse<List<PlacementAdminResponse>>> getAllPlacementAdmins() {
         List<PlacementAdminResponse> response = placementAdminService.getAllPlacementAdmins();
         return ResponseEntity.ok(
-                ApiResponse.<List<PlacementAdminResponse>>builder()
-                        .success(true)
-                        .message("Placement Admins fetched successfully")
-                        .data(response)
-                        .timestamp(LocalDateTime.now())
-                        .build()
+                ResponseBuilder.success(
+                        "Placement Admins fetched successfully",
+                        response
+                )
         );
     }
 }
