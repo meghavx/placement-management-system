@@ -6,6 +6,8 @@ import com.application.placementmanagementsystem.dtos.placementAdmin.CreatePlace
 import com.application.placementmanagementsystem.dtos.placementAdmin.PlacementAdminResponse;
 import com.application.placementmanagementsystem.dtos.placementAdmin.UpdatePlacementAdminRequest;
 import com.application.placementmanagementsystem.services.placementAdmin.PlacementAdminService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,10 +21,12 @@ import java.util.List;
 @RequestMapping("/api/admin/placement-admins")
 @PreAuthorize("hasRole('SUPER_ADMIN')")
 @RequiredArgsConstructor
+@Tag(name = "Placement Admin Management")
 public class PlacementAdminController {
     private final PlacementAdminService placementAdminService;
 
     @PostMapping
+    @Operation(summary = "Add Placement Admin")
     public ResponseEntity<ApiResponse<PlacementAdminResponse>> createPlacementAdmin(
             @Valid @RequestBody CreatePlacementAdminRequest request
     ) {
@@ -36,6 +40,7 @@ public class PlacementAdminController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update Placement Admin")
     public ResponseEntity<ApiResponse<PlacementAdminResponse>> updatePlacementAdmin(
             @PathVariable Long id,
             @Valid @RequestBody UpdatePlacementAdminRequest request
@@ -50,6 +55,7 @@ public class PlacementAdminController {
     }
 
     @PatchMapping("/{id}/status")
+    @Operation(summary = "Activate/Deactivate Placement Admin")
     public ResponseEntity<ApiResponse<PlacementAdminResponse>> updatePlacementAdminStatus(
             @PathVariable Long id,
             @RequestParam boolean active
@@ -65,6 +71,7 @@ public class PlacementAdminController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get Placement Admin by ID")
     public ResponseEntity<ApiResponse<PlacementAdminResponse>> getPlacementAdminById(
             @PathVariable Long id
     ) {
@@ -78,6 +85,7 @@ public class PlacementAdminController {
     }
 
     @GetMapping
+    @Operation(summary = "Get All Placement Admins")
     public ResponseEntity<ApiResponse<List<PlacementAdminResponse>>> getAllPlacementAdmins() {
         List<PlacementAdminResponse> response = placementAdminService.getAllPlacementAdmins();
         return ResponseEntity.ok(

@@ -6,6 +6,8 @@ import com.application.placementmanagementsystem.dtos.company.CompanyCreateReque
 import com.application.placementmanagementsystem.dtos.company.CompanyResponse;
 import com.application.placementmanagementsystem.dtos.company.CompanyUpdateRequest;
 import com.application.placementmanagementsystem.services.company.CompanyService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,11 +21,13 @@ import java.util.List;
 @RequestMapping("/api/companies")
 @PreAuthorize("hasRole('PLACEMENT_ADMIN')")
 @RequiredArgsConstructor
+@Tag(name = "Company Management")
 public class CompanyController {
 
     private final CompanyService companyService;
 
     @PostMapping
+    @Operation(summary = "Add Company")
     public ResponseEntity<ApiResponse<CompanyResponse>> createCompany(
             @Valid @RequestBody CompanyCreateRequest request
     ) {
@@ -37,6 +41,7 @@ public class CompanyController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update Company")
     public ResponseEntity<ApiResponse<CompanyResponse>> updateCompany(
             @PathVariable Long id,
             @Valid @RequestBody CompanyUpdateRequest request
@@ -51,6 +56,7 @@ public class CompanyController {
     }
 
     @PatchMapping("/{id}/status")
+    @Operation(summary = "Activate/Deactivate Company")
     public ResponseEntity<ApiResponse<CompanyResponse>> updateCompanyStatus(
             @PathVariable Long id,
             @RequestParam boolean active
@@ -66,6 +72,7 @@ public class CompanyController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get Company by ID")
     public ResponseEntity<ApiResponse<CompanyResponse>> getCompanyById(
             @PathVariable Long id
     ) {
@@ -79,6 +86,7 @@ public class CompanyController {
     }
 
     @GetMapping
+    @Operation(summary = "Get All Companies")
     public ResponseEntity<ApiResponse<List<CompanyResponse>>> getAllCompanies() {
         List<CompanyResponse> response = companyService.getAllCompanies();
         return ResponseEntity.ok(
