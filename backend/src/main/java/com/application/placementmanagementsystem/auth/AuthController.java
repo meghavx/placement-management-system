@@ -1,5 +1,6 @@
 package com.application.placementmanagementsystem.auth;
 
+import com.application.placementmanagementsystem.auth.dtos.ChangePasswordRequest;
 import com.application.placementmanagementsystem.auth.dtos.CurrentUserResponse;
 import com.application.placementmanagementsystem.auth.dtos.LoginRequest;
 import com.application.placementmanagementsystem.auth.dtos.LoginResponse;
@@ -21,7 +22,9 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(summary = "Login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse<LoginResponse>> login(
+            @Valid @RequestBody LoginRequest request
+    ) {
         LoginResponse response = authService.login(request);
         return ResponseEntity.ok(
                 ResponseBuilder.success(
@@ -39,6 +42,19 @@ public class AuthController {
                 ResponseBuilder.success(
                         "Current user fetched successfully",
                         response
+                )
+        );
+    }
+
+    @PatchMapping("/change-password")
+    @Operation(summary = "Change Password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request
+    ) {
+        authService.changePassword(request);
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "Password changed successfully"
                 )
         );
     }
