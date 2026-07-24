@@ -123,9 +123,9 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public void updateStudentStatus(
+    public StudentResponse updateStudentStatus(
             Long studentId,
-            StudentStatusRequest request
+            boolean active
     ) {
 
         Student student = studentRepository.findById(studentId)
@@ -136,7 +136,7 @@ public class StudentServiceImpl implements StudentService {
 
         User user = student.getUser();
 
-        user.setActive(request.getActive());
+        user.setActive(active);
 
         userRepository.save(user);
     }

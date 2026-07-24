@@ -17,8 +17,8 @@ public interface StudentService {
 
     List<StudentResponse> getAllStudents();
 
-    void updateStudentStatus(
+    StudentResponse updateStudentStatus(
             Long studentId,
-            StudentStatusRequest request
+            boolean active
     );
 }
