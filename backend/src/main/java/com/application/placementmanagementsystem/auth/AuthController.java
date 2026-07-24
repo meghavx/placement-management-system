@@ -1,58 +1,72 @@
 package com.application.placementmanagementsystem.auth;
 
+import com.application.placementmanagementsystem.auth.dtos.ChangePasswordRequest;
 import com.application.placementmanagementsystem.auth.dtos.CurrentUserResponse;
 import com.application.placementmanagementsystem.auth.dtos.LoginRequest;
 import com.application.placementmanagementsystem.auth.dtos.LoginResponse;
 import com.application.placementmanagementsystem.common.ApiResponse;
+import com.application.placementmanagementsystem.common.ResponseBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Authentication and Authorization")
 public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
+    @Operation(summary = "Login")
+    public ResponseEntity<ApiResponse<LoginResponse>> login(
+            @Valid @RequestBody LoginRequest request
+    ) {
         LoginResponse response = authService.login(request);
         return ResponseEntity.ok(
-                ApiResponse.<LoginResponse>builder()
-                        .success(true)
-                        .message("Login successful")
-                        .data(response)
-                        .timestamp(LocalDateTime.now())
-                        .build()
+                ResponseBuilder.success(
+                        "Login successful",
+                        response
+                )
         );
     }
 
     @GetMapping("/me")
+    @Operation(summary = "Get Current User Details")
     public ResponseEntity<ApiResponse<CurrentUserResponse>> getCurrentUser() {
         CurrentUserResponse response = authService.getCurrentUser();
         return ResponseEntity.ok(
-                ApiResponse.<CurrentUserResponse>builder()
-                        .success(true)
-                        .message("Current user fetched successfully")
-                        .data(response)
-                        .timestamp(LocalDateTime.now())
-                        .build()
+                ResponseBuilder.success(
+                        "Current user fetched successfully",
+                        response
+                )
+        );
+    }
+
+    @PatchMapping("/change-password")
+    @Operation(summary = "Change Password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request
+    ) {
+        authService.changePassword(request);
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "Password changed successfully"
+                )
         );
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "Logout")
     public ResponseEntity<ApiResponse<Void>> logout() {
         authService.logout();
         return ResponseEntity.ok(
-                ApiResponse.<Void>builder()
-                        .success(true)
-                        .message("Logout successful")
-                        .data(null)
-                        .timestamp(LocalDateTime.now())
-                        .build()
+                ResponseBuilder.success(
+                        "Logout successful"
+                )
         );
     }
 }

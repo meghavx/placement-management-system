@@ -42,6 +42,9 @@ public class Company {
     @Column(nullable = false)
     private String industry;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

@@ -9,6 +9,18 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-  jwt:
-    secret: ${JWT_SECRET}
-    access-token-expiration: 86_400_000   # Time in ms == 24 hours
+
+springdoc:
+  swagger-ui:
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: 86_400_000   # Time in ms == 24 hours
+
+app:
+  super-admin:
+    name: ${SUPER_ADMIN_NAME}
+    email: ${SUPER_ADMIN_EMAIL}
+    password: ${SUPER_ADMIN_PASSWORD}

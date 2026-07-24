@@ -64,6 +64,20 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    public CompanyResponse updateCompanyStatus(Long id, boolean active) {
+        Company company = companyRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Company with id = " + id + " not found"
+                        )
+                );
+        company.setActive(active);
+        Company updatedCompany = companyRepository.save(company);
+        return companyMapper.toResponse(updatedCompany);
+    }
+
+    @Override
     public CompanyResponse getCompanyById(Long id) {
 
         Company company = companyRepository.findById(id)
@@ -82,5 +96,4 @@ public class CompanyServiceImpl implements CompanyService {
                 .map(companyMapper::toResponse)
                 .toList();
     }
-
 }
