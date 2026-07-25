@@ -3,22 +3,24 @@ package com.application.placementmanagementsystem.dtos.company;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import org.hibernate.validator.constraints.URL;
 
 @Data
 public class CompanyCreateRequest {
 
     @NotBlank(message = "Company name is required")
+    @Size(max = 255)
     private String companyName;
 
     @NotBlank(message = "Industry is required")
+    @Size(max = 255)
     private String industry;
 
     @NotBlank(message = "Website is required")
-    @URL(message = "Invalid website URL")
+    @Size(max = 255)
     private String website;
 
     @NotBlank(message = "Location is required")
+    @Size(max = 255)
     private String location;
 
     private String description;
