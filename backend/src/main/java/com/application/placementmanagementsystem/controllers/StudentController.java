@@ -3,7 +3,6 @@ package com.application.placementmanagementsystem.controllers;
 import com.application.placementmanagementsystem.common.ResponseBuilder;
 import com.application.placementmanagementsystem.dtos.student.StudentCreateRequest;
 import com.application.placementmanagementsystem.dtos.student.StudentResponse;
-import com.application.placementmanagementsystem.dtos.student.StudentStatusRequest;
 import com.application.placementmanagementsystem.dtos.student.StudentUpdateRequest;
 import com.application.placementmanagementsystem.services.student.StudentService;
 import com.application.placementmanagementsystem.common.ApiResponse;

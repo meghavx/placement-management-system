@@ -127,7 +127,6 @@ public class StudentServiceImpl implements StudentService {
             Long studentId,
             boolean active
     ) {
-
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
@@ -139,5 +138,7 @@ public class StudentServiceImpl implements StudentService {
         user.setActive(active);
 
         userRepository.save(user);
+
+        return studentMapper.toResponse(student);
     }
 }

@@ -27,7 +27,7 @@ public class StudentCreateRequest {
     @NotBlank(message = "Roll number is required")
     private String rollNumber;
 
-    @NotBlank(message = "Department is required")
+    @NotNull(message = "Department is required")
     private Department department;
 
     @NotNull(message = "Graduation year is required")
