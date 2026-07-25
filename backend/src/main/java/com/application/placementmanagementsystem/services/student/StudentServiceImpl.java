@@ -2,7 +2,6 @@ package com.application.placementmanagementsystem.services.student;
 
 import com.application.placementmanagementsystem.dtos.student.StudentCreateRequest;
 import com.application.placementmanagementsystem.dtos.student.StudentResponse;
-import com.application.placementmanagementsystem.dtos.student.StudentStatusRequest;
 import com.application.placementmanagementsystem.dtos.student.StudentUpdateRequest;
 import com.application.placementmanagementsystem.exceptions.DuplicateResourceException;
 import com.application.placementmanagementsystem.exceptions.ResourceNotFoundException;
