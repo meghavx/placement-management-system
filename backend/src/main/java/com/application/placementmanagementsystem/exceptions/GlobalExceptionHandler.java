@@ -4,6 +4,7 @@ import com.application.placementmanagementsystem.common.ApiResponse;
 import com.application.placementmanagementsystem.common.ResponseBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -24,6 +25,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleUsernameNotFound(UsernameNotFoundException ex) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
+                .body(ResponseBuilder.failure(ex.getMessage()));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
                 .body(ResponseBuilder.failure(ex.getMessage()));
     }
 
@@ -56,18 +64,18 @@ public class GlobalExceptionHandler {
                 .body(ResponseBuilder.failure(ex.getMessage()));
     }
 
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<ApiResponse<Void>> handleMaxUploadSizeExceededException(
-            MaxUploadSizeExceededException ex
-    ) {
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidArgumentException(InvalidRequestException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ResponseBuilder.failure(ex.getMessage()));
+    }
 
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
         return ResponseEntity
                 .badRequest()
-                .body(
-                        ResponseBuilder.failure(
-                                "Maximum allowed file size is 5 MB."
-                        )
-                );
+                .body(ResponseBuilder.failure("Maximum allowed file size is 5 MB."));
     }
 
     @ExceptionHandler(Exception.class)
