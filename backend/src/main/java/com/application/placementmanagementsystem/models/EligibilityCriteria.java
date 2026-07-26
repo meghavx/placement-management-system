@@ -34,7 +34,7 @@ public class EligibilityCriteria {
     @Column(name = "max_backlogs", nullable = false)
     private Integer maxBacklogs;
 
-    @Column(name = "graduation_year")
+    @Column(name = "graduation_year", nullable = false)
     private Integer graduationYear;
 
     @CreationTimestamp
