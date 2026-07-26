@@ -7,7 +7,15 @@ import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "students")
+@Table(
+        name = "students",
+        indexes = {
+                @Index(
+                        name = "idx_student_eligibility",
+                        columnList = "department, cgpa, current_backlogs"
+                )
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor

@@ -8,7 +8,15 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "companies")
+@Table(
+        name = "companies",
+        indexes = {
+                @Index(
+                        name = "idx_company_name",
+                        columnList = "company_name"
+                )
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -33,6 +41,9 @@ public class Company {
 
     @Column(nullable = false)
     private String industry;
+
+    @Column(nullable = false)
+    private boolean active = true;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
