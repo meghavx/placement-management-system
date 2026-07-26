@@ -15,8 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/drives")
-@PreAuthorize("hasRole('SUPER_ADMIN')")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @Tag(name = "Eligibility Criteria Management")
 public class EligibilityCriteriaController {
@@ -24,6 +23,7 @@ public class EligibilityCriteriaController {
     private final EligibilityCriteriaService eligibilityCriteriaService;
 
     @PostMapping("/recruiter/drives/{driveId}/eligibility")
+    @PreAuthorize("hasRole('RECRUITER')")
     @Operation(summary = "Create Eligibility Criteria")
     public ResponseEntity<ApiResponse<EligibilityCriteriaResponse>> createEligibilityCriteria(
             @PathVariable Long driveId,
@@ -40,12 +40,12 @@ public class EligibilityCriteriaController {
     }
 
     @PutMapping("/recruiter/drives/{driveId}/eligibility")
+    @PreAuthorize("hasRole('RECRUITER')")
     @Operation(summary = "Update Eligibility Criteria")
     public ResponseEntity<ApiResponse<EligibilityCriteriaResponse>> updateEligibilityCriteria(
             @PathVariable Long driveId,
             @Valid @RequestBody EligibilityCriteriaRequest request
     ) {
-
         EligibilityCriteriaResponse response =
                 eligibilityCriteriaService.updateEligibilityCriteria(driveId, request);
         return ResponseEntity.ok(
@@ -57,6 +57,7 @@ public class EligibilityCriteriaController {
     }
 
     @GetMapping("/drives/{driveId}/eligibility")
+    @PreAuthorize("hasAnyRole('RECRUITER','PLACEMENT_ADMIN','STUDENT')")
     @Operation(summary = "Get Eligibility Criteria")
     public ResponseEntity<ApiResponse<EligibilityCriteriaResponse>> getEligibilityCriteria(
             @PathVariable Long driveId
