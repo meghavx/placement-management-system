@@ -89,6 +89,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/companies/**")
                         .hasRole("PLACEMENT_ADMIN")
 
+                        .requestMatchers("/api/student/profile/resume/**")
+                        .hasRole("STUDENT")
+
                         .anyRequest()
                         .authenticated()
                 )
