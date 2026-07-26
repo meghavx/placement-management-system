@@ -62,9 +62,9 @@ public class ResumeController {
     @Operation(summary = "Download Resume")
     public ResponseEntity<ByteArrayResource> downloadResume() {
 
-        byte[] file = resumeService.downloadResume();
+        ResumeResponse response = resumeService.getResume();
 
-        String fileName = resumeService.getResume().getFileName();
+        byte[] file = resumeService.downloadResume();
 
         ByteArrayResource resource = new ByteArrayResource(file);
 
@@ -73,7 +73,7 @@ public class ResumeController {
                 .header(
                         HttpHeaders.CONTENT_DISPOSITION,
                         ContentDisposition.attachment()
-                                .filename(fileName)
+                                .filename(response.getFileName())
                                 .build()
                                 .toString()
                 )
