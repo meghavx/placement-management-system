@@ -44,7 +44,7 @@ public class EligibilityCriteriaServiceImpl implements EligibilityCriteriaServic
         Recruiter recruiter = getAuthenticatedRecruiter();
         PlacementDrive placementDrive = getOwnedPlacementDrive(placementDriveId, recruiter.getCompany().getId());
 
-        validateDriveIsOpen(placementDrive);
+        validateDriveIsDraft(placementDrive);
 
         if (eligibilityCriteriaRepository.existsByPlacementDriveId(placementDriveId)) {
             throw new DuplicateResourceException("Eligibility criteria already exists for this placement drive.");
@@ -64,7 +64,7 @@ public class EligibilityCriteriaServiceImpl implements EligibilityCriteriaServic
         Recruiter recruiter = getAuthenticatedRecruiter();
         PlacementDrive placementDrive = getOwnedPlacementDrive(placementDriveId, recruiter.getCompany().getId());
 
-        validateDriveIsOpen(placementDrive);
+        validateDriveIsDraft(placementDrive);
 
         EligibilityCriteria eligibilityCriteria = eligibilityCriteriaRepository
                 .findByPlacementDriveId(placementDriveId)
@@ -144,10 +144,10 @@ public class EligibilityCriteriaServiceImpl implements EligibilityCriteriaServic
                 .orElseThrow(() -> new ResourceNotFoundException(DRIVE_NOT_FOUND));
     }
 
-    private void validateDriveIsOpen(PlacementDrive placementDrive) {
-        if (placementDrive.getStatus() != DriveStatus.OPEN) {
+    private void validateDriveIsDraft(PlacementDrive placementDrive) {
+        if (placementDrive.getStatus() != DriveStatus.DRAFT) {
             throw new InvalidRequestException(
-                    "Eligibility criteria can only be modified for OPEN placement drives."
+                    "Eligibility criteria can only be modified for DRAFT placement drives."
             );
         }
     }

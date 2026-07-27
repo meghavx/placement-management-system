@@ -12,6 +12,7 @@ import com.application.placementmanagementsystem.models.PlacementDrive;
 import com.application.placementmanagementsystem.models.Recruiter;
 import com.application.placementmanagementsystem.models.User;
 import com.application.placementmanagementsystem.models.enums.DriveStatus;
+import com.application.placementmanagementsystem.repositories.EligibilityCriteriaRepository;
 import com.application.placementmanagementsystem.repositories.PlacementDriveRepository;
 import com.application.placementmanagementsystem.repositories.RecruiterRepository;
 import com.application.placementmanagementsystem.repositories.UserRepository;
@@ -29,8 +30,10 @@ import java.util.List;
 public class PlacementDriveServiceImpl implements PlacementDriveService {
 
     private final PlacementDriveRepository placementDriveRepository;
+    private final EligibilityCriteriaRepository eligibilityCriteriaRepository;
     private final RecruiterRepository recruiterRepository;
     private final UserRepository userRepository;
+
     private final PlacementDriveMapper placementDriveMapper;
 
     private static final String DRIVE_NOT_FOUND = "Placement drive not found.";
@@ -51,7 +54,7 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
                 .location(request.getLocation())
                 .applicationDeadline(request.getApplicationDeadline())
                 .driveDate(request.getDriveDate())
-                .status(DriveStatus.OPEN)
+                .status(DriveStatus.DRAFT)
                 .build();
 
         PlacementDrive savedDrive = placementDriveRepository.save(placementDrive);
@@ -66,8 +69,8 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
     ) {
         Recruiter recruiter = getAuthenticatedRecruiter();
         PlacementDrive placementDrive = getOwnedPlacementDrive(driveId, recruiter.getCompany().getId());
-        if (placementDrive.getStatus() != DriveStatus.OPEN) {
-            throw new InvalidRequestException("Only OPEN placement drives can be updated.");
+        if (placementDrive.getStatus() != DriveStatus.DRAFT) {
+            throw new InvalidRequestException("Only DRAFT placement drives can be updated.");
         }
         validateDriveDates(request.getApplicationDeadline(), request.getDriveDate());
 
@@ -91,6 +94,10 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
         Recruiter recruiter = getAuthenticatedRecruiter();
         PlacementDrive placementDrive = getOwnedPlacementDrive(driveId, recruiter.getCompany().getId());
         validateStatusTransition(placementDrive.getStatus(), status);
+        if (status == DriveStatus.OPEN &&
+                !eligibilityCriteriaRepository.existsByPlacementDriveId(driveId)) {
+            throw new InvalidRequestException("Configure eligibility criteria before opening the placement drive.");
+        }
         placementDrive.setStatus(status);
         PlacementDrive updatedDrive = placementDriveRepository.save(placementDrive);
         return placementDriveMapper.toResponse(updatedDrive);
@@ -201,15 +208,20 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
             DriveStatus newStatus
     ) {
         switch (currentStatus) {
+            case DRAFT -> {
+                if (newStatus != DriveStatus.OPEN) {
+                    throw new InvalidRequestException("A draft placement drive can only be opened.");
+                }
+            }
             case OPEN -> {
                 if (newStatus != DriveStatus.CLOSED &&
                         newStatus != DriveStatus.CANCELLED) {
-                    throw new InvalidRequestException("Invalid status transition.");
+                    throw new InvalidRequestException("An open placement drive can only be closed or cancelled.");
                 }
             }
             case CLOSED -> {
                 if (newStatus != DriveStatus.COMPLETED) {
-                    throw new InvalidRequestException("Invalid status transition.");
+                    throw new InvalidRequestException("A closed placement drive can only be marked as completed.");
                 }
             }
             default -> throw new InvalidRequestException("Status cannot be changed.");
