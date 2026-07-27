@@ -1,14 +1,19 @@
 package com.application.placementmanagementsystem.dtos.placementDrive;
 
 import com.application.placementmanagementsystem.models.enums.DriveStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
+@Setter
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PlacementDriveSummaryResponse {
 
     private Long id;
@@ -24,4 +29,8 @@ public class PlacementDriveSummaryResponse {
     private LocalDate driveDate;
 
     private DriveStatus status;
+
+    private Boolean eligible;
+
+    private List<String> ineligibilityReasons;
 }

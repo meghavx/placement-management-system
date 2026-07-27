@@ -21,5 +21,6 @@ public interface PlacementDriveRepository extends JpaRepository<PlacementDrive, 
 
     List<PlacementDrive> findByCompanyId(Long id);
 
+    @EntityGraph(attributePaths = "eligibilityCriteria")
     List<PlacementDrive> findByStatus(DriveStatus status);
 }

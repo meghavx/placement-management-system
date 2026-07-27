@@ -1,6 +1,6 @@
 package com.application.placementmanagementsystem.dtos.placementDrive;
 
-import com.application.placementmanagementsystem.dtos.eligibilityCriteria.EligibilityCriteriaResponse;
+import com.application.placementmanagementsystem.dtos.eligibility.EligibilityCriteriaResponse;
 import com.application.placementmanagementsystem.models.enums.DriveStatus;
 import lombok.Builder;
 import lombok.Getter;
