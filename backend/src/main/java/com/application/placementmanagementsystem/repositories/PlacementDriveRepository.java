@@ -22,4 +22,13 @@ public interface PlacementDriveRepository extends JpaRepository<PlacementDrive, 
     List<PlacementDrive> findByCompanyId(Long id);
 
     List<PlacementDrive> findByStatus(DriveStatus status);
+
+    long countByCompanyId(Long companyId);
+
+    long countByCompanyIdAndStatus(
+            Long companyId,
+            DriveStatus status
+    );
+
+    long countByStatus(DriveStatus status);
 }
