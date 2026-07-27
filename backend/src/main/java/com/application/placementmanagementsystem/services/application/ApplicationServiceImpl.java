@@ -3,6 +3,7 @@ package com.application.placementmanagementsystem.services.application;
 import com.application.placementmanagementsystem.auth.CustomUserPrincipal;
 import com.application.placementmanagementsystem.dtos.application.ApplicationResponse;
 import com.application.placementmanagementsystem.dtos.application.ApplicationSummaryResponse;
+import com.application.placementmanagementsystem.dtos.eligibility.EligibilityEvaluationResult;
 import com.application.placementmanagementsystem.exceptions.DuplicateResourceException;
 import com.application.placementmanagementsystem.exceptions.InvalidRequestException;
 import com.application.placementmanagementsystem.exceptions.ResourceNotFoundException;
@@ -11,6 +12,7 @@ import com.application.placementmanagementsystem.models.*;
 import com.application.placementmanagementsystem.models.enums.ApplicationStatus;
 import com.application.placementmanagementsystem.models.enums.DriveStatus;
 import com.application.placementmanagementsystem.repositories.*;
+import com.application.placementmanagementsystem.services.eligibility.EligibilityEvaluator;
 import com.application.placementmanagementsystem.dtos.application.ApplicationStatusUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +35,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final RecruiterRepository recruiterRepository;
     private final UserRepository userRepository;
     private final ApplicationMapper applicationMapper;
+
+    private final EligibilityEvaluator eligibilityEvaluator;
 
     private static final String DRIVE_NOT_FOUND = "Placement drive not found.";
     private static final String APPLICATION_NOT_FOUND = "Application not found.";
@@ -225,35 +229,12 @@ public class ApplicationServiceImpl implements ApplicationService {
             PlacementDrive drive
     ) {
 
-        EligibilityCriteria criteria =
-                eligibilityCriteriaRepository
-                        .findByPlacementDriveId(drive.getId())
-                        .orElseThrow(() ->
-                                new InvalidRequestException(
-                                        "Eligibility criteria not found."
-                                ));
+        EligibilityEvaluationResult evaluation =
+                eligibilityEvaluator.evaluate(student, drive);
 
-        if (student.getCgpa().compareTo(criteria.getMinCgpa()) < 0) {
+        if (!evaluation.isEligible()) {
             throw new InvalidRequestException(
-                    "Minimum CGPA requirement is not satisfied."
-            );
-        }
-
-        if (!student.getDepartment().equals(criteria.getDepartment())) {
-            throw new InvalidRequestException(
-                    "Department is not eligible."
-            );
-        }
-
-        if (!student.getGraduationYear().equals(criteria.getGraduationYear())) {
-            throw new InvalidRequestException(
-                    "Graduation year is not eligible."
-            );
-        }
-
-        if (student.getCurrentBacklogs() > criteria.getMaxBacklogs()) {
-            throw new InvalidRequestException(
-                    "Maximum allowed backlogs exceeded."
+                    String.join("; ", evaluation.getIneligibilityReasons())
             );
         }
     }
