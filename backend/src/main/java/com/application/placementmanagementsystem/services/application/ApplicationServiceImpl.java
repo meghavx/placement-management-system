@@ -11,6 +11,7 @@ import com.application.placementmanagementsystem.models.*;
 import com.application.placementmanagementsystem.models.enums.ApplicationStatus;
 import com.application.placementmanagementsystem.models.enums.DriveStatus;
 import com.application.placementmanagementsystem.repositories.*;
+import com.application.placementmanagementsystem.dtos.application.ApplicationStatusUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -108,6 +109,32 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .toList();
     }
 
+    @Transactional
+    @Override
+    public ApplicationResponse updateApplicationStatus(
+            Long applicationId,
+            ApplicationStatusUpdateRequest request
+    ) {
+
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(APPLICATION_NOT_FOUND));
+
+        validateRecruiterOwnsDrive(application);
+
+        validateStatusTransition(
+                application.getStatus(),
+                request.getStatus()
+        );
+
+        application.setStatus(request.getStatus());
+
+        Application updatedApplication =
+                applicationRepository.save(application);
+
+        return applicationMapper.toResponse(updatedApplication);
+    }
+
     // Helper Methods
 
     private User getAuthenticatedUser() {
@@ -152,6 +179,19 @@ public class ApplicationServiceImpl implements ApplicationService {
                 )
                 .orElseThrow(() ->
                         new ResourceNotFoundException(DRIVE_NOT_FOUND));
+    }
+
+    private void validateRecruiterOwnsDrive(Application application) {
+
+        Recruiter recruiter = getAuthenticatedRecruiter();
+
+        if (!application.getPlacementDrive()
+                .getCompany()
+                .getId()
+                .equals(recruiter.getCompany().getId())) {
+
+            throw new ResourceNotFoundException(APPLICATION_NOT_FOUND);
+        }
     }
 
     // Validation Methods
@@ -215,6 +255,60 @@ public class ApplicationServiceImpl implements ApplicationService {
             throw new InvalidRequestException(
                     "Maximum allowed backlogs exceeded."
             );
+        }
+    }
+
+    private void validateStatusTransition(
+            ApplicationStatus currentStatus,
+            ApplicationStatus newStatus
+    ) {
+
+        if (currentStatus == newStatus) {
+            throw new InvalidRequestException(
+                    "Application is already in the requested status."
+            );
+        }
+
+        switch (currentStatus) {
+
+            case APPLIED -> {
+
+                if (newStatus != ApplicationStatus.SHORTLISTED &&
+                        newStatus != ApplicationStatus.REJECTED) {
+
+                    throw new InvalidRequestException(
+                            "Invalid status transition."
+                    );
+                }
+            }
+
+            case SHORTLISTED -> {
+
+                if (newStatus != ApplicationStatus.INTERVIEW_SCHEDULED &&
+                        newStatus != ApplicationStatus.REJECTED) {
+
+                    throw new InvalidRequestException(
+                            "Invalid status transition."
+                    );
+                }
+            }
+
+            case INTERVIEW_SCHEDULED -> {
+
+                if (newStatus != ApplicationStatus.SELECTED &&
+                        newStatus != ApplicationStatus.REJECTED) {
+
+                    throw new InvalidRequestException(
+                            "Invalid status transition."
+                    );
+                }
+            }
+
+            case SELECTED, REJECTED ->
+
+                    throw new InvalidRequestException(
+                            "Final application status cannot be changed."
+                    );
         }
     }
 }

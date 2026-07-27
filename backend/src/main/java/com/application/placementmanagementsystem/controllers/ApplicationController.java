@@ -3,10 +3,12 @@ package com.application.placementmanagementsystem.controllers;
 import com.application.placementmanagementsystem.common.ApiResponse;
 import com.application.placementmanagementsystem.common.ResponseBuilder;
 import com.application.placementmanagementsystem.dtos.application.ApplicationResponse;
+import com.application.placementmanagementsystem.dtos.application.ApplicationStatusUpdateRequest;
 import com.application.placementmanagementsystem.dtos.application.ApplicationSummaryResponse;
 import com.application.placementmanagementsystem.services.application.ApplicationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -89,6 +91,28 @@ public class ApplicationController {
         return ResponseEntity.ok(
                 ResponseBuilder.success(
                         "Applications retrieved successfully.",
+                        response
+                )
+        );
+    }
+
+    @PatchMapping("/recruiter/applications/{applicationId}/status")
+    @PreAuthorize("hasRole('RECRUITER')")
+    @Operation(summary = "Update application status")
+    public ResponseEntity<ApiResponse<ApplicationResponse>> updateApplicationStatus(
+            @PathVariable Long applicationId,
+            @Valid @RequestBody ApplicationStatusUpdateRequest request
+    ) {
+
+        ApplicationResponse response =
+                applicationService.updateApplicationStatus(
+                        applicationId,
+                        request
+                );
+
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "Application status updated successfully.",
                         response
                 )
         );
