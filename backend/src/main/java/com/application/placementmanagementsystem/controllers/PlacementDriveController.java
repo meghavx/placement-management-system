@@ -1,0 +1,104 @@
+package com.application.placementmanagementsystem.controllers;
+
+import com.application.placementmanagementsystem.common.ApiResponse;
+import com.application.placementmanagementsystem.dtos.placementDrive.PlacementDriveCreateRequest;
+import com.application.placementmanagementsystem.dtos.placementDrive.PlacementDriveResponse;
+import com.application.placementmanagementsystem.dtos.placementDrive.PlacementDriveSummaryResponse;
+import com.application.placementmanagementsystem.dtos.placementDrive.PlacementDriveUpdateRequest;
+import com.application.placementmanagementsystem.models.enums.DriveStatus;
+import com.application.placementmanagementsystem.services.placementDrive.PlacementDriveService;
+import com.application.placementmanagementsystem.common.ResponseBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api")
+@Tag(name = "Placement Drive Management")
+public class PlacementDriveController {
+
+    private final PlacementDriveService placementDriveService;
+
+    @PostMapping("/recruiter/drives")
+    @PreAuthorize("hasRole('RECRUITER')")
+    @Operation(summary = "Create Placement Drive")
+    public ResponseEntity<ApiResponse<PlacementDriveResponse>> createPlacementDrive(
+            @Valid @RequestBody PlacementDriveCreateRequest request
+    ) {
+        PlacementDriveResponse response = placementDriveService.createPlacementDrive(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ResponseBuilder.success(
+                        "Placement drive created successfully",
+                        response
+                ));
+    }
+
+    @PutMapping("/recruiter/drives/{id}")
+    @PreAuthorize("hasRole('RECRUITER')")
+    @Operation(summary = "Update Placement Drive")
+    public ResponseEntity<ApiResponse<PlacementDriveResponse>> updatePlacementDrive(
+            @PathVariable Long id,
+            @Valid @RequestBody PlacementDriveUpdateRequest request
+    ) {
+        PlacementDriveResponse response = placementDriveService.updatePlacementDrive(id, request);
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "Placement drive updated successfully",
+                        response
+                )
+        );
+    }
+
+    @PatchMapping("/recruiter/drives/{id}/status")
+    @PreAuthorize("hasRole('RECRUITER')")
+    @Operation(summary = "Update Placement Drive Status")
+    public ResponseEntity<ApiResponse<PlacementDriveResponse>> updatePlacementDriveStatus(
+            @PathVariable Long id,
+            @RequestParam @NotNull DriveStatus status
+    ) {
+        PlacementDriveResponse response = placementDriveService.updatePlacementDriveStatus(id, status);
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "Placement drive status updated successfully",
+                        response
+                )
+        );
+    }
+
+    @GetMapping("/drives/{id}")
+    @PreAuthorize("hasAnyRole('RECRUITER', 'PLACEMENT_ADMIN', 'STUDENT')")
+    @Operation(summary = "Get Placement Drive by ID")
+    public ResponseEntity<ApiResponse<PlacementDriveResponse>> getPlacementDrive(
+            @PathVariable Long id
+    ) {
+        PlacementDriveResponse response = placementDriveService.getPlacementDriveById(id);
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "Placement drive retrieved successfully",
+                        response
+                )
+        );
+    }
+
+    @GetMapping("/drives")
+    @PreAuthorize("hasAnyRole('RECRUITER', 'PLACEMENT_ADMIN', 'STUDENT')")
+    @Operation(summary = "Get Placement Drives")
+    public ResponseEntity<ApiResponse<List<PlacementDriveSummaryResponse>>> getPlacementDrives() {
+        List<PlacementDriveSummaryResponse> response = placementDriveService.getPlacementDrives();
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "Placement drives retrieved successfully",
+                        response
+                )
+        );
+    }
+}

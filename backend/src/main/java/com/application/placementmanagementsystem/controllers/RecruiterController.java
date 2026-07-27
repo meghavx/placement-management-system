@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/recruiter")
+@RequestMapping("/api/recruiters")
 @PreAuthorize("hasRole('PLACEMENT_ADMIN')")
 @RequiredArgsConstructor
 @Tag(name = "Recruiter Management")

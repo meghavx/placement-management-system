@@ -56,6 +56,9 @@ public class PlacementDrive {
     @Column(nullable = false)
     private DriveStatus status;
 
+    @OneToOne(mappedBy = "placementDrive", fetch = FetchType.LAZY)
+    private EligibilityCriteria eligibilityCriteria;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
