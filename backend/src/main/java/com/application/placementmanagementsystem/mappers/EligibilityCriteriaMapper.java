@@ -23,6 +23,9 @@ public class EligibilityCriteriaMapper {
     }
 
     public EligibilityCriteriaResponse toResponse(EligibilityCriteria eligibilityCriteria) {
+        if (eligibilityCriteria == null) {
+            return null;
+        }
         return EligibilityCriteriaResponse.builder()
                 .id(eligibilityCriteria.getId())
                 .placementDriveId(eligibilityCriteria.getPlacementDrive().getId())

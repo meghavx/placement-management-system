@@ -1,5 +1,6 @@
 package com.application.placementmanagementsystem.dtos.placementDrive;
 
+import com.application.placementmanagementsystem.dtos.eligibilityCriteria.EligibilityCriteriaResponse;
 import com.application.placementmanagementsystem.models.enums.DriveStatus;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,6 +32,8 @@ public class PlacementDriveResponse {
     private LocalDate driveDate;
 
     private DriveStatus status;
+
+    private EligibilityCriteriaResponse eligibility;
 
     private LocalDateTime createdAt;
 

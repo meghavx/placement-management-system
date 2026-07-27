@@ -4,12 +4,16 @@ import com.application.placementmanagementsystem.dtos.placementDrive.*;
 import com.application.placementmanagementsystem.models.Company;
 import com.application.placementmanagementsystem.models.PlacementDrive;
 import com.application.placementmanagementsystem.models.enums.DriveStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class PlacementDriveMapper {
+
+    private final EligibilityCriteriaMapper eligibilityCriteriaMapper;
 
     public PlacementDriveResponse toResponse(PlacementDrive drive) {
         return PlacementDriveResponse.builder()
@@ -23,6 +27,10 @@ public class PlacementDriveMapper {
                 .applicationDeadline(drive.getApplicationDeadline())
                 .driveDate(drive.getDriveDate())
                 .status(drive.getStatus())
+                .eligibility(
+                        eligibilityCriteriaMapper.toResponse(
+                                drive.getEligibilityCriteria()
+                        ))
                 .createdAt(drive.getCreatedAt())
                 .updatedAt(drive.getUpdatedAt())
                 .build();
