@@ -70,11 +70,6 @@ public class ApplicationServiceImpl implements ApplicationService {
         return applicationMapper.toResponse(savedApplication);
     }
 
-    /*
-     * Remaining interface methods
-     * Implemented in Part 2B
-     */
-
     @Override
     public List<ApplicationSummaryResponse> getMyApplications() {
 
@@ -113,9 +108,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .toList();
     }
 
-    // ==========================================================
     // Helper Methods
-    // ==========================================================
 
     private User getAuthenticatedUser() {
 
@@ -161,9 +154,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                         new ResourceNotFoundException(DRIVE_NOT_FOUND));
     }
 
-    // ==========================================================
     // Validation Methods
-    // ==========================================================
 
     private void validateDrive(PlacementDrive drive) {
 
