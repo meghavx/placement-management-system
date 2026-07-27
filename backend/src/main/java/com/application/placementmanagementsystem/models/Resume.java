@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Resume {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,8 +27,9 @@ public class Resume {
     @Column(name = "file_name", nullable = false)
     private String fileName;
 
-    @Column(name = "file_path", nullable = false)
-    private String filePath;
+    @Lob
+    @Column(name = "file", columnDefinition = "MEDIUMBLOB", nullable = false)
+    private byte[] file;
 
     @CreationTimestamp
     @Column(name = "uploaded_at", updatable = false)
