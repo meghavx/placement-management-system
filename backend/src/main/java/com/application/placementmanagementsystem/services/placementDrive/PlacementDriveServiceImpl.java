@@ -1,6 +1,7 @@
 package com.application.placementmanagementsystem.services.placementDrive;
 
 import com.application.placementmanagementsystem.auth.CustomUserPrincipal;
+import com.application.placementmanagementsystem.dtos.eligibility.EligibilityEvaluationResult;
 import com.application.placementmanagementsystem.dtos.placementDrive.PlacementDriveCreateRequest;
 import com.application.placementmanagementsystem.dtos.placementDrive.PlacementDriveResponse;
 import com.application.placementmanagementsystem.dtos.placementDrive.PlacementDriveSummaryResponse;
@@ -10,12 +11,11 @@ import com.application.placementmanagementsystem.exceptions.ResourceNotFoundExce
 import com.application.placementmanagementsystem.mappers.PlacementDriveMapper;
 import com.application.placementmanagementsystem.models.PlacementDrive;
 import com.application.placementmanagementsystem.models.Recruiter;
+import com.application.placementmanagementsystem.models.Student;
 import com.application.placementmanagementsystem.models.User;
 import com.application.placementmanagementsystem.models.enums.DriveStatus;
-import com.application.placementmanagementsystem.repositories.EligibilityCriteriaRepository;
-import com.application.placementmanagementsystem.repositories.PlacementDriveRepository;
-import com.application.placementmanagementsystem.repositories.RecruiterRepository;
-import com.application.placementmanagementsystem.repositories.UserRepository;
+import com.application.placementmanagementsystem.repositories.*;
+import com.application.placementmanagementsystem.services.eligibility.EligibilityEvaluator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -35,6 +35,10 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
     private final UserRepository userRepository;
 
     private final PlacementDriveMapper placementDriveMapper;
+
+    private final StudentRepository studentRepository;
+
+    private final EligibilityEvaluator eligibilityEvaluator;
 
     private static final String DRIVE_NOT_FOUND = "Placement drive not found.";
 
@@ -155,8 +159,19 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
             case PLACEMENT_ADMIN ->
                     placementDrives = placementDriveRepository.findAll();
 
-            case STUDENT ->
-                    placementDrives = placementDriveRepository.findByStatus(DriveStatus.OPEN);
+            case STUDENT -> {
+                Student student = getAuthenticatedStudent();
+                placementDrives = placementDriveRepository.findByStatus(DriveStatus.OPEN);
+                return placementDrives.stream()
+                        .map(drive -> {
+                            PlacementDriveSummaryResponse response = placementDriveMapper.toSummaryResponse(drive);
+                            EligibilityEvaluationResult evaluation = eligibilityEvaluator.evaluate(student, drive);
+                            response.setEligible(evaluation.isEligible());
+                            response.setIneligibilityReasons(evaluation.getIneligibilityReasons());
+                            return response;
+                        })
+                        .toList();
+            }
 
             default ->
                     throw new IllegalStateException("Unsupported role.");
@@ -175,6 +190,13 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
         return userRepository.findById(principal.getId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found."));
+    }
+
+    private Student getAuthenticatedStudent() {
+        User user = getAuthenticatedUser();
+        return studentRepository.findByUser(user)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Student not found."));
     }
 
     private Recruiter getAuthenticatedRecruiter() {

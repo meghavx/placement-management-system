@@ -2,9 +2,9 @@ package com.application.placementmanagementsystem.controllers;
 
 import com.application.placementmanagementsystem.common.ApiResponse;
 import com.application.placementmanagementsystem.common.ResponseBuilder;
-import com.application.placementmanagementsystem.dtos.eligibilityCriteria.EligibilityCriteriaRequest;
-import com.application.placementmanagementsystem.dtos.eligibilityCriteria.EligibilityCriteriaResponse;
-import com.application.placementmanagementsystem.services.eligibilityCriteria.EligibilityCriteriaService;
+import com.application.placementmanagementsystem.dtos.eligibility.EligibilityCriteriaRequest;
+import com.application.placementmanagementsystem.dtos.eligibility.EligibilityCriteriaResponse;
+import com.application.placementmanagementsystem.services.eligibility.EligibilityCriteriaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
