@@ -2,6 +2,7 @@ package com.application.placementmanagementsystem.services.application;
 
 import com.application.placementmanagementsystem.auth.CustomUserPrincipal;
 import com.application.placementmanagementsystem.dtos.application.ApplicationResponse;
+import com.application.placementmanagementsystem.dtos.application.ApplicationStatusUpdateRequest;
 import com.application.placementmanagementsystem.dtos.application.ApplicationSummaryResponse;
 import com.application.placementmanagementsystem.exceptions.DuplicateResourceException;
 import com.application.placementmanagementsystem.exceptions.InvalidRequestException;
@@ -10,8 +11,9 @@ import com.application.placementmanagementsystem.mappers.ApplicationMapper;
 import com.application.placementmanagementsystem.models.*;
 import com.application.placementmanagementsystem.models.enums.ApplicationStatus;
 import com.application.placementmanagementsystem.models.enums.DriveStatus;
+import com.application.placementmanagementsystem.models.enums.NotificationType;
 import com.application.placementmanagementsystem.repositories.*;
-import com.application.placementmanagementsystem.dtos.application.ApplicationStatusUpdateRequest;
+import com.application.placementmanagementsystem.services.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final RecruiterRepository recruiterRepository;
     private final UserRepository userRepository;
     private final ApplicationMapper applicationMapper;
+    private final NotificationService notificationService;
 
     private static final String DRIVE_NOT_FOUND = "Placement drive not found.";
     private static final String APPLICATION_NOT_FOUND = "Application not found.";
@@ -67,6 +70,17 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         Application savedApplication =
                 applicationRepository.save(application);
+
+        notificationService.createNotification(
+                student.getUser(),
+                NotificationType.APPLICATION,
+                "Application Submitted",
+                "Your application for "
+                        + drive.getJobRole()
+                        + " at "
+                        + drive.getCompany().getCompanyName()
+                        + " has been submitted successfully."
+        );
 
         return applicationMapper.toResponse(savedApplication);
     }
@@ -131,6 +145,65 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         Application updatedApplication =
                 applicationRepository.save(application);
+
+        NotificationType notificationType = null;
+        String title = null;
+        String message = null;
+
+        switch (updatedApplication.getStatus()) {
+
+            case SHORTLISTED -> {
+                notificationType = NotificationType.SHORTLISTED;
+                title = "Application Shortlisted";
+                message = "Congratulations! You have been shortlisted for "
+                        + updatedApplication.getPlacementDrive().getJobRole()
+                        + " at "
+                        + updatedApplication.getPlacementDrive().getCompany().getCompanyName()
+                        + ".";
+            }
+
+            case INTERVIEW_SCHEDULED -> {
+                notificationType = NotificationType.APPLICATION;
+                title = "Interview Scheduled";
+                message = "Your interview has been scheduled for "
+                        + updatedApplication.getPlacementDrive().getJobRole()
+                        + " at "
+                        + updatedApplication.getPlacementDrive().getCompany().getCompanyName()
+                        + ".";
+            }
+
+            case SELECTED -> {
+                notificationType = NotificationType.RESULT;
+                title = "Application Selected";
+                message = "Congratulations! You have been selected for "
+                        + updatedApplication.getPlacementDrive().getJobRole()
+                        + " at "
+                        + updatedApplication.getPlacementDrive().getCompany().getCompanyName()
+                        + ".";
+            }
+
+            case REJECTED -> {
+                notificationType = NotificationType.RESULT;
+                title = "Application Rejected";
+                message = "Your application for "
+                        + updatedApplication.getPlacementDrive().getJobRole()
+                        + " at "
+                        + updatedApplication.getPlacementDrive().getCompany().getCompanyName()
+                        + " was not selected.";
+            }
+
+            default -> {
+            }
+        }
+
+        if (notificationType != null) {
+            notificationService.createNotification(
+                    updatedApplication.getStudent().getUser(),
+                    notificationType,
+                    title,
+                    message
+            );
+        }
 
         return applicationMapper.toResponse(updatedApplication);
     }
@@ -305,7 +378,6 @@ public class ApplicationServiceImpl implements ApplicationService {
             }
 
             case SELECTED, REJECTED ->
-
                     throw new InvalidRequestException(
                             "Final application status cannot be changed."
                     );
