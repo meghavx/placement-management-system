@@ -229,12 +229,35 @@ public class ApplicationServiceImpl implements ApplicationService {
             PlacementDrive drive
     ) {
 
-        EligibilityEvaluationResult evaluation =
-                eligibilityEvaluator.evaluate(student, drive);
+        EligibilityCriteria criteria =
+                eligibilityCriteriaRepository
+                        .findByPlacementDriveId(drive.getId())
+                        .orElseThrow(() ->
+                                new InvalidRequestException(
+                                        "Eligibility criteria not found."
+                                ));
 
-        if (!evaluation.isEligible()) {
+        if (student.getCgpa().compareTo(criteria.getMinCgpa()) < 0) {
             throw new InvalidRequestException(
-                    String.join("; ", evaluation.getIneligibilityReasons())
+                    "Minimum CGPA requirement is not satisfied."
+            );
+        }
+
+        if (!student.getDepartment().equals(criteria.getDepartment())) {
+            throw new InvalidRequestException(
+                    "Department is not eligible."
+            );
+        }
+
+        if (!student.getGraduationYear().equals(criteria.getGraduationYear())) {
+            throw new InvalidRequestException(
+                    "Graduation year is not eligible."
+            );
+        }
+
+        if (student.getCurrentBacklogs() > criteria.getMaxBacklogs()) {
+            throw new InvalidRequestException(
+                    "Maximum allowed backlogs exceeded."
             );
         }
     }
