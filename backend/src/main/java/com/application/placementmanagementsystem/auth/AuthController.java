@@ -1,9 +1,6 @@
 package com.application.placementmanagementsystem.auth;
 
-import com.application.placementmanagementsystem.auth.dtos.ChangePasswordRequest;
-import com.application.placementmanagementsystem.auth.dtos.CurrentUserResponse;
-import com.application.placementmanagementsystem.auth.dtos.LoginRequest;
-import com.application.placementmanagementsystem.auth.dtos.LoginResponse;
+import com.application.placementmanagementsystem.auth.dtos.*;
 import com.application.placementmanagementsystem.common.ApiResponse;
 import com.application.placementmanagementsystem.common.ResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,6 +52,32 @@ public class AuthController {
         return ResponseEntity.ok(
                 ResponseBuilder.success(
                         "Password changed successfully"
+                )
+        );
+    }
+
+    @PostMapping("/forgot-password")
+    @Operation(summary = "Request Password Reset")
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request
+    ) {
+        authService.forgotPassword(request);
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "If an account exists for this email, a password reset link has been sent."
+                )
+        );
+    }
+
+    @PostMapping("/reset-password")
+    @Operation(summary = "Reset Password")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request
+    ) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "Password reset successfully"
                 )
         );
     }
