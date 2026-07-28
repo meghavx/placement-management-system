@@ -10,6 +10,13 @@ import java.util.List;
 public interface AuditLogService {
 
     void log(
+            AuditAction action,
+            AuditEntityType entityType,
+            Long entityId,
+            String description
+    );
+
+    void log(
             User user,
             AuditAction action,
             AuditEntityType entityType,

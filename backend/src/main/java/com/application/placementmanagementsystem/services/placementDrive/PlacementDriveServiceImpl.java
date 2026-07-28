@@ -13,8 +13,11 @@ import com.application.placementmanagementsystem.models.PlacementDrive;
 import com.application.placementmanagementsystem.models.Recruiter;
 import com.application.placementmanagementsystem.models.Student;
 import com.application.placementmanagementsystem.models.User;
+import com.application.placementmanagementsystem.models.enums.AuditAction;
+import com.application.placementmanagementsystem.models.enums.AuditEntityType;
 import com.application.placementmanagementsystem.models.enums.DriveStatus;
 import com.application.placementmanagementsystem.repositories.*;
+import com.application.placementmanagementsystem.services.audit.AuditLogService;
 import com.application.placementmanagementsystem.services.eligibility.EligibilityEvaluator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,7 +36,7 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
     private final EligibilityCriteriaRepository eligibilityCriteriaRepository;
     private final RecruiterRepository recruiterRepository;
     private final UserRepository userRepository;
-
+    private final AuditLogService auditLogService;
     private final PlacementDriveMapper placementDriveMapper;
 
     private final StudentRepository studentRepository;
@@ -62,6 +65,14 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
                 .build();
 
         PlacementDrive savedDrive = placementDriveRepository.save(placementDrive);
+
+        auditLogService.log(
+                AuditAction.CREATE,
+                AuditEntityType.PLACEMENT_DRIVE,
+                savedDrive.getId(),
+                "Created placement drive: " + savedDrive.getJobRole()
+        );
+
         return placementDriveMapper.toResponse(savedDrive);
     }
 
@@ -86,6 +97,14 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
         placementDrive.setDriveDate(request.getDriveDate());
 
         PlacementDrive updatedDrive = placementDriveRepository.save(placementDrive);
+
+        auditLogService.log(
+                AuditAction.UPDATE,
+                AuditEntityType.PLACEMENT_DRIVE,
+                updatedDrive.getId(),
+                "Updated placement drive: " + updatedDrive.getJobRole()
+        );
+
         return placementDriveMapper.toResponse(updatedDrive);
     }
 
@@ -104,6 +123,18 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
         }
         placementDrive.setStatus(status);
         PlacementDrive updatedDrive = placementDriveRepository.save(placementDrive);
+
+        AuditAction action = (status == DriveStatus.OPEN)
+                ? AuditAction.PUBLISH
+                : AuditAction.UPDATE;
+
+        auditLogService.log(
+                action,
+                AuditEntityType.PLACEMENT_DRIVE,
+                updatedDrive.getId(),
+                "Changed drive status to " + status
+        );
+
         return placementDriveMapper.toResponse(updatedDrive);
     }
 

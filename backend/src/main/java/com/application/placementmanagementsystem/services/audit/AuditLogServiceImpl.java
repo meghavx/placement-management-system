@@ -26,6 +26,25 @@ public class AuditLogServiceImpl implements AuditLogService {
 
     @Override
     public void log(
+            AuditAction action,
+            AuditEntityType entityType,
+            Long entityId,
+            String description
+    ) {
+        CustomUserPrincipal principal =
+                (CustomUserPrincipal) SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getPrincipal();
+
+        User user = userRepository.findById(principal.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+
+        log(user, action, entityType, entityId, description);
+    }
+
+    @Override
+    public void log(
             User user,
             AuditAction action,
             AuditEntityType entityType,

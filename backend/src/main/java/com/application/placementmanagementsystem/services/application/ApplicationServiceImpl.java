@@ -10,8 +10,11 @@ import com.application.placementmanagementsystem.exceptions.ResourceNotFoundExce
 import com.application.placementmanagementsystem.mappers.ApplicationMapper;
 import com.application.placementmanagementsystem.models.*;
 import com.application.placementmanagementsystem.models.enums.ApplicationStatus;
+import com.application.placementmanagementsystem.models.enums.AuditAction;
+import com.application.placementmanagementsystem.models.enums.AuditEntityType;
 import com.application.placementmanagementsystem.models.enums.DriveStatus;
 import com.application.placementmanagementsystem.repositories.*;
+import com.application.placementmanagementsystem.services.audit.AuditLogService;
 import com.application.placementmanagementsystem.services.eligibility.EligibilityEvaluator;
 import com.application.placementmanagementsystem.dtos.application.ApplicationStatusUpdateRequest;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +38,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final RecruiterRepository recruiterRepository;
     private final UserRepository userRepository;
     private final ApplicationMapper applicationMapper;
-
+    private final AuditLogService auditLogService;
     private final EligibilityEvaluator eligibilityEvaluator;
 
     private static final String DRIVE_NOT_FOUND = "Placement drive not found.";
@@ -71,6 +74,13 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         Application savedApplication =
                 applicationRepository.save(application);
+
+        auditLogService.log(
+                AuditAction.APPLY,
+                AuditEntityType.APPLICATION,
+                savedApplication.getId(),
+                "Applied for drive: " + drive.getJobRole()
+        );
 
         return applicationMapper.toResponse(savedApplication);
     }
@@ -135,6 +145,18 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         Application updatedApplication =
                 applicationRepository.save(application);
+
+        AuditAction auditAction =
+                request.getStatus() == ApplicationStatus.SHORTLISTED
+                        ? AuditAction.SHORTLIST
+                        : AuditAction.UPDATE;
+
+        auditLogService.log(
+                auditAction,
+                AuditEntityType.APPLICATION,
+                updatedApplication.getId(),
+                "Changed application status to " + request.getStatus()
+        );
 
         return applicationMapper.toResponse(updatedApplication);
     }

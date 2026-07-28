@@ -8,6 +8,9 @@ import com.application.placementmanagementsystem.auth.jwt.JwtService;
 import com.application.placementmanagementsystem.exceptions.ResourceNotFoundException;
 import com.application.placementmanagementsystem.models.User;
 import com.application.placementmanagementsystem.repositories.UserRepository;
+import com.application.placementmanagementsystem.models.enums.AuditAction;
+import com.application.placementmanagementsystem.models.enums.AuditEntityType;
+import com.application.placementmanagementsystem.services.audit.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -23,6 +26,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final AuditLogService auditLogService;
 
     private User getAuthenticatedUser() {
         CustomUserPrincipal principal =
@@ -51,6 +55,14 @@ public class AuthService {
         }
 
         String accessToken = jwtService.generateAccessToken((user)).toString();
+
+        auditLogService.log(
+                user,
+                AuditAction.LOGIN,
+                AuditEntityType.USER,
+                user.getId(),
+                "User logged in."
+        );
 
         return LoginResponse.builder()
                 .id(user.getId())
@@ -90,11 +102,26 @@ public class AuthService {
         }
         user.setPassword(passwordEncoder.encode(request.newPassword()));
         userRepository.save(user);
+
+        auditLogService.log(
+                AuditAction.UPDATE,
+                AuditEntityType.USER,
+                user.getId(),
+                "Password changed."
+        );
     }
 
     // Mostly symbolic in a stateless JWT setup since
     // the token itself remains valid until it expires.
     public void logout() {
+
+        auditLogService.log(
+                AuditAction.LOGOUT,
+                AuditEntityType.USER,
+                getAuthenticatedUser().getId(),
+                "User logged out."
+        );
+
         SecurityContextHolder.clearContext();
     }
 }
