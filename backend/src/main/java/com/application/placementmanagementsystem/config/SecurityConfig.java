@@ -120,6 +120,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**")
                         .hasRole("SUPER_ADMIN")
 
+                        .requestMatchers(HttpMethod.GET, "/api/audit-logs/**")
+                        .hasRole("SUPER_ADMIN")
+
                         .requestMatchers("/api/companies/**")
                         .hasRole("PLACEMENT_ADMIN")
 
