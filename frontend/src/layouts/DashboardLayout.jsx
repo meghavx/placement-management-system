@@ -1,111 +1,45 @@
 /*
-Purpose
+========================================
+Component: DashboardLayout
 
-Reusable Dashboard Layout.
+Purpose:
+The ONE shared layout used by every authenticated page in the
+application (Navbar + Sidebar + Main Content + Footer), per the
+mandatory Dashboard Layout section of the spec. No page ever builds
+its own layout.
 
-Structure:
+Current Features:
+- Renders Navbar, Sidebar, Footer, and the routed page content
+- Controls sidebar open/close on mobile via useSidebar
 
-Navbar
--------------------
-
-Sidebar | Content
-
-Used By:
-- Student Dashboard
-- Admin Dashboard
-- Recruiter Dashboard
+Future Features
+- None; keep this the single DashboardLayout implementation.
+========================================
 */
 
-import Navbar from "../components/Navbar";
+import { Outlet } from 'react-router-dom'
+import Navbar from './Navbar'
+import Sidebar from './Sidebar'
+import Footer from './Footer'
+import ToastContainer from '../components/Toast'
+import { useSidebar } from '../hooks/useSidebar'
 
-import StudentSidebar from "../components/StudentSidebar";
-import AdminSidebar from "../components/AdminSidebar";
-import RecruiterSidebar from "../components/RecruiterSidebar";
-
-import { useState } from "react";
-
-function DashboardLayout({ role, children }) {
-
-
-  // Controls mobile sidebar visibility.
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
-  
-  // Selects sidebar based on role.
-
-  let sidebar;
-
-  if (role === "student") {
-
-    sidebar = (
-      <StudentSidebar
-        isSidebarOpen={isSidebarOpen}
-      />
-    );
-
-  }
-
-  else if (role === "admin") {
-
-    sidebar = (
-      <AdminSidebar
-        isSidebarOpen={isSidebarOpen}
-      />
-    );
-
-  }
-
-  else if (role === "recruiter") {
-
-    sidebar = (
-      <RecruiterSidebar
-        isSidebarOpen={isSidebarOpen}
-      />
-    );
-
-  }
+export default function DashboardLayout() {
+  const { isOpen, toggleSidebar, closeSidebar } = useSidebar()
 
   return (
-
-    <div
-      className="
-      min-h-screen
-      "
-    >
-
-      {/* Top Navbar */}
-      <Navbar
-        toggleSidebar={() =>
-          setIsSidebarOpen(!isSidebarOpen)
-        }
-      />
-
-      <div
-        className="
-        flex
-        "
-      >
-
-        {/* Left Sidebar */}
-        {sidebar}
-
-        {/* Page Content */}
-        <main
-          className="
-          flex-1
-          p-6
-          "
-        >
-
-          {children}
-
-        </main>
-
+    <div className="flex h-screen flex-col">
+      <Navbar onToggleSidebar={toggleSidebar} />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar isOpen={isOpen} onClose={closeSidebar} />
+        <div className="flex flex-1 flex-col overflow-y-auto">
+          <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+            <Outlet />
+          </main>
+          <Footer />
+        </div>
       </div>
-
+      <ToastContainer />
     </div>
-
-  );
+  )
 }
-
-export default DashboardLayout;
