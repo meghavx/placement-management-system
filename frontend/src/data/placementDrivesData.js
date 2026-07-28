@@ -1,0 +1,92 @@
+/*
+Purpose
+Realistic dummy placement drive records shared by the Student "Browse
+Drives" page and reused (in variant form) across Recruiter/Admin pages.
+*/
+
+export const placementDrivesData = [
+  {
+    id: 1,
+    company: 'Tech Mahindra',
+    role: 'Software Engineer',
+    package: 8.5,
+    location: 'Bengaluru',
+    employmentType: 'Full-Time',
+    driveDate: '2026-08-10',
+    applicationDeadline: '2026-08-01',
+    minCgpa: 7.0,
+    departments: ['Computer Science', 'Information Technology'],
+    description:
+      'Work on enterprise-scale applications using Java and Spring Boot in an agile team environment.',
+    selectionProcess: ['Online Test', 'Technical Interview', 'HR Interview'],
+    eligibilityStatus: 'Eligible',
+    applied: false,
+  },
+  {
+    id: 2,
+    company: 'Infosys',
+    role: 'Systems Engineer',
+    package: 6.2,
+    location: 'Pune',
+    employmentType: 'Full-Time',
+    driveDate: '2026-08-14',
+    applicationDeadline: '2026-08-05',
+    minCgpa: 6.5,
+    departments: ['Computer Science', 'Electronics & Communication', 'Information Technology'],
+    description:
+      'Entry-level role covering full-stack development and cloud fundamentals with structured training.',
+    selectionProcess: ['Online Test', 'Technical Interview'],
+    eligibilityStatus: 'Eligible',
+    applied: true,
+  },
+  {
+    id: 3,
+    company: 'Google',
+    role: 'Software Development Engineer',
+    package: 24,
+    location: 'Hyderabad',
+    employmentType: 'Full-Time',
+    driveDate: '2026-08-20',
+    applicationDeadline: '2026-08-08',
+    minCgpa: 8.5,
+    departments: ['Computer Science'],
+    description:
+      'Build large-scale distributed systems and contribute to core infrastructure products.',
+    selectionProcess: ['Online Test', 'Technical Interview', 'Technical Interview', 'HR Interview'],
+    eligibilityStatus: 'Not Eligible',
+    applied: false,
+  },
+  {
+    id: 4,
+    company: 'Wipro',
+    role: 'Project Engineer',
+    package: 4.5,
+    location: 'Chennai',
+    employmentType: 'Full-Time',
+    driveDate: '2026-08-18',
+    applicationDeadline: '2026-08-09',
+    minCgpa: 6.0,
+    departments: ['Mechanical Engineering', 'Civil Engineering', 'Electrical Engineering'],
+    description:
+      'Support engineering project delivery across manufacturing and infrastructure clients.',
+    selectionProcess: ['Group Discussion', 'Technical Interview'],
+    eligibilityStatus: 'Not Eligible',
+    applied: false,
+  },
+  {
+    id: 5,
+    company: 'Zoho Corporation',
+    role: 'Associate Software Developer',
+    package: 9.0,
+    location: 'Chennai',
+    employmentType: 'Full-Time',
+    driveDate: '2026-08-25',
+    applicationDeadline: '2026-08-12',
+    minCgpa: 7.5,
+    departments: ['Computer Science', 'Information Technology', 'Artificial Intelligence & Data Science'],
+    description: 'Develop and maintain modules within the Zoho SaaS product suite.',
+    selectionProcess: ['Online Test', 'Technical Interview', 'HR Interview'],
+    eligibilityStatus: 'Eligible',
+    applied: false,
+  },
+]
