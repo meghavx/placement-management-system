@@ -27,7 +27,7 @@ import Avatar from '../components/Avatar'
 export default function Navbar({ onToggleSidebar }) {
   const { user, role, logout } = useAuth()
 
-  const handleLogout = () => {
+  const handleLogout = async() => {
     logout()
     window.location.href = ROUTES.LOGIN
   }
