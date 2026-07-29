@@ -11,6 +11,9 @@ import com.application.placementmanagementsystem.models.User;
 import com.application.placementmanagementsystem.models.enums.RoleType;
 import com.application.placementmanagementsystem.repositories.StudentRepository;
 import com.application.placementmanagementsystem.repositories.UserRepository;
+import com.application.placementmanagementsystem.models.enums.AuditAction;
+import com.application.placementmanagementsystem.models.enums.AuditEntityType;
+import com.application.placementmanagementsystem.services.audit.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,7 @@ public class StudentServiceImpl implements StudentService {
     private final UserRepository userRepository;
     private final StudentMapper studentMapper;
     private final PasswordEncoder passwordEncoder;
+    private final AuditLogService auditLogService;
 
     @Override
     public StudentResponse createStudent(StudentCreateRequest request) {
@@ -66,6 +70,13 @@ public class StudentServiceImpl implements StudentService {
                 .build();
 
         Student savedStudent = studentRepository.save(student);
+
+        auditLogService.log(
+                AuditAction.CREATE,
+                AuditEntityType.STUDENT,
+                savedStudent.getId(),
+                "Created student: " + savedStudent.getUser().getFullName()
+        );
 
         return studentMapper.toResponse(savedStudent);
     }
@@ -117,7 +128,12 @@ public class StudentServiceImpl implements StudentService {
 
         userRepository.save(user);
         Student updatedStudent = studentRepository.save(student);
-
+        auditLogService.log(
+                AuditAction.UPDATE,
+                AuditEntityType.STUDENT,
+                updatedStudent.getId(),
+                "Updated student: " + updatedStudent.getUser().getFullName()
+        );
         return studentMapper.toResponse(updatedStudent);
     }
 
@@ -137,6 +153,14 @@ public class StudentServiceImpl implements StudentService {
         user.setActive(active);
 
         userRepository.save(user);
+
+        auditLogService.log(
+                active ? AuditAction.ACTIVATE : AuditAction.DEACTIVATE,
+                AuditEntityType.STUDENT,
+                student.getId(),
+                (active ? "Activated student: " : "Deactivated student: ")
+                        + student.getUser().getFullName()
+        );
 
         return studentMapper.toResponse(student);
     }

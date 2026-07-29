@@ -6,6 +6,9 @@ import com.application.placementmanagementsystem.exceptions.ResourceNotFoundExce
 import com.application.placementmanagementsystem.models.PasswordResetToken;
 import com.application.placementmanagementsystem.models.User;
 import com.application.placementmanagementsystem.repositories.UserRepository;
+import com.application.placementmanagementsystem.models.enums.AuditAction;
+import com.application.placementmanagementsystem.models.enums.AuditEntityType;
+import com.application.placementmanagementsystem.services.audit.AuditLogService;
 import com.application.placementmanagementsystem.services.email.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +28,7 @@ public class AuthService {
     private final UserRepository userRepository;
 
     private final JwtService jwtService;
+    private final AuditLogService auditLogService;
 
     private final PasswordResetTokenService passwordResetTokenService;
     private final EmailService emailService;
@@ -59,6 +63,14 @@ public class AuthService {
         }
 
         String accessToken = jwtService.generateAccessToken((user)).toString();
+
+        auditLogService.log(
+                user,
+                AuditAction.LOGIN,
+                AuditEntityType.USER,
+                user.getId(),
+                "Logged in."
+        );
 
         return LoginResponse.builder()
                 .id(user.getId())
@@ -98,6 +110,13 @@ public class AuthService {
         }
         user.setPassword(passwordEncoder.encode(request.newPassword()));
         userRepository.save(user);
+
+        auditLogService.log(
+                AuditAction.UPDATE,
+                AuditEntityType.USER,
+                user.getId(),
+                "Changed password."
+        );
     }
 
     public void forgotPassword(ForgotPasswordRequest request) {
@@ -152,12 +171,29 @@ public class AuthService {
         }
         user.setPassword(passwordEncoder.encode(request.newPassword()));
         userRepository.save(user);
+        auditLogService.log(
+                user,
+                AuditAction.UPDATE,
+                AuditEntityType.USER,
+                user.getId(),
+                "Reset password."
+        );
         passwordResetTokenService.markTokenAsUsed(resetToken);
     }
 
     // Mostly symbolic in a stateless JWT setup since
     // the token itself remains valid until it expires.
     public void logout() {
+
+        User user = getAuthenticatedUser();
+
+        auditLogService.log(
+                AuditAction.LOGOUT,
+                AuditEntityType.USER,
+                user.getId(),
+                "Logged out."
+        );
+
         SecurityContextHolder.clearContext();
     }
 }

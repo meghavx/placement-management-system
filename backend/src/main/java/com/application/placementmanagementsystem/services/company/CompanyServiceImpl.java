@@ -7,7 +7,10 @@ import com.application.placementmanagementsystem.exceptions.DuplicateResourceExc
 import com.application.placementmanagementsystem.exceptions.ResourceNotFoundException;
 import com.application.placementmanagementsystem.mappers.CompanyMapper;
 import com.application.placementmanagementsystem.models.Company;
+import com.application.placementmanagementsystem.models.enums.AuditAction;
+import com.application.placementmanagementsystem.models.enums.AuditEntityType;
 import com.application.placementmanagementsystem.repositories.CompanyRepository;
+import com.application.placementmanagementsystem.services.audit.AuditLogService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
     private final CompanyMapper companyMapper;
+    private final AuditLogService auditLogService;
 
     @Override
     public CompanyResponse createCompany(
@@ -37,6 +41,13 @@ public class CompanyServiceImpl implements CompanyService {
 
         Company savedCompany =
                 companyRepository.save(company);
+
+        auditLogService.log(
+                AuditAction.CREATE,
+                AuditEntityType.COMPANY,
+                savedCompany.getId(),
+                "Created company: " + savedCompany.getCompanyName()
+        );
 
         return companyMapper.toResponse(savedCompany);
     }
@@ -60,6 +71,13 @@ public class CompanyServiceImpl implements CompanyService {
         Company updatedCompany =
                 companyRepository.save(company);
 
+        auditLogService.log(
+                AuditAction.UPDATE,
+                AuditEntityType.COMPANY,
+                updatedCompany.getId(),
+                "Updated company: " + updatedCompany.getCompanyName()
+        );
+
         return companyMapper.toResponse(updatedCompany);
     }
 
@@ -74,6 +92,15 @@ public class CompanyServiceImpl implements CompanyService {
                 );
         company.setActive(active);
         Company updatedCompany = companyRepository.save(company);
+
+        auditLogService.log(
+                active ? AuditAction.ACTIVATE : AuditAction.DEACTIVATE,
+                AuditEntityType.COMPANY,
+                updatedCompany.getId(),
+                (active ? "Activated company: " : "Deactivated company: ")
+                        + updatedCompany.getCompanyName()
+        );
+
         return companyMapper.toResponse(updatedCompany);
     }
 
