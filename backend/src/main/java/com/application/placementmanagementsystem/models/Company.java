@@ -42,6 +42,7 @@ public class Company {
     @Column(nullable = false)
     private String industry;
 
+    @Builder.Default
     @Column(nullable = false)
     private boolean active = true;
 
