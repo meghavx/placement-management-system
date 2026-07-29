@@ -1,122 +1,166 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+/*
+Purpose
+Root application component. Wires up global providers (Auth,
+Notification) and the centralized route table. Matches the
+Application Flow described in the spec:
+Login -> Role Identification -> Redirect to Role Dashboard -> Sidebar Navigation.
 
-function App() {
-  const [count, setCount] = useState(0)
+Current Features
+- AuthProvider and NotificationProvider wrap the whole app
+- Centralized <Routes> definition using ROUTES constants
+- Role-based route protection via ProtectedRoute
+- Lazy-loaded page modules for a lighter initial bundle
 
+Future Features
+- Backend Integration: no changes needed here — auth/session logic
+  lives in useAuth/authService only.
+*/
+
+import { Suspense, lazy } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider, useAuth } from './hooks/useAuth'
+import { NotificationProvider } from './hooks/useNotification'
+import ProtectedRoute from './layouts/ProtectedRoute'
+import DashboardLayout from './layouts/DashboardLayout'
+import LoadingScreen from './layouts/LoadingScreen'
+import NotFound from './layouts/NotFound'
+import { ROUTES } from './constants/routes'
+import { ROLES } from './constants/roles'
+import { ROLE_HOME_ROUTE } from './routes/sidebarMenus'
+
+const LoginPage = lazy(() => import('./pages/auth/LoginPage'))
+
+// Student pages
+const StudentDashboard = lazy(() => import('./pages/student/StudentDashboard'))
+const StudentProfile = lazy(() => import('./pages/student/StudentProfile'))
+const StudentResume = lazy(() => import('./pages/student/StudentResume'))
+const StudentDrives = lazy(() => import('./pages/student/StudentDrives'))
+const StudentApplications = lazy(() => import('./pages/student/StudentApplications'))
+const StudentNotifications = lazy(() => import('./pages/student/StudentNotifications'))
+
+// Recruiter pages
+const RecruiterDashboard = lazy(() => import('./pages/recruiter/RecruiterDashboard'))
+const RecruiterDrives = lazy(() => import('./pages/recruiter/RecruiterDrives'))
+const RecruiterDriveForm = lazy(() => import('./pages/recruiter/RecruiterDriveForm'))
+const RecruiterApplicants = lazy(() => import('./pages/recruiter/RecruiterApplicants'))
+const RecruiterShortlisted = lazy(() => import('./pages/recruiter/RecruiterShortlisted'))
+const RecruiterInterviews = lazy(() => import('./pages/recruiter/RecruiterInterviews'))
+const RecruiterResults = lazy(() => import('./pages/recruiter/RecruiterResults'))
+const RecruiterNotifications = lazy(() => import('./pages/recruiter/RecruiterNotifications'))
+
+// Placement Admin pages
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
+const AdminStudents = lazy(() => import('./pages/admin/AdminStudents'))
+const AdminRecruiters = lazy(() => import('./pages/admin/AdminRecruiters'))
+const AdminCompanies = lazy(() => import('./pages/admin/AdminCompanies'))
+const AdminDrives = lazy(() => import('./pages/admin/AdminDrives'))
+const AdminEligibility = lazy(() => import('./pages/admin/AdminEligibility'))
+const AdminApplications = lazy(() => import('./pages/admin/AdminApplications'))
+const AdminReports = lazy(() => import('./pages/admin/AdminReports'))
+
+// Super Admin pages
+const SuperAdminDashboard = lazy(() => import('./pages/superAdmin/SuperAdminDashboard'))
+const SuperAdminPlacementAdmins = lazy(() => import('./pages/superAdmin/SuperAdminPlacementAdmins'))
+const SuperAdminAuditLogs = lazy(() => import('./pages/superAdmin/SuperAdminAuditLogs'))
+const SuperAdminReports = lazy(() => import('./pages/superAdmin/SuperAdminReports'))
+const SuperAdminSettings = lazy(() => import('./pages/superAdmin/SuperAdminSettings'))
+
+// Redirects an already-logged-in user straight to their dashboard
+// instead of showing the login form again.
+function LoginRoute() {
+  const { isAuthenticated, role } = useAuth()
+  if (isAuthenticated) {
+    return <Navigate to={ROLE_HOME_ROUTE[role]} replace />
+  }
+  return <LoginPage />
+}
+
+function AppRoutes() {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+    <Suspense fallback={<LoadingScreen />}>
+      <Routes>
+        <Route path={ROUTES.LOGIN} element={<LoginRoute />} />
+
+        {/* Student Module */}
+        <Route
+          element={
+            <ProtectedRoute allowedRoles={[ROLES.STUDENT]}>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
         >
-          Count is {count}
-        </button>
-      </section>
+          <Route path={ROUTES.STUDENT_DASHBOARD} element={<StudentDashboard />} />
+          <Route path={ROUTES.STUDENT_PROFILE} element={<StudentProfile />} />
+          <Route path={ROUTES.STUDENT_RESUME} element={<StudentResume />} />
+          <Route path={ROUTES.STUDENT_DRIVES} element={<StudentDrives />} />
+          <Route path={ROUTES.STUDENT_APPLICATIONS} element={<StudentApplications />} />
+          <Route path={ROUTES.STUDENT_NOTIFICATIONS} element={<StudentNotifications />} />
+        </Route>
 
-      <div className="ticks"></div>
+        {/* Recruiter Module */}
+        <Route
+          element={
+            <ProtectedRoute allowedRoles={[ROLES.RECRUITER]}>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path={ROUTES.RECRUITER_DASHBOARD} element={<RecruiterDashboard />} />
+          <Route path={ROUTES.RECRUITER_VIEW_DRIVES} element={<RecruiterDrives />} />
+          <Route path={ROUTES.RECRUITER_CREATE_DRIVE} element={<RecruiterDriveForm />} />
+          <Route path={ROUTES.RECRUITER_EDIT_DRIVE} element={<RecruiterDriveForm />} />
+          <Route path={ROUTES.RECRUITER_VIEW_APPLICANTS} element={<RecruiterApplicants />} />
+          <Route path={ROUTES.RECRUITER_SHORTLIST} element={<RecruiterShortlisted />} />
+          <Route path={ROUTES.RECRUITER_INTERVIEWS} element={<RecruiterInterviews />} />
+          <Route path={ROUTES.RECRUITER_RESULTS} element={<RecruiterResults />} />
+          <Route path={ROUTES.RECRUITER_NOTIFICATIONS} element={<RecruiterNotifications />} />
+        </Route>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        {/* Placement Admin Module */}
+        <Route
+          element={
+            <ProtectedRoute allowedRoles={[ROLES.PLACEMENT_ADMIN]}>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path={ROUTES.ADMIN_DASHBOARD} element={<AdminDashboard />} />
+          <Route path={ROUTES.ADMIN_STUDENTS} element={<AdminStudents />} />
+          <Route path={ROUTES.ADMIN_RECRUITERS} element={<AdminRecruiters />} />
+          <Route path={ROUTES.ADMIN_COMPANIES} element={<AdminCompanies />} />
+          <Route path={ROUTES.ADMIN_DRIVES} element={<AdminDrives />} />
+          <Route path={ROUTES.ADMIN_ELIGIBILITY} element={<AdminEligibility />} />
+          <Route path={ROUTES.ADMIN_APPLICATIONS} element={<AdminApplications />} />
+          <Route path={ROUTES.ADMIN_REPORTS} element={<AdminReports />} />
+        </Route>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        {/* Super Admin Module */}
+        <Route
+          element={
+            <ProtectedRoute allowedRoles={[ROLES.SUPER_ADMIN]}>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path={ROUTES.SUPER_ADMIN_DASHBOARD} element={<SuperAdminDashboard />} />
+          <Route path={ROUTES.SUPER_ADMIN_PLACEMENT_ADMINS} element={<SuperAdminPlacementAdmins />} />
+          <Route path={ROUTES.SUPER_ADMIN_AUDIT_LOGS} element={<SuperAdminAuditLogs />} />
+          <Route path={ROUTES.SUPER_ADMIN_REPORTS} element={<SuperAdminReports />} />
+          <Route path={ROUTES.SUPER_ADMIN_SETTINGS} element={<SuperAdminSettings />} />
+        </Route>
+
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
   )
 }
 
-export default App
+export default function App() {
+  return (
+    <AuthProvider>
+      <NotificationProvider>
+        <AppRoutes />
+      </NotificationProvider>
+    </AuthProvider>
+  )
+}

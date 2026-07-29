@@ -1,23 +1,24 @@
 package com.application.placementmanagementsystem.auth;
 
-import com.application.placementmanagementsystem.auth.dtos.ChangePasswordRequest;
-import com.application.placementmanagementsystem.auth.dtos.CurrentUserResponse;
-import com.application.placementmanagementsystem.auth.dtos.LoginRequest;
-import com.application.placementmanagementsystem.auth.dtos.LoginResponse;
+import com.application.placementmanagementsystem.auth.dtos.*;
 import com.application.placementmanagementsystem.auth.jwt.JwtService;
 import com.application.placementmanagementsystem.exceptions.ResourceNotFoundException;
+import com.application.placementmanagementsystem.models.PasswordResetToken;
 import com.application.placementmanagementsystem.models.User;
 import com.application.placementmanagementsystem.repositories.UserRepository;
 import com.application.placementmanagementsystem.models.enums.AuditAction;
 import com.application.placementmanagementsystem.models.enums.AuditEntityType;
 import com.application.placementmanagementsystem.services.audit.AuditLogService;
+import com.application.placementmanagementsystem.services.email.EmailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +26,15 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+
     private final JwtService jwtService;
     private final AuditLogService auditLogService;
+
+    private final PasswordResetTokenService passwordResetTokenService;
+    private final EmailService emailService;
+
+    @Value("${app.mail.frontend-url}")
+    private String frontendUrl;
 
     private User getAuthenticatedUser() {
         CustomUserPrincipal principal =
@@ -109,6 +117,61 @@ public class AuthService {
                 user.getId(),
                 "Password changed."
         );
+    }
+
+    public void forgotPassword(ForgotPasswordRequest request) {
+
+        User user = userRepository.findByEmail(request.email()).orElse(null);
+
+        // Do not reveal whether an account exists for this email.
+        if (user == null) return;
+
+        String token = passwordResetTokenService.createToken(user);
+
+        String resetLink = frontendUrl
+                + "/reset-password?token="
+                + token;
+
+        String subject = "Reset your PMS password";
+
+        String body = """
+            Hello %s,
+
+            We received a request to reset your password.
+
+            Use the link below to set a new password:
+
+            %s
+
+            This link will expire in 30 minutes.
+
+            If you did not request a password reset, you can ignore this email.
+
+            Placement Management System
+            """.formatted(
+                user.getFullName(),
+                resetLink
+        );
+
+        emailService.sendEmail(
+                user.getEmail(),
+                subject,
+                body
+        );
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        PasswordResetToken resetToken = passwordResetTokenService.validateToken(request.token());
+        User user = resetToken.getUser();
+        if (passwordEncoder.matches(request.newPassword(), user.getPassword())) {
+            throw new IllegalArgumentException(
+                    "New password must be different from the current password."
+            );
+        }
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+        passwordResetTokenService.markTokenAsUsed(resetToken);
     }
 
     // Mostly symbolic in a stateless JWT setup since
