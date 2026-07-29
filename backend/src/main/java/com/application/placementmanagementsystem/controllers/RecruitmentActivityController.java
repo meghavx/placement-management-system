@@ -5,6 +5,8 @@ import com.application.placementmanagementsystem.common.ResponseBuilder;
 import com.application.placementmanagementsystem.dtos.recruitmentactivity.RecruitmentActivityRequest;
 import com.application.placementmanagementsystem.dtos.recruitmentactivity.RecruitmentActivityResponse;
 import com.application.placementmanagementsystem.services.recruitmentactivity.RecruitmentActivityService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,12 +19,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/drives/{driveId}/activities")
 @RequiredArgsConstructor
+@Tag(name = "Recruitement Activity Scheduling")
 public class RecruitmentActivityController {
 
     private final RecruitmentActivityService recruitmentActivityService;
 
     @PostMapping
     @PreAuthorize("hasRole('PLACEMENT_ADMIN')")
+    @Operation(summary = "Create Recruitment Activity")
     public ResponseEntity<ApiResponse<RecruitmentActivityResponse>> createActivity(
             @PathVariable Long driveId,
             @Valid @RequestBody RecruitmentActivityRequest request
@@ -39,6 +43,7 @@ public class RecruitmentActivityController {
 
     @PutMapping("/{activityId}")
     @PreAuthorize("hasRole('PLACEMENT_ADMIN')")
+    @Operation(summary = "Update Recruitment Activity")
     public ResponseEntity<ApiResponse<RecruitmentActivityResponse>> updateActivity(
             @PathVariable Long driveId,
             @PathVariable Long activityId,
@@ -60,6 +65,7 @@ public class RecruitmentActivityController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('STUDENT', 'RECRUITER', 'PLACEMENT_ADMIN')")
+    @Operation(summary = "Get all Recruitment Activities for a specific Drive")
     public ResponseEntity<ApiResponse<List<RecruitmentActivityResponse>>> getActivitiesByDrive(
             @PathVariable Long driveId
     ) {
