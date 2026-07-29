@@ -46,12 +46,27 @@ export default function AdminDrives() {
   const { searchTerm, setSearchTerm, filteredItems } = useSearch(drives, ['company', 'role'])
   const statusFiltered = status ? filteredItems.filter((d) => d.status === status) : filteredItems
 
+  // useEffect(() => {
+  //   // Backend Integration: replace with real GET /admin/drives response.
+  //   getAdminDrives().then((res) => {
+  //     setDrives(res)
+  //     setLoading(false)
+  //   })
+  // }, [])
   useEffect(() => {
-    // Backend Integration: replace with real GET /admin/drives response.
-    getAdminDrives().then((res) => {
-      setDrives(res)
-      setLoading(false)
-    })
+    const fetchDrives = async () => {
+      try {
+        const data = await getAdminDrives()
+        setDrives(data)
+      } catch (error) {
+        console.error(error)
+        notify('Failed to load drives')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchDrives()
   }, [])
 
   const stats = {

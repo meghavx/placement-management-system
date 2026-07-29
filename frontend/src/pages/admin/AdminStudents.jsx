@@ -58,12 +58,28 @@ export default function AdminStudents() {
     .filter((s) => (department ? s.department === department : true))
     .filter((s) => (status ? s.status === status : true))
 
+  // useEffect(() => {
+  //   // Backend Integration: replace with real GET /admin/students response.
+  //   getStudents().then((res) => {
+  //     setStudents(res)
+  //     setLoading(false)
+  //   })
+  // }, [])
+
   useEffect(() => {
-    // Backend Integration: replace with real GET /admin/students response.
-    getStudents().then((res) => {
-      setStudents(res)
-      setLoading(false)
-    })
+    const fetchStudents = async () => {
+      try {
+        const data = await getStudents()
+        setStudents(data)
+      } catch (error) {
+        console.error(error)
+        notify('Failed to load students')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchStudents()
   }, [])
 
   const stats = {

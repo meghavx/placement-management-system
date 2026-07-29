@@ -16,6 +16,7 @@ import { placementDriveManagementData } from '../data/placementDriveManagementDa
 import { eligibilityData } from '../data/eligibilityData'
 import { adminApplicationData } from '../data/applicationData'
 import { reportData } from '../data/reportData'
+import apiClient from './apiClient'
 
 // Future: GET /admin/dashboard
 export function getAdminDashboard() {
@@ -23,8 +24,37 @@ export function getAdminDashboard() {
 }
 
 // Future: GET /admin/students
-export function getStudents() {
-  return Promise.resolve(studentManagementData)
+export async function getStudents() {
+  try {
+    const response = await apiClient.get('/students')
+
+    return response.data.data.map((student) => ({
+      id: student.rollNumber || student.id,
+
+      userId: student.userId,
+
+      name: student.fullName,
+      email: student.email,
+      phone: student.phoneNumber,
+
+      department: student.department,
+
+      batch: student.graduationYear
+        ? `${student.graduationYear - 4}-${student.graduationYear}`
+        : '-',
+
+      cgpa: student.cgpa,
+
+      rollNumber: student.rollNumber,
+
+      backlogs: student.currentBacklogs,
+
+      status: student.active ? 'Active' : 'Inactive',
+    }))
+  } catch (error) {
+    console.error('Failed to fetch students:', error)
+    throw error
+  }
 }
 
 // Future: POST /admin/students (body: student DTO)
@@ -43,8 +73,32 @@ export function deleteStudent(studentId) {
 }
 
 // Future: GET /admin/recruiters
-export function getRecruiters() {
-  return Promise.resolve(recruiterManagementData)
+export async function getRecruiters() {
+  try {
+    const response = await apiClient.get('/recruiters')
+
+    return response.data.data.map((recruiter) => ({
+      id: recruiter.id,
+      userId: recruiter.userId,
+
+      recruiter: recruiter.fullName,
+      company: recruiter.companyName,
+
+      email: recruiter.email,
+      phone: recruiter.phoneNumber,
+
+      status: recruiter.active ? 'Active' : 'Inactive',
+
+      designation: recruiter.designation,
+      companyId: recruiter.companyId,
+
+      // Backend doesn't provide this yet
+      createdDate: null,
+    }))
+  } catch (error) {
+    console.error('Failed to fetch recruiters:', error)
+    throw error
+  }
 }
 
 // Future: POST /admin/recruiters (body: recruiter DTO)
@@ -63,8 +117,48 @@ export function deleteRecruiter(recruiterId) {
 }
 
 // Future: GET /admin/drives
-export function getAdminDrives() {
-  return Promise.resolve(placementDriveManagementData)
+// export function getAdminDrives() {
+//   return Promise.resolve(placementDriveManagementData)
+// }
+export async function getAdminDrives() {
+  try {
+    const response = await apiClient.get('/drives')
+
+    const statusMap = {
+      DRAFT: 'Draft',
+      PUBLISHED: 'Published',
+      CLOSED: 'Closed',
+      EXPIRED: 'Expired',
+    }
+
+    return response.data.data.map((drive) => ({
+      id: drive.id,
+
+      drive: `${drive.companyName} - ${drive.jobRole}`,
+
+      company: drive.companyName,
+
+      role: drive.jobRole,
+
+      package: drive.packageOffered,
+
+      deadline: drive.driveDate,
+
+      status: statusMap[drive.status] ?? drive.status,
+
+      // Backend doesn't provide these yet
+      applicants: 0,
+
+      location: drive.location,
+
+      eligible: drive.eligible,
+
+      ineligibilityReasons: drive.ineligibilityReasons,
+    }))
+  } catch (error) {
+    console.error('Failed to fetch drives:', error)
+    throw error
+  }
 }
 
 // Future: PUT /admin/drives/{id}
