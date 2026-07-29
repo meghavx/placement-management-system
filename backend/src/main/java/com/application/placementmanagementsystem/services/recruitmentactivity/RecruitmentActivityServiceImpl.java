@@ -10,6 +10,9 @@ import com.application.placementmanagementsystem.models.RecruitmentActivity;
 import com.application.placementmanagementsystem.models.enums.ActivityMode;
 import com.application.placementmanagementsystem.repositories.PlacementDriveRepository;
 import com.application.placementmanagementsystem.repositories.RecruitmentActivityRepository;
+import com.application.placementmanagementsystem.models.enums.AuditAction;
+import com.application.placementmanagementsystem.models.enums.AuditEntityType;
+import com.application.placementmanagementsystem.services.audit.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,7 @@ public class RecruitmentActivityServiceImpl implements RecruitmentActivityServic
     private final RecruitmentActivityRepository recruitmentActivityRepository;
     private final PlacementDriveRepository placementDriveRepository;
     private final RecruitmentActivityMapper recruitmentActivityMapper;
+    private final AuditLogService auditLogService;
 
     @Override
     public RecruitmentActivityResponse createActivity(
@@ -45,6 +49,15 @@ public class RecruitmentActivityServiceImpl implements RecruitmentActivityServic
             activity.setMeetingLink(null);
         }
         RecruitmentActivity savedActivity = recruitmentActivityRepository.save(activity);
+
+        auditLogService.log(
+                AuditAction.CREATE,
+                AuditEntityType.PLACEMENT_DRIVE,
+                placementDrive.getId(),
+                "Created recruitment activity '" + savedActivity.getTitle()
+                        + "' for placement drive '" + placementDrive.getJobRole() + "'."
+        );
+
         return recruitmentActivityMapper.toResponse(savedActivity);
     }
 
@@ -78,6 +91,15 @@ public class RecruitmentActivityServiceImpl implements RecruitmentActivityServic
             activity.setMeetingLink(null);
         }
         RecruitmentActivity updatedActivity = recruitmentActivityRepository.save(activity);
+
+        auditLogService.log(
+                AuditAction.UPDATE,
+                AuditEntityType.PLACEMENT_DRIVE,
+                placementDrive.getId(),
+                "Updated recruitment activity '" + updatedActivity.getTitle()
+                        + "' for placement drive '" + placementDrive.getJobRole() + "'."
+        );
+
         return recruitmentActivityMapper.toResponse(updatedActivity);
     }
 

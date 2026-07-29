@@ -69,7 +69,7 @@ public class AuthService {
                 AuditAction.LOGIN,
                 AuditEntityType.USER,
                 user.getId(),
-                "User logged in."
+                "Logged in."
         );
 
         return LoginResponse.builder()
@@ -115,7 +115,7 @@ public class AuthService {
                 AuditAction.UPDATE,
                 AuditEntityType.USER,
                 user.getId(),
-                "Password changed."
+                "Changed password."
         );
     }
 
@@ -171,6 +171,13 @@ public class AuthService {
         }
         user.setPassword(passwordEncoder.encode(request.newPassword()));
         userRepository.save(user);
+        auditLogService.log(
+                user,
+                AuditAction.UPDATE,
+                AuditEntityType.USER,
+                user.getId(),
+                "Reset password."
+        );
         passwordResetTokenService.markTokenAsUsed(resetToken);
     }
 
@@ -178,11 +185,13 @@ public class AuthService {
     // the token itself remains valid until it expires.
     public void logout() {
 
+        User user = getAuthenticatedUser();
+
         auditLogService.log(
                 AuditAction.LOGOUT,
                 AuditEntityType.USER,
-                getAuthenticatedUser().getId(),
-                "User logged out."
+                user.getId(),
+                "Logged out."
         );
 
         SecurityContextHolder.clearContext();

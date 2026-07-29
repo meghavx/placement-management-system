@@ -51,13 +51,19 @@ public class AuditLogServiceImpl implements AuditLogService {
             Long entityId,
             String description
     ) {
-
         AuditLog auditLog = AuditLog.builder()
                 .user(user)
                 .action(action)
                 .entityType(entityType)
                 .entityId(entityId)
-                .description(description)
+                .description(
+                        String.format(
+                                "%s - %s - %s",
+                                user.getRole(),
+                                user.getFullName(),
+                                description
+                        )
+                )
                 .build();
 
         auditLogRepository.save(auditLog);
