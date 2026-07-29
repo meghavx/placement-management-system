@@ -13,6 +13,10 @@ import com.application.placementmanagementsystem.repositories.RecruitmentActivit
 import com.application.placementmanagementsystem.models.enums.AuditAction;
 import com.application.placementmanagementsystem.models.enums.AuditEntityType;
 import com.application.placementmanagementsystem.services.audit.AuditLogService;
+import com.application.placementmanagementsystem.models.Application;
+import com.application.placementmanagementsystem.models.enums.NotificationType;
+import com.application.placementmanagementsystem.repositories.ApplicationRepository;
+import com.application.placementmanagementsystem.services.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +30,8 @@ public class RecruitmentActivityServiceImpl implements RecruitmentActivityServic
     private final PlacementDriveRepository placementDriveRepository;
     private final RecruitmentActivityMapper recruitmentActivityMapper;
     private final AuditLogService auditLogService;
+    private final ApplicationRepository applicationRepository;
+    private final NotificationService notificationService;
 
     @Override
     public RecruitmentActivityResponse createActivity(
@@ -49,6 +55,12 @@ public class RecruitmentActivityServiceImpl implements RecruitmentActivityServic
             activity.setMeetingLink(null);
         }
         RecruitmentActivity savedActivity = recruitmentActivityRepository.save(activity);
+
+        notifyApplicants(
+                placementDrive,
+                savedActivity,
+                false
+        );
 
         auditLogService.log(
                 AuditAction.CREATE,
@@ -92,6 +104,12 @@ public class RecruitmentActivityServiceImpl implements RecruitmentActivityServic
         }
         RecruitmentActivity updatedActivity = recruitmentActivityRepository.save(activity);
 
+        notifyApplicants(
+                placementDrive,
+                updatedActivity,
+                true
+        );
+
         auditLogService.log(
                 AuditAction.UPDATE,
                 AuditEntityType.PLACEMENT_DRIVE,
@@ -120,6 +138,49 @@ public class RecruitmentActivityServiceImpl implements RecruitmentActivityServic
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Placement drive not found with id: " + driveId
                 ));
+    }
+
+    private void notifyApplicants(
+            PlacementDrive placementDrive,
+            RecruitmentActivity activity,
+            boolean updated
+    ) {
+
+        List<Application> applications =
+                applicationRepository.findByPlacementDrive(placementDrive);
+
+        String title = updated
+                ? "Recruitment Activity Updated"
+                : "Recruitment Activity Scheduled";
+
+        StringBuilder message = new StringBuilder();
+
+        message.append(activity.getTitle())
+                .append(updated ? " has been updated" : " has been scheduled")
+                .append(" for ")
+                .append(placementDrive.getJobRole())
+                .append(" at ")
+                .append(placementDrive.getCompany().getCompanyName())
+                .append(". Scheduled at: ")
+                .append(activity.getScheduledAt());
+
+        if (activity.getMode() == ActivityMode.ONLINE) {
+            message.append(". Meeting Link: ")
+                    .append(activity.getMeetingLink());
+        } else {
+            message.append(". Venue: ")
+                    .append(activity.getVenue());
+        }
+
+        for (Application application : applications) {
+
+            notificationService.createNotification(
+                    application.getStudent().getUser(),
+                    NotificationType.RECRUITMENT_ACTIVITY,
+                    title,
+                    message.toString()
+            );
+        }
     }
 
     private void validateActivityDetails(RecruitmentActivityRequest request) {
