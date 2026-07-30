@@ -43,6 +43,7 @@ const ROLE_OPTIONS = [
   { label: 'Student', value: ROLES.STUDENT },
   { label: 'Recruiter', value: ROLES.RECRUITER },
   { label: 'Placement Admin', value: ROLES.PLACEMENT_ADMIN },
+  { label: 'Super Admin', value: ROLES.SUPER_ADMIN },
 ]
 
 export default function LoginPage() {
