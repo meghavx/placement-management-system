@@ -125,7 +125,7 @@ export async function getAuditLogs() {
   try {
     const response = await apiClient.get('/audit-logs')
 
-    console.log(response.data)
+    // console.log(response.data)
     return response.data.data.map((log) => ({
       id: log.id,
 

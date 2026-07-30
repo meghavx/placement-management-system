@@ -41,7 +41,7 @@ export default function SuperAdminAuditLogs() {
   const fetchAuditLogs = async () => {
     try {
       const res = await getAuditLogs()
-      console.log('Fetched audit logs:', res)
+      // console.log('Fetched audit logs:', res)
       setLogs(res)
     } catch (error) {
       console.error(error)
