@@ -1,4 +1,4 @@
-package com.application.placementmanagementsystem.services.placementDrive;
+package com.application.placementmanagementsystem.services.placementdrive;
 
 import com.application.placementmanagementsystem.auth.CustomUserPrincipal;
 import com.application.placementmanagementsystem.dtos.eligibility.EligibilityEvaluationResult;
