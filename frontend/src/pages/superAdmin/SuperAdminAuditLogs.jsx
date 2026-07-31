@@ -22,6 +22,7 @@ import Table from '../../components/Table'
 import SkeletonLoader from '../../components/SkeletonLoader'
 import { getAuditLogs } from '../../services/superAdminService'
 import { useSearch } from '../../hooks/useSearch'
+import { formatDate } from '../../utils/formatDate'
 
 export default function SuperAdminAuditLogs() {
   const [logs, setLogs] = useState([])
@@ -29,13 +30,28 @@ export default function SuperAdminAuditLogs() {
 
   const { searchTerm, setSearchTerm, filteredItems } = useSearch(logs, ['user', 'action', 'entityType'])
 
+  // useEffect(() => {
+  //   // Backend Integration: replace with real GET /super-admin/audit-logs response.
+  //   getAuditLogs().then((res) => {
+  //     setLogs(res)
+  //     setLoading(false)
+  //   })
+  // }, [])
   useEffect(() => {
-    // Backend Integration: replace with real GET /super-admin/audit-logs response.
-    getAuditLogs().then((res) => {
+  const fetchAuditLogs = async () => {
+    try {
+      const res = await getAuditLogs()
+      // console.log('Fetched audit logs:', res)
       setLogs(res)
+    } catch (error) {
+      console.error(error)
+    } finally {
       setLoading(false)
-    })
-  }, [])
+    }
+  }
+
+  fetchAuditLogs()
+}, [])
 
   return (
     <div className="flex flex-col gap-6">
@@ -52,10 +68,15 @@ export default function SuperAdminAuditLogs() {
       ) : (
         <Table
           columns={[
-            { key: 'user', header: 'User' },
-            { key: 'action', header: 'Action' },
+            { key: 'user', header: 'Username' },
             { key: 'entityType', header: 'Entity Type' },
-            { key: 'timestamp', header: 'Timestamp' },
+            { key: 'description', header: 'Description' },
+            {
+              key: 'timestamp',
+              header: 'Created At',
+              render: (r) => formatDate(r.timestamp),
+              // render: (r) => r.timestamp.replace('T', ' ').split('.')[0],
+            },
           ]}
           rows={filteredItems}
           emptyMessage="No audit log entries found."

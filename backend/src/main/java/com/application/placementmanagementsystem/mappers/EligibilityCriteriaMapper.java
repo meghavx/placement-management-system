@@ -1,7 +1,7 @@
 package com.application.placementmanagementsystem.mappers;
 
-import com.application.placementmanagementsystem.dtos.eligibilityCriteria.EligibilityCriteriaRequest;
-import com.application.placementmanagementsystem.dtos.eligibilityCriteria.EligibilityCriteriaResponse;
+import com.application.placementmanagementsystem.dtos.eligibility.EligibilityCriteriaRequest;
+import com.application.placementmanagementsystem.dtos.eligibility.EligibilityCriteriaResponse;
 import com.application.placementmanagementsystem.models.EligibilityCriteria;
 import com.application.placementmanagementsystem.models.PlacementDrive;
 import org.springframework.stereotype.Component;

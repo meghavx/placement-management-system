@@ -1,8 +1,8 @@
-package com.application.placementmanagementsystem.services.eligibilityCriteria;
+package com.application.placementmanagementsystem.services.eligibility;
 
 import com.application.placementmanagementsystem.auth.CustomUserPrincipal;
-import com.application.placementmanagementsystem.dtos.eligibilityCriteria.EligibilityCriteriaRequest;
-import com.application.placementmanagementsystem.dtos.eligibilityCriteria.EligibilityCriteriaResponse;
+import com.application.placementmanagementsystem.dtos.eligibility.EligibilityCriteriaRequest;
+import com.application.placementmanagementsystem.dtos.eligibility.EligibilityCriteriaResponse;
 import com.application.placementmanagementsystem.exceptions.DuplicateResourceException;
 import com.application.placementmanagementsystem.exceptions.InvalidRequestException;
 import com.application.placementmanagementsystem.exceptions.ResourceNotFoundException;
@@ -11,11 +11,14 @@ import com.application.placementmanagementsystem.models.EligibilityCriteria;
 import com.application.placementmanagementsystem.models.PlacementDrive;
 import com.application.placementmanagementsystem.models.Recruiter;
 import com.application.placementmanagementsystem.models.User;
+import com.application.placementmanagementsystem.models.enums.AuditAction;
+import com.application.placementmanagementsystem.models.enums.AuditEntityType;
 import com.application.placementmanagementsystem.models.enums.DriveStatus;
 import com.application.placementmanagementsystem.repositories.EligibilityCriteriaRepository;
 import com.application.placementmanagementsystem.repositories.PlacementDriveRepository;
 import com.application.placementmanagementsystem.repositories.RecruiterRepository;
 import com.application.placementmanagementsystem.repositories.UserRepository;
+import com.application.placementmanagementsystem.services.audit.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -31,7 +34,7 @@ public class EligibilityCriteriaServiceImpl implements EligibilityCriteriaServic
     private final RecruiterRepository recruiterRepository;
     private final UserRepository userRepository;
     private final EligibilityCriteriaMapper eligibilityCriteriaMapper;
-
+    private final AuditLogService auditLogService;
     private static final String DRIVE_NOT_FOUND = "Placement drive not found.";
     private static final String ELIGIBILITY_NOT_FOUND = "Eligibility criteria not found.";
 
@@ -52,6 +55,14 @@ public class EligibilityCriteriaServiceImpl implements EligibilityCriteriaServic
 
         EligibilityCriteria eligibilityCriteria = eligibilityCriteriaMapper.toEntity(request, placementDrive);
         EligibilityCriteria savedEligibility = eligibilityCriteriaRepository.save(eligibilityCriteria);
+
+        auditLogService.log(
+                AuditAction.CREATE,
+                AuditEntityType.ELIGIBILITY_CRITERIA,
+                savedEligibility.getId(),
+                "Created eligibility criteria."
+        );
+
         return eligibilityCriteriaMapper.toResponse(savedEligibility);
     }
 
@@ -77,6 +88,14 @@ public class EligibilityCriteriaServiceImpl implements EligibilityCriteriaServic
         eligibilityCriteria.setGraduationYear(request.getGraduationYear());
 
         EligibilityCriteria updatedEligibility = eligibilityCriteriaRepository.save(eligibilityCriteria);
+
+        auditLogService.log(
+                AuditAction.UPDATE,
+                AuditEntityType.ELIGIBILITY_CRITERIA,
+                updatedEligibility.getId(),
+                "Updated eligibility criteria."
+        );
+
         return eligibilityCriteriaMapper.toResponse(updatedEligibility);
     }
 

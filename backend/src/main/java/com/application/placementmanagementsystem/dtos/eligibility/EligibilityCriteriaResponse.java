@@ -1,4 +1,4 @@
-package com.application.placementmanagementsystem.dtos.eligibilityCriteria;
+package com.application.placementmanagementsystem.dtos.eligibility;
 
 import com.application.placementmanagementsystem.models.enums.Department;
 import lombok.Builder;

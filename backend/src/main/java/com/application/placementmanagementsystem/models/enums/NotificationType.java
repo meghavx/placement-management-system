@@ -5,6 +5,7 @@ public enum NotificationType {
     APPLICATION,
     SHORTLISTED,
     RESULT,
+    RECRUITMENT_ACTIVITY,
     ANNOUNCEMENT,
     SYSTEM
 }

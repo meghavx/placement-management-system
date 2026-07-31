@@ -9,10 +9,13 @@ import com.application.placementmanagementsystem.mappers.RecruiterMapper;
 import com.application.placementmanagementsystem.models.Company;
 import com.application.placementmanagementsystem.models.Recruiter;
 import com.application.placementmanagementsystem.models.User;
+import com.application.placementmanagementsystem.models.enums.AuditAction;
+import com.application.placementmanagementsystem.models.enums.AuditEntityType;
 import com.application.placementmanagementsystem.models.enums.RoleType;
 import com.application.placementmanagementsystem.repositories.CompanyRepository;
 import com.application.placementmanagementsystem.repositories.RecruiterRepository;
 import com.application.placementmanagementsystem.repositories.UserRepository;
+import com.application.placementmanagementsystem.services.audit.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,6 +33,7 @@ public class RecruiterServiceImpl implements RecruiterService {
     private final CompanyRepository companyRepository;
     private final RecruiterMapper recruiterMapper;
     private final PasswordEncoder passwordEncoder;
+    private final AuditLogService auditLogService;
 
     private static final String DEFAULT_PASSWORD = "Recruiter@123";
 
@@ -56,6 +60,14 @@ public class RecruiterServiceImpl implements RecruiterService {
                 .company(company)
                 .build();
         Recruiter savedRecruiter = recruiterRepository.save(recruiter);
+
+        auditLogService.log(
+                AuditAction.CREATE,
+                AuditEntityType.RECRUITER,
+                savedRecruiter.getId(),
+                "Created recruiter: " + savedRecruiter.getUser().getFullName()
+        );
+
         return recruiterMapper.toResponse(savedRecruiter);
     }
 
@@ -86,6 +98,14 @@ public class RecruiterServiceImpl implements RecruiterService {
         recruiter.setDesignation(request.getDesignation());
 
         Recruiter updatedRecruiter = recruiterRepository.save(recruiter);
+
+        auditLogService.log(
+                AuditAction.UPDATE,
+                AuditEntityType.RECRUITER,
+                updatedRecruiter.getId(),
+                "Updated recruiter: " + updatedRecruiter.getUser().getFullName()
+        );
+
         return recruiterMapper.toResponse(updatedRecruiter);
     }
 
@@ -99,6 +119,15 @@ public class RecruiterServiceImpl implements RecruiterService {
         User user = recruiter.getUser();
         user.setActive(active);
         userRepository.save(user);
+
+        auditLogService.log(
+                active ? AuditAction.ACTIVATE : AuditAction.DEACTIVATE,
+                AuditEntityType.RECRUITER,
+                recruiter.getId(),
+                (active ? "Activated recruiter: " : "Deactivated recruiter: ")
+                        + recruiter.getUser().getFullName()
+        );
+
         return recruiterMapper.toResponse(recruiter);
     }
 

@@ -107,7 +107,12 @@ public class SecurityConfig {
                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(c -> c
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login")
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/auth/login",
+                                "/api/auth/forgot-password",
+                                "/api/auth/reset-password"
+                        )
                         .permitAll()
 
                         .requestMatchers(
@@ -118,6 +123,9 @@ public class SecurityConfig {
                         ).permitAll()
 
                         .requestMatchers("/api/admin/**")
+                        .hasRole("SUPER_ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/audit-logs/**")
                         .hasRole("SUPER_ADMIN")
 
                         .requestMatchers("/api/companies/**")

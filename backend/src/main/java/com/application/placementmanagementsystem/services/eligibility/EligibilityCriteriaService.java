@@ -1,7 +1,7 @@
-package com.application.placementmanagementsystem.services.eligibilityCriteria;
+package com.application.placementmanagementsystem.services.eligibility;
 
-import com.application.placementmanagementsystem.dtos.eligibilityCriteria.EligibilityCriteriaRequest;
-import com.application.placementmanagementsystem.dtos.eligibilityCriteria.EligibilityCriteriaResponse;
+import com.application.placementmanagementsystem.dtos.eligibility.EligibilityCriteriaRequest;
+import com.application.placementmanagementsystem.dtos.eligibility.EligibilityCriteriaResponse;
 
 public interface EligibilityCriteriaService {
 

@@ -27,33 +27,35 @@ import Input from '../../components/Input'
 import Textarea from '../../components/Textarea'
 import Dropdown from '../../components/Dropdown'
 import Button from '../../components/Button'
-import Checkbox from '../../components/Checkbox'
-import { getRecruiterDrives, createDrive, updateDrive } from '../../services/recruiterService'
+import {
+  getRecruiterDriveById,
+  getDriveEligibility,
+  createDrive,
+  updateDrive,
+  createDriveEligibility,
+  updateDriveEligibility,
+} from '../../services/recruiterService'
 import { useNotification } from '../../hooks/useNotification'
 import { validateRequired } from '../../utils/validators'
 import { DEPARTMENTS } from '../../constants/departments'
 import { ROUTES } from '../../constants/routes'
 
 const EMPTY_DRIVE = {
-  company: '',
-  website: '',
+  companyName: '',
+  jobRole: '',
+  jobDescription: '',
+  packageOffered: '',
   location: '',
-  industry: '',
-  role: '',
-  description: '',
-  employmentType: 'Full-Time',
-  package: '',
-  bondInformation: '',
-  minCgpa: '',
-  departments: [],
-  graduationYear: '',
-  skills: '',
-  certifications: '',
-  additionalRequirements: '',
-  selectionProcess: ['Online Test'],
+
   applicationDeadline: '',
   driveDate: '',
-  status: 'Draft',
+
+  eligibility: {
+    minCgpa: '',
+    department: '',
+    maxBacklogs: '',
+    graduationYear: '',
+  },
 }
 
 export default function RecruiterDriveForm() {
@@ -67,22 +69,38 @@ export default function RecruiterDriveForm() {
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    if (isEdit) {
-      // Backend Integration: replace with real GET /recruiter/drives/{id} call.
-      getRecruiterDrives().then((drives) => {
-        const existing = drives.find((d) => String(d.id) === driveId)
-        if (existing) {
-          setForm({
-            ...EMPTY_DRIVE,
-            ...existing,
-            applicationDeadline: existing.deadline,
-          })
-        }
-      })
+    if (!isEdit) return
+
+    const fetchData = async () => {
+      try {
+        const [drive, eligibility] = await Promise.all([
+          getRecruiterDriveById(driveId),
+          getDriveEligibility(driveId),
+        ])
+
+        setForm({
+          ...drive,
+          eligibility,
+        })
+      } catch (error) {
+        console.error(error)
+        notify('Failed to load drive.')
+      }
     }
+    fetchData()
   }, [driveId, isEdit])
 
   const handleChange = (field, value) => setForm((prev) => ({ ...prev, [field]: value }))
+
+  const handleEligibilityChange = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      eligibility: {
+        ...prev.eligibility,
+        [field]: value,
+      },
+    }))
+  }
 
   const toggleDepartment = (dept) => {
     setForm((prev) => ({
@@ -106,33 +124,120 @@ export default function RecruiterDriveForm() {
 
   const validate = () => {
     const newErrors = {}
-    if (!validateRequired(form.company)) newErrors.company = 'Company name is required.'
-    if (!validateRequired(form.role)) newErrors.role = 'Job role is required.'
-    if (!validateRequired(form.package)) newErrors.package = 'Package is required.'
-    if (!validateRequired(form.applicationDeadline)) newErrors.applicationDeadline = 'Application deadline is required.'
-    if (!validateRequired(form.driveDate)) newErrors.driveDate = 'Drive date is required.'
-    if (form.applicationDeadline && form.driveDate && form.applicationDeadline > form.driveDate) {
-      newErrors.applicationDeadline = 'Deadline must be before the drive date.'
+
+    // Job Details
+    if (!validateRequired(form.jobRole))
+      newErrors.jobRole = 'Job role is required.'
+
+    if (!validateRequired(form.packageOffered))
+      newErrors.packageOffered = 'Package is required.'
+
+    if (!validateRequired(form.location))
+      newErrors.location = 'Location is required.'
+
+    // Eligibility
+    if (!validateRequired(form.eligibility.minCgpa))
+      newErrors.minCgpa = 'Minimum CGPA is required.'
+
+    if (!validateRequired(form.eligibility.department))
+      newErrors.department = 'Department is required.'
+
+    if (!validateRequired(form.eligibility.maxBacklogs))
+      newErrors.maxBacklogs = 'Maximum backlogs is required.'
+
+    if (!validateRequired(form.eligibility.graduationYear))
+      newErrors.graduationYear = 'Graduation year is required.'
+
+    // Selection Process (Enable when backend supports it)
+    /*
+    if (
+      !form.selectionProcess.length ||
+      form.selectionProcess.some((round) => !validateRequired(round))
+    ) {
+      newErrors.selectionProcess =
+        'At least one valid selection round is required.'
     }
+    */
+
+    // Deadlines
+    if (!validateRequired(form.applicationDeadline))
+      newErrors.applicationDeadline = 'Application deadline is required.'
+
+    if (!validateRequired(form.driveDate))
+      newErrors.driveDate = 'Drive date is required.'
+
+    if (
+      form.applicationDeadline &&
+      form.driveDate &&
+      form.applicationDeadline > form.driveDate
+    ) {
+      newErrors.applicationDeadline =
+        'Deadline must be before the drive date.'
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     if (!validate()) return
+
     setSaving(true)
-    if (isEdit) {
-      // Backend Integration: replace with real PUT /recruiter/drives/{id} call.
-      await updateDrive(driveId, form)
-      notify('Drive Updated')
-    } else {
-      // Backend Integration: replace with real POST /recruiter/drives call.
-      await createDrive(form)
-      notify('Drive Created')
+
+    try {
+      // Payload for Drive API
+      const drivePayload = {
+        jobRole: form.jobRole,
+        jobDescription: form.jobDescription,
+        packageOffered: Number(form.packageOffered),
+        location: form.location,
+        applicationDeadline: form.applicationDeadline,
+        driveDate: form.driveDate,
+      }
+
+      // Payload for Eligibility API
+      const eligibilityPayload = {
+        minCgpa: Number(form.eligibility.minCgpa),
+        department: form.eligibility.department,
+        maxBacklogs: Number(form.eligibility.maxBacklogs),
+        graduationYear: Number(form.eligibility.graduationYear),
+      }
+
+      if (isEdit) {
+        // Update drive
+        await updateDrive(driveId, drivePayload)
+
+        // Update eligibility
+        await updateDriveEligibility(driveId, eligibilityPayload)
+
+        notify('Drive updated successfully.')
+      } else {
+        // Create drive
+        const createdDrive = await createDrive(drivePayload)
+
+        // Create eligibility for the new drive
+        await createDriveEligibility(
+          createdDrive.id,
+          eligibilityPayload
+        )
+
+        notify('Drive created successfully.')
+      }
+
+      navigate(ROUTES.RECRUITER_VIEW_DRIVES)
+    } catch (error) {
+      console.error(error)
+
+      notify(
+        isEdit
+          ? 'Failed to update drive.'
+          : 'Failed to create drive.'
+      )
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
-    navigate(ROUTES.RECRUITER_VIEW_DRIVES)
   }
 
   return (
@@ -143,58 +248,138 @@ export default function RecruiterDriveForm() {
         breadcrumb={['Dashboard', 'Placement Drives', isEdit ? 'Edit' : 'Create']}
       />
 
-      <Card title="Company Information">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Input label="Company Name" name="company" value={form.company} onChange={(e) => handleChange('company', e.target.value)} required error={errors.company} />
-          <Input label="Website" name="website" value={form.website} onChange={(e) => handleChange('website', e.target.value)} />
-          <Input label="Location" name="location" value={form.location} onChange={(e) => handleChange('location', e.target.value)} />
-          <Input label="Industry" name="industry" value={form.industry} onChange={(e) => handleChange('industry', e.target.value)} />
-        </div>
-      </Card>
-
       <Card title="Job Details">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Input label="Role" name="role" value={form.role} onChange={(e) => handleChange('role', e.target.value)} required error={errors.role} />
-          <Dropdown label="Employment Type" name="employmentType" value={form.employmentType} onChange={(e) => handleChange('employmentType', e.target.value)} options={['Full-Time', 'Internship', 'Internship + Full-Time']} />
-          <Input label="Package (LPA)" name="package" type="number" value={form.package} onChange={(e) => handleChange('package', e.target.value)} required error={errors.package} />
-          <Input label="Bond Information" name="bondInformation" value={form.bondInformation} onChange={(e) => handleChange('bondInformation', e.target.value)} />
+          <Input
+            label="Job Role"
+            name="jobRole"
+            value={form.jobRole}
+            onChange={(e) => handleChange('jobRole', e.target.value)}
+            required
+            error={errors.jobRole}
+          />
+
+          <Input
+            label="Package Offered"
+            name="packageOffered"
+            type="number"
+            value={form.packageOffered}
+            onChange={(e) => handleChange('packageOffered', e.target.value)}
+            required
+            error={errors.packageOffered}
+          />
         </div>
-        <Textarea label="Job Description" name="description" value={form.description} onChange={(e) => handleChange('description', e.target.value)} className="mt-4" />
+
+        <Input
+          className="mt-4"
+          label="Location"
+          name="location"
+          value={form.location}
+          onChange={(e) => handleChange('location', e.target.value)}
+          required
+          error={errors.location}
+        />
+
+        <Textarea
+          className="mt-4"
+          label="Job Description"
+          name="jobDescription"
+          value={form.jobDescription}
+          onChange={(e) => handleChange('jobDescription', e.target.value)}
+        />
       </Card>
 
       <Card title="Eligibility">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Input label="Minimum CGPA" name="minCgpa" type="number" value={form.minCgpa} onChange={(e) => handleChange('minCgpa', e.target.value)} />
-          <Input label="Graduation Year" name="graduationYear" type="number" value={form.graduationYear} onChange={(e) => handleChange('graduationYear', e.target.value)} />
-          <Input label="Required Skills (comma separated)" name="skills" value={form.skills} onChange={(e) => handleChange('skills', e.target.value)} />
-          <Input label="Certifications (optional)" name="certifications" value={form.certifications} onChange={(e) => handleChange('certifications', e.target.value)} />
+
+          <Input
+            label="Minimum CGPA"
+            type="number"
+            value={form.eligibility.minCgpa}
+            onChange={(e) =>
+              handleEligibilityChange('minCgpa', e.target.value)
+            }
+            required
+            error={errors.minCgpa}
+          />
+
+          <Input
+            label="Graduation Year"
+            type="number"
+            value={form.eligibility.graduationYear}
+            onChange={(e) =>
+              handleEligibilityChange('graduationYear', e.target.value)
+            }
+            required
+            error={errors.graduationYear}
+          />
+
+          <Input
+            label="Maximum Backlogs"
+            type="number"
+            value={form.eligibility.maxBacklogs}
+            onChange={(e) =>
+              handleEligibilityChange('maxBacklogs', e.target.value)
+            }
+            required
+            error={errors.maxBacklogs}
+          />
+
+          <Dropdown
+            label="Department"
+            value={form.eligibility.department}
+            onChange={(e) =>
+              handleEligibilityChange('department', e.target.value)
+            }
+            options={DEPARTMENTS}
+            required
+            error={errors.department}
+          />
         </div>
-        <div className="mt-4">
-          <span className="mb-2 block text-sm font-medium text-gray-700">Eligible Departments</span>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {DEPARTMENTS.map((dept) => (
-              <Checkbox key={dept} name={dept} label={dept} checked={form.departments.includes(dept)} onChange={() => toggleDepartment(dept)} />
-            ))}
-          </div>
-        </div>
-        <Textarea label="Additional Requirements" name="additionalRequirements" value={form.additionalRequirements} onChange={(e) => handleChange('additionalRequirements', e.target.value)} className="mt-4" />
       </Card>
 
-      <Card title="Selection Process">
+      {/* <Card title="Selection Process (Future)">
         <div className="flex flex-col gap-3">
-          {form.selectionProcess.map((round, index) => (
+          {form.selectionProcess?.map((round, index) => (
             <div key={index} className="flex items-center gap-2">
-              <Input name={`round-${index}`} value={round} onChange={(e) => updateRound(index, e.target.value)} placeholder="e.g. Technical Interview" className="flex-1" />
-              <button type="button" onClick={() => removeRound(index)} aria-label="Remove round" className="text-gray-400 hover:text-red-500">
-                <X size={18} />
-              </button>
+              <Input
+                className="flex-1"
+                label={index === 0 ? 'Round' : ''}
+                placeholder={`Round ${index + 1}`}
+                value={round}
+                onChange={(e) => updateRound(index, e.target.value)}
+                required
+                error={errors.selectionProcess}
+              />
+
+              {form.selectionProcess.length > 1 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  icon={X}
+                  onClick={() => removeRound(index)}
+                />
+              )}
             </div>
           ))}
-          <Button type="button" variant="outline" size="sm" icon={Plus} onClick={addRound} className="self-start">
-            Add Round
-          </Button>
+
+          <div>
+            <Button
+              type="button"
+              variant="outline"
+              icon={Plus}
+              onClick={addRound}
+            >
+              Add Round
+            </Button>
+          </div>
+
+          <p className="text-xs text-gray-500">
+            Selection process is currently stored only in the frontend.
+            Backend support will be added in a future release.
+          </p>
         </div>
-      </Card>
+      </Card> */}
 
       <Card title="Deadlines">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

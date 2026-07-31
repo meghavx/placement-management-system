@@ -49,12 +49,28 @@ export default function AdminRecruiters() {
 
   const { searchTerm, setSearchTerm, filteredItems } = useSearch(recruiters, ['recruiter', 'company', 'email'])
 
+  // useEffect(() => {
+  //   // Backend Integration: replace with real GET /admin/recruiters response.
+  //   getRecruiters().then((res) => {
+  //     setRecruiters(res)
+  //     setLoading(false)
+  //   })
+  // }, [])
+
   useEffect(() => {
-    // Backend Integration: replace with real GET /admin/recruiters response.
-    getRecruiters().then((res) => {
-      setRecruiters(res)
-      setLoading(false)
-    })
+    const fetchRecruiters = async () => {
+      try {
+        const data = await getRecruiters()
+        setRecruiters(data)
+      } catch (error) {
+        console.error(error)
+        notify('Failed to load recruiters')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchRecruiters()
   }, [])
 
   const stats = {
@@ -135,7 +151,11 @@ export default function AdminRecruiters() {
             { key: 'email', header: 'Email' },
             { key: 'phone', header: 'Phone' },
             { key: 'status', header: 'Status', render: (r) => <Badge label={r.status} /> },
-            { key: 'createdDate', header: 'Created', render: (r) => formatDate(r.createdDate) },
+            {
+              key: 'createdDate',
+              header: 'Created',
+              render: (r) => (r.createdDate ? formatDate(r.createdDate) : '-'),
+            },
           ]}
           rows={filteredItems}
           emptyMessage="No recruiters found."
