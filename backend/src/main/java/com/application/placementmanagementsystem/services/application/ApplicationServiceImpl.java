@@ -120,6 +120,26 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .toList();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<ApplicationResponse> getAllApplications() {
+
+        return applicationRepository.findAll()
+                .stream()
+                .map(applicationMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    public ApplicationResponse getApplicationById(Long applicationId) {
+
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(APPLICATION_NOT_FOUND));
+
+        return applicationMapper.toResponse(application);
+    }
+
     @Transactional
     @Override
     public ApplicationResponse updateApplicationStatus(

@@ -46,7 +46,7 @@ public class ApplicationController {
 
     @GetMapping("/student/applications")
     @PreAuthorize("hasRole('STUDENT')")
-    @Operation(summary = "Get my applications")
+    @Operation(summary = "For Student to get their applications")
     public ResponseEntity<ApiResponse<List<ApplicationSummaryResponse>>> getMyApplications() {
 
         List<ApplicationSummaryResponse> response =
@@ -62,7 +62,7 @@ public class ApplicationController {
 
     @GetMapping("/student/applications/{applicationId}")
     @PreAuthorize("hasRole('STUDENT')")
-    @Operation(summary = "Get my application by ID")
+    @Operation(summary = "For Student to get their application by ID")
     public ResponseEntity<ApiResponse<ApplicationResponse>> getMyApplication(
             @PathVariable Long applicationId
     ) {
@@ -80,7 +80,7 @@ public class ApplicationController {
 
     @GetMapping("/recruiter/drives/{driveId}/applications")
     @PreAuthorize("hasRole('RECRUITER')")
-    @Operation(summary = "Get applications for a placement drive")
+    @Operation(summary = "For Recruiter to get applications for their placement drive")
     public ResponseEntity<ApiResponse<List<ApplicationResponse>>> getApplicationsForDrive(
             @PathVariable Long driveId
     ) {
@@ -91,6 +91,34 @@ public class ApplicationController {
         return ResponseEntity.ok(
                 ResponseBuilder.success(
                         "Applications retrieved successfully.",
+                        response
+                )
+        );
+    }
+
+    @GetMapping("/placement-admin/applications")
+    @PreAuthorize("hasRole('PLACEMENT_ADMIN')")
+    @Operation(summary = "For Placement Admin to get all applications")
+    public ResponseEntity<ApiResponse<List<ApplicationResponse>>> getAllApplications() {
+        List<ApplicationResponse> response = applicationService.getAllApplications();
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "Applications retrieved successfully.",
+                        response
+                )
+        );
+    }
+
+    @GetMapping("/placement-admin/applications/{applicationId}")
+    @PreAuthorize("hasRole('PLACEMENT_ADMIN')")
+    @Operation(summary = "For Placement Admin to get application by ID")
+    public ResponseEntity<ApiResponse<ApplicationResponse>> getApplicationById(
+            @PathVariable Long applicationId
+    ) {
+        ApplicationResponse response = applicationService.getApplicationById(applicationId);
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "Application retrieved successfully.",
                         response
                 )
         );
