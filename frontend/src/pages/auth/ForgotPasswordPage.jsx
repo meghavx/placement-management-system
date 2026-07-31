@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { GraduationCap } from 'lucide-react'
+import { forgotPassword } from '../../services/authService'
 
 import Input from '../../components/Input'
 import Button from '../../components/Button'
@@ -43,11 +44,17 @@ export default function ForgotPasswordPage() {
       // TODO:
       // await forgotPassword(email)
 
-      setSuccessMessage(
-        'If an account exists with this email, a password reset link has been sent.'
-      )
+      await forgotPassword(email)
+
+setSuccessMessage(
+  'If an account exists with this email, a password reset link has been sent.'
+)
     } catch (err) {
-      setErrorMessage(err.message || 'Unable to send reset link.')
+      setErrorMessage(
+  err?.message ||
+  err?.error ||
+  'Unable to send reset link.'
+)
     } finally {
       setLoading(false)
     }
