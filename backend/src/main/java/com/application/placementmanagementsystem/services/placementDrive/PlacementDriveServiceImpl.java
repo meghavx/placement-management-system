@@ -19,6 +19,8 @@ import com.application.placementmanagementsystem.models.enums.DriveStatus;
 import com.application.placementmanagementsystem.repositories.*;
 import com.application.placementmanagementsystem.services.audit.AuditLogService;
 import com.application.placementmanagementsystem.services.eligibility.EligibilityEvaluator;
+import com.application.placementmanagementsystem.models.enums.NotificationType;
+import com.application.placementmanagementsystem.services.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,7 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
     private final UserRepository userRepository;
     private final AuditLogService auditLogService;
     private final PlacementDriveMapper placementDriveMapper;
+    private final NotificationService notificationService;
 
     private final StudentRepository studentRepository;
 
@@ -122,7 +125,12 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
             throw new InvalidRequestException("Configure eligibility criteria before opening the placement drive.");
         }
         placementDrive.setStatus(status);
+
         PlacementDrive updatedDrive = placementDriveRepository.save(placementDrive);
+
+        if (status == DriveStatus.OPEN) {
+            notifyEligibleStudents(updatedDrive);
+        }
 
         AuditAction action = (status == DriveStatus.OPEN)
                 ? AuditAction.PUBLISH
@@ -245,6 +253,30 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
                 .findByIdAndCompanyId(driveId, companyId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(DRIVE_NOT_FOUND));
+    }
+
+    private void notifyEligibleStudents(PlacementDrive placementDrive) {
+
+        List<Student> students = studentRepository.findAll();
+
+        for (Student student : students) {
+
+            EligibilityEvaluationResult evaluation =
+                    eligibilityEvaluator.evaluate(student, placementDrive);
+
+            if (evaluation.isEligible()) {
+
+                notificationService.createNotification(
+                        student.getUser(),
+                        NotificationType.DRIVE,
+                        "New Placement Drive Available",
+                        placementDrive.getCompany().getCompanyName()
+                                + " has published a placement drive for "
+                                + placementDrive.getJobRole()
+                                + "."
+                );
+            }
+        }
     }
 
     private void validateDriveDates(
