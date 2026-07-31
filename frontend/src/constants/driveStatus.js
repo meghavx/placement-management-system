@@ -12,15 +12,17 @@ Future Features
 */
 
 export const DRIVE_STATUS = {
-  DRAFT: 'Draft',
-  PUBLISHED: 'Published',
-  CLOSED: 'Closed',
-  EXPIRED: 'Expired',
+  DRAFT: 'DRAFT',
+  OPEN: 'OPEN',
+  CLOSED: 'CLOSED',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED',
 }
 
 export const DRIVE_STATUS_COLORS = {
   [DRIVE_STATUS.DRAFT]: 'gray',
-  [DRIVE_STATUS.PUBLISHED]: 'green',
+  [DRIVE_STATUS.OPEN]: 'green',
   [DRIVE_STATUS.CLOSED]: 'red',
-  [DRIVE_STATUS.EXPIRED]: 'yellow',
+  [DRIVE_STATUS.COMPLETED]: 'blue',
+  [DRIVE_STATUS.CANCELLED]: 'yellow',
 }
