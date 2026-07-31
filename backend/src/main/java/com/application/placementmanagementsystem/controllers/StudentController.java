@@ -2,6 +2,7 @@ package com.application.placementmanagementsystem.controllers;
 
 import com.application.placementmanagementsystem.common.ResponseBuilder;
 import com.application.placementmanagementsystem.dtos.student.StudentCreateRequest;
+import com.application.placementmanagementsystem.dtos.student.StudentImportResponse;
 import com.application.placementmanagementsystem.dtos.student.StudentResponse;
 import com.application.placementmanagementsystem.dtos.student.StudentUpdateRequest;
 import com.application.placementmanagementsystem.services.student.StudentService;
@@ -11,9 +12,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -36,6 +39,20 @@ public class StudentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 ResponseBuilder.success(
                         "Student created successfully",
+                        response
+                )
+        );
+    }
+
+    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Import Students from Excel")
+    public ResponseEntity<ApiResponse<StudentImportResponse>> importStudents(
+            @RequestParam("file") MultipartFile file
+    ) {
+        StudentImportResponse response = studentService.importStudents(file);
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "Student import completed",
                         response
                 )
         );
