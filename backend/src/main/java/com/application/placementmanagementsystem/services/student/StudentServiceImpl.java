@@ -49,12 +49,29 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public StudentImportResponse importStudents(MultipartFile file) {
 
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Excel file is required"
+            );
+        }
+        String filename = file.getOriginalFilename();
+        if (filename == null || !filename.toLowerCase().endsWith(".xlsx")) {
+            throw new IllegalArgumentException(
+                    "Only .xlsx files are supported"
+            );
+        }
+
         List<StudentImportError> errors = new ArrayList<>();
 
         int total = 0;
         int created = 0;
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+            if (workbook.getNumberOfSheets() == 0) {
+                throw new IllegalArgumentException(
+                        "Excel file contains no sheets"
+                );
+            }
             Sheet sheet = workbook.getSheetAt(0);
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
