@@ -11,13 +11,16 @@ import java.util.Optional;
 public interface PlacementDriveRepository extends JpaRepository<PlacementDrive, Long> {
 
     @EntityGraph(attributePaths = "eligibilityCriteria")
-    Optional<PlacementDrive> findById(Long id);
+    Optional<PlacementDrive> findByIdAndStatusNot(Long id, DriveStatus status);
 
     @EntityGraph(attributePaths = "eligibilityCriteria")
     Optional<PlacementDrive> findByIdAndCompanyId(Long id, Long companyId);
 
     @EntityGraph(attributePaths = "eligibilityCriteria")
     Optional<PlacementDrive> findByIdAndStatus(Long id, DriveStatus status);
+
+    @EntityGraph(attributePaths = "eligibilityCriteria")
+    List<PlacementDrive> findByStatusNot(DriveStatus status);
 
     List<PlacementDrive> findByCompanyId(Long id);
 

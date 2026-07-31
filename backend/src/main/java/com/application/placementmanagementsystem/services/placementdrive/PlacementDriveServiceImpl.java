@@ -1,4 +1,4 @@
-package com.application.placementmanagementsystem.services.placementDrive;
+package com.application.placementmanagementsystem.services.placementdrive;
 
 import com.application.placementmanagementsystem.auth.CustomUserPrincipal;
 import com.application.placementmanagementsystem.dtos.eligibility.EligibilityEvaluationResult;
@@ -147,9 +147,7 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
     }
 
     @Override
-    public PlacementDriveResponse getPlacementDriveById(
-            Long driveId
-    ) {
+    public PlacementDriveResponse getPlacementDriveById(Long driveId) {
         User user = getAuthenticatedUser();
         PlacementDrive placementDrive;
 
@@ -167,7 +165,7 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
 
             case PLACEMENT_ADMIN ->
                     placementDrive = placementDriveRepository
-                            .findById(driveId)
+                            .findByIdAndStatusNot(driveId, DriveStatus.DRAFT)
                             .orElseThrow(() ->
                                     new ResourceNotFoundException(DRIVE_NOT_FOUND));
 
@@ -196,7 +194,7 @@ public class PlacementDriveServiceImpl implements PlacementDriveService {
             }
 
             case PLACEMENT_ADMIN ->
-                    placementDrives = placementDriveRepository.findAll();
+                    placementDrives = placementDriveRepository.findByStatusNot(DriveStatus.DRAFT);
 
             case STUDENT -> {
                 Student student = getAuthenticatedStudent();
