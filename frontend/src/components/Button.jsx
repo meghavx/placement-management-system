@@ -19,6 +19,7 @@ Future:
 
 const VARIANT_CLASSES = {
   primary: 'bg-primary-600 text-white hover:bg-primary-700 focus-visible:ring-primary-500',
+  primaryOutline: 'border border-primary-600 text-primary-600 hover:bg-primary-50 focus-visible:ring-primary-500',
   secondary: 'bg-gray-100 text-gray-800 hover:bg-gray-200 focus-visible:ring-gray-400',
   outline: 'border border-gray-300 text-gray-700 hover:bg-gray-50 focus-visible:ring-gray-400',
   danger: 'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500',

@@ -19,7 +19,7 @@ GET /admin/students, POST /admin/students, PUT /admin/students/{id}, DELETE /adm
 */
 
 import { useEffect, useState } from 'react'
-import { Plus, Eye, Pencil, KeyRound, UserCheck, UserX, Trash2 } from 'lucide-react'
+import { Plus, Eye, Pencil, KeyRound, UserCheck, UserX, Trash2, Upload, FileSpreadsheet } from 'lucide-react'
 import PageHeader from '../../components/PageHeader'
 import StatisticCard from '../../components/StatisticCard'
 import SearchBar from '../../components/SearchBar'
@@ -32,7 +32,7 @@ import Input from '../../components/Input'
 import Dropdown from '../../components/Dropdown'
 import ConfirmationModal from '../../components/ConfirmationModal'
 import SkeletonLoader from '../../components/SkeletonLoader'
-import { getStudents, createStudent, updateStudent, deleteStudent } from '../../services/adminService'
+import { getStudents, createStudent, updateStudent, deleteStudent, importStudents } from '../../services/adminService'
 import { useSearch } from '../../hooks/useSearch'
 import { useNotification } from '../../hooks/useNotification'
 import { validateEmail, validatePhone, validateRequired } from '../../utils/validators'
@@ -52,6 +52,12 @@ export default function AdminStudents() {
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState(null)
+  
+  const [importOpen, setImportOpen] = useState(false)
+  const [importFile, setImportFile] = useState(null)
+  const [importing, setImporting] = useState(false)
+  const [importResult, setImportResult] = useState(null)
+  const [importError, setImportError] = useState('')
 
   const { searchTerm, setSearchTerm, filteredItems } = useSearch(students, ['name', 'id', 'email'])
   const filtered = filteredItems
@@ -114,6 +120,55 @@ export default function AdminStudents() {
     notify('Student Account Created')
   }
 
+  const handleImportStudents = async () => {
+    if (!importFile) {
+      setImportError('Please select an Excel file.')
+      return
+    }
+
+    if (!importFile.name.toLowerCase().endsWith('.xlsx')) {
+      setImportError('Only .xlsx files are supported.')
+      return
+    }
+
+    setImporting(true)
+    setImportError('')
+    setImportResult(null)
+
+    try {
+      const result = await importStudents(importFile)
+
+      setImportResult(result)
+
+      // Refresh the student list so newly imported students appear immediately.
+      const updatedStudents = await getStudents()
+      setStudents(updatedStudents)
+
+      notify(
+        result.failed === 0
+          ? 'Students imported successfully'
+          : 'Student import completed with some errors'
+      )
+    } catch (error) {
+      console.error('Failed to import students:', error)
+
+      const message =
+        error.response?.data?.message ||
+        'Failed to import students. Please try again.'
+
+      setImportError(message)
+    } finally {
+      setImporting(false)
+    }
+  }
+
+  const handleCloseImport = () => {
+    setImportOpen(false)
+    setImportFile(null)
+    setImportResult(null)
+    setImportError('')
+  }
+
   const handleToggleStatus = async (student) => {
     const newStatus = student.status === 'Active' ? 'Inactive' : 'Active'
     // Backend Integration: replace with real PUT /admin/students/{id} call.
@@ -136,9 +191,18 @@ export default function AdminStudents() {
         description="Create and manage student accounts."
         breadcrumb={['Dashboard', 'Students']}
         primaryAction={
-          <Button icon={Plus} onClick={() => setAddOpen(true)}>
-            Add Student
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="primaryOutline" 
+              icon={Upload}
+              onClick={() => setImportOpen(true)}
+            >
+              Import Students
+            </Button>
+            <Button icon={Plus} onClick={() => setAddOpen(true)}>
+              Add Student
+            </Button>
+          </div>
         }
       />
 
@@ -224,6 +288,160 @@ export default function AdminStudents() {
           <Input label="Roll Number" name="rollNumber" value={form.rollNumber} onChange={(e) => handleFormChange('rollNumber', e.target.value)} />
           <Input label="Enrollment Number" name="enrollmentNumber" value={form.enrollmentNumber} onChange={(e) => handleFormChange('enrollmentNumber', e.target.value)} />
         </form>
+      </Modal>
+
+      <Modal
+        open={importOpen}
+        onClose={handleCloseImport}
+        title="Import Students"
+        footer={
+          importResult ? (
+            <Button onClick={handleCloseImport}>
+              Done
+            </Button>
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                onClick={handleCloseImport}
+                disabled={importing}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                onClick={handleImportStudents}
+                disabled={!importFile}
+                loading={importing}
+              >
+                Import Students
+              </Button>
+            </>
+          )
+        }
+      >
+        <div className="flex flex-col gap-4">
+          <div>
+            <p className="text-sm text-gray-700">
+              Upload an Excel (.xlsx) file containing student account details.
+            </p>
+            <p className="mt-1 text-xs text-gray-500">
+              The first row should contain the column headers.
+            </p>
+          </div>
+
+          <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-gray-300 px-4 py-4 transition-colors hover:border-primary-500 hover:bg-primary-50">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+              <FileSpreadsheet className="text-gray-600" size={20} />
+            </div>
+
+            <div className="min-w-0 flex-1">
+              {importFile ? (
+                <>
+                  <p className="truncate text-sm font-medium text-gray-800">
+                    {importFile.name}
+                  </p>
+                  <p className="mt-0.5 text-xs text-gray-500">
+                    Click to choose a different file
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-medium text-primary-600">
+                    Choose Excel file
+                  </p>
+                  <p className="mt-0.5 text-xs text-gray-500">
+                    .xlsx files only
+                  </p>
+                </>
+              )}
+            </div>
+
+            <Upload size={18} className="shrink-0 text-gray-400" />
+
+            <input
+              type="file"
+              accept=".xlsx"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null
+
+                setImportResult(null)
+
+                if (file && !file.name.toLowerCase().endsWith('.xlsx')) {
+                  setImportFile(null)
+                  setImportError('Only .xlsx files are supported.')
+                  e.target.value = ''
+                  return
+                }
+
+                setImportFile(file)
+                setImportError('')
+              }}
+            />
+          </label>
+
+          {importError && (
+            <p className="text-sm text-red-600">
+              {importError}
+            </p>
+          )}
+
+          {importResult && (
+            <div className="flex flex-col gap-4">
+
+              {/* Summary */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="rounded-lg bg-gray-50 p-3 text-center">
+                  <p className="text-xl font-semibold text-gray-900">
+                    {importResult.total}
+                  </p>
+                  <p className="text-xs text-gray-500">Processed</p>
+                </div>
+
+                <div className="rounded-lg bg-green-50 p-3 text-center">
+                  <p className="text-xl font-semibold text-green-700">
+                    {importResult.created}
+                  </p>
+                  <p className="text-xs text-green-600">Created</p>
+                </div>
+
+                <div className="rounded-lg bg-red-50 p-3 text-center">
+                  <p className="text-xl font-semibold text-red-700">
+                    {importResult.failed}
+                  </p>
+                  <p className="text-xs text-red-600">Failed</p>
+                </div>
+              </div>
+
+              {/* Row-level errors */}
+              {importResult.errors?.length > 0 && (
+                <div>
+                  <p className="mb-2 text-sm font-medium text-gray-800">
+                    Failed Rows
+                  </p>
+
+                  <div className="max-h-48 overflow-y-auto rounded-lg border border-gray-200">
+                    {importResult.errors.map((error, index) => (
+                      <div
+                        key={`${error.row}-${index}`}
+                        className="flex gap-4 border-b border-gray-100 px-4 py-3 last:border-b-0"
+                      >
+                        <span className="shrink-0 text-sm font-medium text-red-600">
+                          Row {error.row}
+                        </span>
+
+                        <span className="text-sm text-gray-700">
+                          {error.message}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </Modal>
 
       <ConfirmationModal
