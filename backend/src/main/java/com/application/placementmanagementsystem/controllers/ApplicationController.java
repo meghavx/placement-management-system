@@ -96,8 +96,8 @@ public class ApplicationController {
         );
     }
 
-    @PatchMapping("/recruiter/applications/{applicationId}/status")
-    @PreAuthorize("hasRole('RECRUITER')")
+    @PatchMapping("/applications/{applicationId}/status")
+    @PreAuthorize("hasAnyRole('RECRUITER', 'PLACEMENT_ADMIN')")
     @Operation(summary = "Update application status")
     public ResponseEntity<ApiResponse<ApplicationResponse>> updateApplicationStatus(
             @PathVariable Long applicationId,
