@@ -41,10 +41,9 @@ import { ROUTES } from '../../constants/routes'
 // Only these three roles are selectable at login, per product decision.
 // Super Admin accounts are provisioned separately and do not appear here.
 const ROLE_OPTIONS = [
-  { label: 'Student', value: ROLES.STUDENT },
-  { label: 'Recruiter', value: ROLES.RECRUITER },
   { label: 'Placement Admin', value: ROLES.PLACEMENT_ADMIN },
-  { label: 'Super Admin', value: ROLES.SUPER_ADMIN },
+  { label: 'Recruiter', value: ROLES.RECRUITER },
+  { label: 'Student', value: ROLES.STUDENT },
 ]
 
 export default function LoginPage() {
@@ -128,15 +127,7 @@ export default function LoginPage() {
             error={errors.password}
           />
 
-          <div className="flex justify-end -mt-2">
-          <button
-          type="button"
-          onClick={() => navigate("/forgot-password")}
-          className="text-sm text-primary-600 hover:text-primary-700 hover:underline"
-          >
-           Forgot Password?
-         </button>
-</div>
+          
 
 <Button
   type="submit"
@@ -146,26 +137,25 @@ export default function LoginPage() {
 >
   Log In
 </Button>
-        </form>
 
-        <div className="mt-6 text-center">
-  <p className="text-sm text-gray-500">
-    Super Administrator?{' '}
-    <Link
-      to={ROUTES.SUPER_ADMIN_LOGIN}
-      className="font-medium text-primary-600 hover:text-primary-700 hover:underline"
-    >
-      Sign in here
-    </Link>
-  </p>
+<div className="flex -mt-2">
+          <button
+          type="button"
+          onClick={() => navigate("/forgot-password")}
+          className="text-sm text-primary-600 hover:text-primary-700 hover:underline"
+          >
+           Forgot Password?
+         </button>
 </div>
 
-        <div className="mt-6 rounded-lg bg-gray-50 p-3 text-xs text-gray-500">
+        </form>
+
+        {/* <div className="mt-6 rounded-lg bg-gray-50 p-3 text-xs text-gray-500">
           <p className="mb-1 font-medium text-gray-600">Demo credentials (password: password123):</p>
           <p>Role: Student → student@college.edu</p>
           <p>Role: Recruiter → recruiter@techcorp.com</p>
           <p>Role: Placement Admin → admin@college.edu</p>
-        </div>
+        </div> */}
       </div>
     </div>
   )

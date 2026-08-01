@@ -130,14 +130,14 @@ export default function SuperAdminLoginPage() {
           </Button>
         </form>
 
-        <div className="mt-6 text-center">
+        {/* <div className="mt-6 text-center">
           <Link
             to={ROUTES.LOGIN}
             className="text-sm text-primary-600 hover:text-primary-700 hover:underline"
           >
             Back to Main Sign In
           </Link>
-        </div>
+        </div> */}
       </div>
     </div>
   )
