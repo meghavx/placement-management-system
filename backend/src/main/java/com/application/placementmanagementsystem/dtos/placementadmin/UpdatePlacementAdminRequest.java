@@ -1,4 +1,4 @@
-package com.application.placementmanagementsystem.dtos.placementAdmin;
+package com.application.placementmanagementsystem.dtos.placementadmin;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

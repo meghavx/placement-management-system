@@ -2,7 +2,7 @@ package com.application.placementmanagementsystem.controllers;
 
 import com.application.placementmanagementsystem.common.ApiResponse;
 import com.application.placementmanagementsystem.common.ResponseBuilder;
-import com.application.placementmanagementsystem.dtos.placementAdmin.PlacementAdminResponse;
+import com.application.placementmanagementsystem.dtos.placementadmin.PlacementAdminResponse;
 import com.application.placementmanagementsystem.dtos.profile.PlacementAdminProfileUpdateRequest;
 import com.application.placementmanagementsystem.dtos.profile.RecruiterProfileUpdateRequest;
 import com.application.placementmanagementsystem.dtos.profile.StudentProfileUpdateRequest;
