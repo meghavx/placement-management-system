@@ -20,7 +20,7 @@ Replace mock getRecruiterDashboard() with GET /recruiter/dashboard.
 */
 
 import { useEffect, useState } from 'react'
-import { Briefcase, ClipboardList, ListChecks, Award } from 'lucide-react'
+import { Briefcase, ClipboardList, ListChecks, UserCheck, FolderOpen } from 'lucide-react'
 import PageHeader from '../../components/PageHeader'
 import StatisticCard from '../../components/StatisticCard'
 import Card from '../../components/Card'
@@ -34,12 +34,26 @@ export default function RecruiterDashboard() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  // useEffect(() => {
+  //   // Backend Integration: replace with the real dashboard API response.
+  //   getRecruiterDashboard().then((res) => {
+  //     setData(res)
+  //     setLoading(false)
+  //   })
+  // }, [])
   useEffect(() => {
-    // Backend Integration: replace with the real dashboard API response.
-    getRecruiterDashboard().then((res) => {
-      setData(res)
-      setLoading(false)
-    })
+    async function fetchDashboard() {
+      try {
+        const res = await getRecruiterDashboard()
+        setData(res)
+      } catch (error) {
+        console.error('Error fetching recruiter dashboard:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchDashboard()
   }, [])
 
   return (
@@ -54,14 +68,51 @@ export default function RecruiterDashboard() {
         <SkeletonLoader rows={6} />
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatisticCard title="Active Drives" value={data.stats.activeDrives} icon={Briefcase} />
-            <StatisticCard title="Applications Received" value={data.stats.applicationsReceived} icon={ClipboardList} />
-            <StatisticCard title="Candidates Shortlisted" value={data.stats.candidatesShortlisted} icon={ListChecks} />
-            <StatisticCard title="Offers Published" value={data.stats.offersPublished} icon={Award} />
+          <div className="flex flex-col gap-4">
+            {/* Top Row */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {/* <div className="h-44"> */}
+                <StatisticCard
+                  title="Total Drives"
+                  value={data.stats.totalDrives}
+                  icon={FolderOpen}
+                />
+              {/* </div> */}
+
+              {/* <div className="h-44"> */}
+                <StatisticCard
+                  title="Active Drives"
+                  value={data.stats.activeDrives}
+                  icon={Briefcase}
+                />
+              {/* </div> */}
+{/* 
+              <div className="h-44"> */}
+                <StatisticCard
+                  title="Applications Received"
+                  value={data.stats.applicationsReceived}
+                  icon={ClipboardList}
+                />
+              {/* </div> */}
+            </div>
+
+            {/* Bottom Row */}
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <StatisticCard
+                title="Candidates Shortlisted"
+                value={data.stats.candidatesShortlisted}
+                icon={ListChecks}
+              />
+
+              <StatisticCard
+                title="Selected Candidates"
+                value={data.stats.selectedCandidates}
+                icon={UserCheck}
+              />
+            </div>
           </div>
 
-          <Card title="Recent Placement Drives">
+          {/* <Card title="Recent Placement Drives">
             <Table
               columns={[
                 { key: 'company', header: 'Company' },
@@ -115,7 +166,7 @@ export default function RecruiterDashboard() {
                 ))}
               </ul>
             </Card>
-          </div>
+          </div> */}
         </>
       )}
     </div>

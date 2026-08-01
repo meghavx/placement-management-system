@@ -9,10 +9,7 @@ import com.application.placementmanagementsystem.exceptions.InvalidRequestExcept
 import com.application.placementmanagementsystem.exceptions.ResourceNotFoundException;
 import com.application.placementmanagementsystem.mappers.ApplicationMapper;
 import com.application.placementmanagementsystem.models.*;
-import com.application.placementmanagementsystem.models.enums.ApplicationStatus;
-import com.application.placementmanagementsystem.models.enums.AuditAction;
-import com.application.placementmanagementsystem.models.enums.AuditEntityType;
-import com.application.placementmanagementsystem.models.enums.DriveStatus;
+import com.application.placementmanagementsystem.models.enums.*;
 import com.application.placementmanagementsystem.repositories.*;
 import com.application.placementmanagementsystem.services.audit.AuditLogService;
 import com.application.placementmanagementsystem.services.eligibility.EligibilityEvaluator;
@@ -123,6 +120,26 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .toList();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<ApplicationResponse> getAllApplications() {
+
+        return applicationRepository.findAll()
+                .stream()
+                .map(applicationMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    public ApplicationResponse getApplicationById(Long applicationId) {
+
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(APPLICATION_NOT_FOUND));
+
+        return applicationMapper.toResponse(application);
+    }
+
     @Transactional
     @Override
     public ApplicationResponse updateApplicationStatus(
@@ -134,7 +151,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException(APPLICATION_NOT_FOUND));
 
-        validateRecruiterOwnsDrive(application);
+        validateApplicationStatusUpdateAccess(application);
 
         validateStatusTransition(
                 application.getStatus(),
@@ -217,6 +234,26 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .equals(recruiter.getCompany().getId())) {
 
             throw new ResourceNotFoundException(APPLICATION_NOT_FOUND);
+        }
+    }
+
+    private void validateApplicationStatusUpdateAccess(Application application) {
+
+        User user = getAuthenticatedUser();
+
+        if (user.getRole() == RoleType.RECRUITER) {
+
+            Recruiter recruiter = recruiterRepository.findByUser(user)
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException("Recruiter not found."));
+
+            if (!application.getPlacementDrive()
+                    .getCompany()
+                    .getId()
+                    .equals(recruiter.getCompany().getId())) {
+
+                throw new ResourceNotFoundException(APPLICATION_NOT_FOUND);
+            }
         }
     }
 

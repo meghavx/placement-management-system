@@ -20,4 +20,8 @@ public interface ApplicationService {
             Long applicationId,
             ApplicationStatusUpdateRequest request
     );
+
+    List<ApplicationResponse> getAllApplications();
+
+    ApplicationResponse getApplicationById(Long applicationId);
 }

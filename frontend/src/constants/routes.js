@@ -14,6 +14,7 @@ export const ROUTES = {
   // Student routes
   STUDENT_DASHBOARD: '/student',
   STUDENT_PROFILE: '/student/profile',
+  STUDENT_PROFILE_FORM: '/student/profile/edit',
   STUDENT_RESUME: '/student/resume',
   STUDENT_DRIVES: '/student/drives',
   STUDENT_APPLICATIONS: '/student/applications',
@@ -41,6 +42,7 @@ export const ROUTES = {
   ADMIN_REPORTS: '/admin/reports',
 
   // Super Admin routes
+  SUPER_ADMIN_LOGIN: '/super-admin/login',
   SUPER_ADMIN_DASHBOARD: '/super-admin',
   SUPER_ADMIN_PLACEMENT_ADMINS: '/super-admin/placement-admins',
   SUPER_ADMIN_AUDIT_LOGS: '/super-admin/audit-logs',

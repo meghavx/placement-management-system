@@ -29,10 +29,12 @@ import { ROLES } from './constants/roles'
 import { ROLE_HOME_ROUTE } from './routes/sidebarMenus'
 
 const LoginPage = lazy(() => import('./pages/auth/LoginPage'))
+const SuperAdminLoginPage = lazy(() => import('./pages/auth/SuperAdminLoginPage'))
 
 // Student pages
 const StudentDashboard = lazy(() => import('./pages/student/StudentDashboard'))
 const StudentProfile = lazy(() => import('./pages/student/StudentProfile'))
+const StudentProfileForm = lazy(() => import('./pages/student/StudentProfileForm'))
 const StudentResume = lazy(() => import('./pages/student/StudentResume'))
 const StudentDrives = lazy(() => import('./pages/student/StudentDrives'))
 const StudentApplications = lazy(() => import('./pages/student/StudentApplications'))
@@ -80,7 +82,8 @@ function AppRoutes() {
     <Suspense fallback={<LoadingScreen />}>
       <Routes>
         <Route path={ROUTES.LOGIN} element={<LoginRoute />} />
-
+        <Route path={ROUTES.SUPER_ADMIN_LOGIN} element={<SuperAdminLoginPage />}/>
+        
         {/* Student Module */}
         <Route
           element={
@@ -91,6 +94,10 @@ function AppRoutes() {
         >
           <Route path={ROUTES.STUDENT_DASHBOARD} element={<StudentDashboard />} />
           <Route path={ROUTES.STUDENT_PROFILE} element={<StudentProfile />} />
+          <Route
+            path={ROUTES.STUDENT_PROFILE_FORM}
+            element={<StudentProfileForm />}
+          />
           <Route path={ROUTES.STUDENT_RESUME} element={<StudentResume />} />
           <Route path={ROUTES.STUDENT_DRIVES} element={<StudentDrives />} />
           <Route path={ROUTES.STUDENT_APPLICATIONS} element={<StudentApplications />} />

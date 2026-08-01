@@ -8,12 +8,21 @@ Future Features
   institution's department list becomes dynamic.
 */
 
+// export const DEPARTMENTS = [
+//   'Computer Science',
+//   'Information Technology',
+//   'Electronics & Communication',
+//   'Electrical Engineering',
+//   'Mechanical Engineering',
+//   'Civil Engineering',
+//   'Artificial Intelligence & Data Science',
+// ]
 export const DEPARTMENTS = [
-  'Computer Science',
-  'Information Technology',
-  'Electronics & Communication',
-  'Electrical Engineering',
-  'Mechanical Engineering',
-  'Civil Engineering',
-  'Artificial Intelligence & Data Science',
+  { label: 'Computer Science', value: 'CSE' },
+  { label: 'Information Technology', value: 'IT' },
+  { label: 'Electronics & Communication', value: 'ECE' },
+  { label: 'Electrical Engineering', value: 'EE' },
+  { label: 'Mechanical Engineering', value: 'ME' },
+  { label: 'Civil Engineering', value: 'CE' },
+  { label: 'Artificial Intelligence & Data Science', value: 'AIDS' },
 ]

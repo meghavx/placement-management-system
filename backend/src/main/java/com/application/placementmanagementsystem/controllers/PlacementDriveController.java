@@ -6,7 +6,7 @@ import com.application.placementmanagementsystem.dtos.placementDrive.PlacementDr
 import com.application.placementmanagementsystem.dtos.placementDrive.PlacementDriveSummaryResponse;
 import com.application.placementmanagementsystem.dtos.placementDrive.PlacementDriveUpdateRequest;
 import com.application.placementmanagementsystem.models.enums.DriveStatus;
-import com.application.placementmanagementsystem.services.placementDrive.PlacementDriveService;
+import com.application.placementmanagementsystem.services.placementdrive.PlacementDriveService;
 import com.application.placementmanagementsystem.common.ResponseBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

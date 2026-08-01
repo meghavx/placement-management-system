@@ -9,9 +9,13 @@ export function validateEmail(email) {
   return regex.test(email)
 }
 
+// export function validatePhone(phone) {
+//   const regex = /^[0-9]{10}$/
+//   return regex.test(phone)
+// }
 export function validatePhone(phone) {
-  const regex = /^[0-9]{10}$/
-  return regex.test(phone)
+  const regex = /^[6-9]\d{9}$/
+  return regex.test(String(phone).trim())
 }
 
 export function validateCGPA(cgpa) {
