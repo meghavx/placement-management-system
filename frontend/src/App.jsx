@@ -29,6 +29,7 @@ import { ROLES } from './constants/roles'
 import { ROLE_HOME_ROUTE } from './routes/sidebarMenus'
 
 const LoginPage = lazy(() => import('./pages/auth/LoginPage'))
+const SuperAdminLoginPage = lazy(() => import('./pages/auth/SuperAdminLoginPage'))
 const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPasswordPage'))
 const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage'))
 
@@ -82,6 +83,7 @@ function AppRoutes() {
     <Suspense fallback={<LoadingScreen />}>
       <Routes>
         <Route path={ROUTES.LOGIN} element={<LoginRoute />} />
+        <Route path={ROUTES.SUPER_ADMIN_LOGIN} element={<SuperAdminLoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
 

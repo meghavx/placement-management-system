@@ -25,7 +25,7 @@ Future Features
 */
 
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { GraduationCap } from 'lucide-react'
 import Input from '../../components/Input'
 import PasswordInput from '../../components/PasswordInput'
@@ -147,6 +147,18 @@ export default function LoginPage() {
   Log In
 </Button>
         </form>
+
+        <div className="mt-6 text-center">
+  <p className="text-sm text-gray-500">
+    Super Administrator?{' '}
+    <Link
+      to={ROUTES.SUPER_ADMIN_LOGIN}
+      className="font-medium text-primary-600 hover:text-primary-700 hover:underline"
+    >
+      Sign in here
+    </Link>
+  </p>
+</div>
 
         <div className="mt-6 rounded-lg bg-gray-50 p-3 text-xs text-gray-500">
           <p className="mb-1 font-medium text-gray-600">Demo credentials (password: password123):</p>
