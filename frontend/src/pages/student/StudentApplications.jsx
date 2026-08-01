@@ -27,7 +27,7 @@ import Badge from '../../components/Badge'
 import Button from '../../components/Button'
 import Modal from '../../components/Modal'
 import SkeletonLoader from '../../components/SkeletonLoader'
-import { getStudentApplications } from '../../services/studentService'
+import { getStudentApplications, getStudentApplicationById } from '../../services/studentService'
 import { useSearch } from '../../hooks/useSearch'
 import { formatDate } from '../../utils/formatDate'
 import { APPLICATION_STATUS } from '../../constants/applicationStatus'
@@ -49,11 +49,16 @@ export default function StudentApplications() {
   const statusFiltered = status ? filteredItems.filter((a) => a.status === status) : filteredItems
 
   useEffect(() => {
-    // Backend Integration: replace with real GET /student/applications response.
-    getStudentApplications().then((res) => {
-      setApplications(res)
-      setLoading(false)
-    })
+    async function fetchApplications() {
+      try {
+        const data = await getStudentApplications()
+        setApplications(data)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchApplications()
   }, [])
 
   const stats = {
@@ -62,6 +67,15 @@ export default function StudentApplications() {
     interview: applications.filter((a) => a.status === APPLICATION_STATUS.INTERVIEW_SCHEDULED).length,
     selected: applications.filter((a) => a.status === APPLICATION_STATUS.SELECTED).length,
     rejected: applications.filter((a) => a.status === APPLICATION_STATUS.REJECTED).length,
+  }
+
+  const handleViewDetails = async (applicationId) => {
+    try {
+      const application = await getStudentApplicationById(applicationId)
+      setSelected(application)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
@@ -94,17 +108,34 @@ export default function StudentApplications() {
       ) : (
         <Table
           columns={[
-            { key: 'company', header: 'Company' },
-            { key: 'role', header: 'Role' },
-            { key: 'appliedDate', header: 'Applied Date', render: (r) => formatDate(r.appliedDate) },
-            { key: 'status', header: 'Status', render: (r) => <Badge label={r.status} /> },
-            { key: 'interviewDate', header: 'Interview Date', render: (r) => formatDate(r.interviewDate) },
-            { key: 'updatedOn', header: 'Updated On', render: (r) => formatDate(r.updatedOn) },
+            {
+              key: 'companyName',
+              header: 'Company',
+            },
+            {
+              key: 'jobRole',
+              header: 'Role',
+            },
+            {
+              key: 'driveDate',
+              header: 'Drive Date',
+              render: (r) => formatDate(r.driveDate),
+            },
+            {
+              key: 'appliedAt',
+              header: 'Applied On',
+              render: (r) => formatDate(r.appliedAt),
+            },
+            {
+              key: 'status',
+              header: 'Status',
+              render: (r) => <Badge label={r.status} />,
+            },
           ]}
           rows={statusFiltered}
           emptyMessage="No applications match your search."
           actions={(row) => (
-            <Button variant="outline" size="sm" onClick={() => setSelected(row)}>
+            <Button variant="outline" size="sm" onClick={() => handleViewDetails(row.id)}>
               View Details
             </Button>
           )}
@@ -113,24 +144,56 @@ export default function StudentApplications() {
 
       <Modal open={!!selected} onClose={() => setSelected(null)} title={selected ? `${selected.company} — ${selected.role}` : ''}>
         {selected && (
-          <div className="flex flex-col gap-4">
-            <p className="text-sm text-gray-600">Application Timeline</p>
-            <ol className="flex flex-col gap-3">
-              {TIMELINE_STEPS.map((step) => {
-                const stepIndex = TIMELINE_STEPS.indexOf(step)
-                const currentIndex = TIMELINE_STEPS.indexOf(selected.status)
-                const reached = selected.status === APPLICATION_STATUS.REJECTED ? stepIndex === 0 : stepIndex <= currentIndex
-                return (
-                  <li key={step} className="flex items-center gap-3">
-                    <span className={`h-2.5 w-2.5 rounded-full ${reached ? 'bg-primary-600' : 'bg-gray-300'}`} />
-                    <span className={`text-sm ${reached ? 'text-gray-800' : 'text-gray-400'}`}>{step}</span>
-                  </li>
-                )
-              })}
-            </ol>
-            {selected.status === APPLICATION_STATUS.REJECTED && (
-              <Badge label="Rejected" />
-            )}
+          <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
+            <div>
+              <p className="text-gray-500">Company</p>
+              <p className="font-medium">{selected.companyName}</p>
+            </div>
+
+            <div>
+              <p className="text-gray-500">Role</p>
+              <p className="font-medium">{selected.jobRole}</p>
+            </div>
+
+            <div>
+              <p className="text-gray-500">Package</p>
+              <p className="font-medium">
+                {selected.packageOffered?.toLocaleString('en-IN')}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-gray-500">Drive Date</p>
+              <p className="font-medium">
+                {formatDate(selected.driveDate)}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-gray-500">Status</p>
+              <Badge label={selected.status} />
+            </div>
+
+            <div>
+              <p className="text-gray-500">Applied On</p>
+              <p className="font-medium">
+                {formatDate(selected.appliedAt)}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-gray-500">Last Updated</p>
+              <p className="font-medium">
+                {formatDate(selected.updatedAt)}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-gray-500">Roll Number</p>
+              <p className="font-medium">
+                {selected.rollNumber}
+              </p>
+            </div>
           </div>
         )}
       </Modal>

@@ -24,25 +24,80 @@ import { Briefcase, ClipboardList, CalendarCheck, Award } from 'lucide-react'
 import PageHeader from '../../components/PageHeader'
 import StatisticCard from '../../components/StatisticCard'
 import Card from '../../components/Card'
-import Table from '../../components/Table'
-import Badge from '../../components/Badge'
-import EmptyState from '../../components/EmptyState'
 import SkeletonLoader from '../../components/SkeletonLoader'
 import { getStudentDashboard } from '../../services/studentService'
-import { formatSalary } from '../../utils/formatSalary'
-import { formatDate } from '../../utils/formatDate'
+import DashboardBarChart from '../../components/charts/DashboardBarChart'
+import DashboardPieChart from '../../components/charts/DashboardPieChart'
 
 export default function StudentDashboard() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Backend Integration: replace with the real dashboard API response.
-    getStudentDashboard().then((res) => {
-      setData(res)
-      setLoading(false)
-    })
+    async function fetchDashboard() {
+      try {
+        const dashboard = await getStudentDashboard()
+        setData(dashboard)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchDashboard()
   }, [])
+
+  const chartData = data
+    ? [
+        {
+          name: 'Drives',
+          value: data.availableDrives,
+        },
+        {
+          name: 'Applied',
+          value: data.appliedCount,
+        },
+        {
+          name: 'Shortlisted',
+          value: data.shortlistedCount,
+        },
+        {
+          name: 'Interview',
+          value: data.interviewScheduledCount,
+        },
+        {
+          name: 'Selected',
+          value: data.selectedCount,
+        },
+        {
+          name: 'Rejected',
+          value: data.rejectedCount,
+        },
+      ]
+    : []
+
+  const pieData = data
+    ? [
+        {
+          name: 'Selected',
+          value: data.selectedCount,
+        },
+        {
+          name: 'Remaining',
+          value: Math.max(
+            data.appliedCount - data.selectedCount,
+            0
+          ),
+        },
+      ]
+    : []
+
+  const successRate = data
+    ? data.appliedCount === 0
+      ? 0
+      : (
+          (data.selectedCount / data.appliedCount) *
+          100
+        ).toFixed(1)
+    : 0
 
   return (
     <div className="flex flex-col gap-6">
@@ -56,82 +111,65 @@ export default function StudentDashboard() {
         <SkeletonLoader rows={6} />
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatisticCard title="Eligible Drives" value={data.stats.eligibleDrives} icon={Briefcase} />
-            <StatisticCard title="Applications Submitted" value={data.stats.applicationsSubmitted} icon={ClipboardList} />
-            <StatisticCard title="Interviews Scheduled" value={data.stats.interviewsScheduled} icon={CalendarCheck} />
-            <StatisticCard title="Offers Received" value={data.stats.offersReceived} icon={Award} />
-          </div>
 
-          <Card title="Upcoming Placement Drives">
-            {data.upcomingDrives.length === 0 ? (
-              <EmptyState title="No upcoming drives" description="Check back later for new opportunities." />
-            ) : (
-              <Table
-                columns={[
-                  { key: 'company', header: 'Company' },
-                  { key: 'role', header: 'Role' },
-                  { key: 'package', header: 'Package', render: (r) => formatSalary(r.package) },
-                  { key: 'deadline', header: 'Deadline', render: (r) => formatDate(r.deadline) },
-                  { key: 'eligibilityStatus', header: 'Eligibility', render: (r) => <Badge label={r.eligibilityStatus} /> },
-                ]}
-                rows={data.upcomingDrives}
-                emptyMessage="No upcoming drives found."
-              />
-            )}
-          </Card>
+          {/* Statistics */}
 
-          <Card title="Recent Applications">
-            <Table
-              columns={[
-                { key: 'company', header: 'Company' },
-                { key: 'role', header: 'Role' },
-                { key: 'appliedDate', header: 'Applied Date', render: (r) => formatDate(r.appliedDate) },
-                { key: 'status', header: 'Status', render: (r) => <Badge label={r.status} /> },
-                { key: 'updatedOn', header: 'Updated On', render: (r) => formatDate(r.updatedOn) },
-              ]}
-              rows={data.recentApplications}
-              emptyMessage="You have not applied to any drives yet."
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+            <StatisticCard
+              title="Available Drives"
+              value={data.availableDrives}
+              icon={Briefcase}
             />
-          </Card>
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <Card title="Notifications">
-              {data.notifications.length === 0 ? (
-                <EmptyState title="No notifications" description="You're all caught up." />
-              ) : (
-                <ul className="flex flex-col divide-y divide-gray-100">
-                  {data.notifications.slice(0, 5).map((n) => (
-                    <li key={n.id} className="flex items-start justify-between gap-3 py-3">
-                      <div>
-                        <p className="text-sm font-medium text-gray-800">{n.title}</p>
-                        <p className="text-xs text-gray-500">{n.description}</p>
-                      </div>
-                      <span className="whitespace-nowrap text-xs text-gray-400">{n.time}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
+            <StatisticCard
+              title="Applications"
+              value={data.totalApplications}
+              icon={ClipboardList}
+            />
 
-            <Card title="Upcoming Interviews">
-              {data.upcomingInterviews.length === 0 ? (
-                <EmptyState title="No interviews scheduled" description="Interview details will appear here." />
-              ) : (
-                <ul className="flex flex-col divide-y divide-gray-100">
-                  {data.upcomingInterviews.map((i) => (
-                    <li key={i.id} className="flex items-center justify-between py-3 text-sm">
-                      <div>
-                        <p className="font-medium text-gray-800">{i.company}</p>
-                        <p className="text-xs text-gray-500">{formatDate(i.date)} · {i.time} · {i.mode}</p>
-                      </div>
-                      <Badge label={i.status} color="purple" />
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
+            <StatisticCard
+              title="Interviews"
+              value={data.interviewScheduledCount}
+              icon={CalendarCheck}
+            />
+
+            <StatisticCard
+              title="Selected"
+              value={data.selectedCount}
+              icon={Award}
+            />
+
           </div>
+
+          {/* Charts */}
+
+          <div className="mt-2 grid grid-cols-1 gap-6 xl:grid-cols-3">
+
+            <div className="xl:col-span-2">
+
+              <DashboardBarChart
+                title="Placement Progress"
+                data={chartData}
+                xKey="name"
+                dataKey="value"
+                color="#22c55e"
+              />
+
+            </div>
+
+            <DashboardPieChart
+              title="Placement Success"
+              data={pieData}
+              centerText={`${successRate}%`}
+              colors={[
+                '#22c55e',
+                '#d1d5db',
+              ]}
+            />
+
+          </div>
+
         </>
       )}
     </div>

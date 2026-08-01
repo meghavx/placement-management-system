@@ -17,20 +17,14 @@ Future:
 ========================================
 */
 
-import { Menu, LogOut } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { GraduationCap, User } from 'lucide-react'
 import { ROLE_LABELS } from '../constants/roles'
-import { ROUTES } from '../constants/routes'
 import Avatar from '../components/Avatar'
 
 export default function Navbar({ onToggleSidebar }) {
-  const { user, role, logout } = useAuth()
-
-  const handleLogout = async() => {
-    logout()
-    window.location.href = ROUTES.LOGIN
-  }
+  const { user, role } = useAuth()
 
   return (
     <header className="sticky top-0 z-20 flex h-16 items-center justify-between bg-gradient-to-br from-[#57f967] via-[#42e886] to-[#28d0ac] px-4 shadow-sm sm:px-6">
@@ -39,11 +33,11 @@ export default function Navbar({ onToggleSidebar }) {
           type="button"
           onClick={onToggleSidebar}
           aria-label="Toggle navigation menu"
-          className="rounded-md p-2 text-primary-100 hover:bg-white/10 hover:text-white md:hidden"
+          className="rounded-md p-2 text-gray-900 hover:bg-black/10 md:hidden"
         >
           <Menu size={22} />
         </button>
-        <span className="rounded-full bg-transparent p-3 text-black-400">
+        <span className="rounded-full bg-transparent p-3 text-black-400 hidden md:block">
           <GraduationCap size={28} />
         </span>
         
@@ -56,13 +50,22 @@ export default function Navbar({ onToggleSidebar }) {
         <span className="rounded-full bg-transparent text-primary-900">
           <User size={20} />
         </span>
-        <div className="hidden text-right sm:block">
-          <p className="text-sm font-medium ">
+        <div className="hidden text-right md:block">
+          <p className="text-sm font-medium">
             Welcome, {user?.fullName}
           </p>
-          <p className="text-xs text-primary-900">{ROLE_LABELS[role]}</p>
+          <p className="text-xs text-primary-900">
+            {ROLE_LABELS[role]}
+          </p>
         </div>
-        <Avatar className="bg-transparent text-primary-900" name={user?.fullName} size="sm" />
+
+        <div className="block md:hidden">
+          <Avatar
+            className="bg-transparent text-primary-900"
+            name={user?.fullName}
+            size="sm"
+          />
+        </div>
       </div>
     </header>
   )
