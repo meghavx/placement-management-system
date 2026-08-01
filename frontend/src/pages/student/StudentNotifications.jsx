@@ -25,20 +25,29 @@ import FilterBar from '../../components/FilterBar'
 import Button from '../../components/Button'
 import EmptyState from '../../components/EmptyState'
 import SkeletonLoader from '../../components/SkeletonLoader'
-import { getStudentNotifications } from '../../services/studentService'
-import { markNotificationRead, deleteNotification } from '../../services/notificationService'
+import { markNotificationRead, getNotifications } from '../../services/notificationService'
 import { useNotification } from '../../hooks/useNotification'
 
 const TYPE_ICONS = {
-  'Interview Schedule': CalendarClock,
-  'Placement Announcement': Megaphone,
-  'Application Update': Info,
-  'Selection Result': Award,
-  'Deadline Reminder': AlertCircle,
-  'General Notice': Bell,
+  'DRIVE': Megaphone,
+  'APPLICATION': Info,
+  'SHORTLISTED': Award,
+  'RESULT': Award,
+  'RECRUITMENT_ACTIVITY': CalendarClock,
+  'ANNOUNCEMENT': Megaphone,
+  'SYSTEM': Bell,
 }
 
-const FILTER_OPTIONS = ['Unread', 'Placement Announcement', 'Interview Schedule', 'Selection Result', 'General Notice']
+const FILTER_OPTIONS = [
+  'Unread',
+  'DRIVE',
+  'APPLICATION',
+  'SHORTLISTED',
+  'RESULT',
+  'RECRUITMENT_ACTIVITY',
+  'ANNOUNCEMENT',
+  'SYSTEM',
+]
 
 export default function StudentNotifications() {
   const { notify } = useNotification()
@@ -47,11 +56,16 @@ export default function StudentNotifications() {
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
-    // Backend Integration: replace with real GET /student/notifications response.
-    getStudentNotifications().then((res) => {
-      setNotifications(res)
-      setLoading(false)
-    })
+    async function fetchNotifications() {
+      try {
+        const data = await getNotifications()
+        setNotifications(data)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchNotifications()
   }, [])
 
   const filtered = notifications.filter((n) => {
@@ -61,16 +75,20 @@ export default function StudentNotifications() {
   })
 
   const handleMarkRead = async (id) => {
-    // Backend Integration: replace with real PUT /student/notifications/{id} call.
-    await markNotificationRead(id)
-    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)))
-  }
+    try {
+      await markNotificationRead(id)
 
-  const handleDelete = async (id) => {
-    // Backend Integration: replace with real DELETE /student/notifications/{id} call.
-    await deleteNotification(id)
-    setNotifications((prev) => prev.filter((n) => n.id !== id))
-    notify('Notification Deleted')
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === id
+            ? { ...n, read: true }
+            : n
+        )
+      )
+      notify('Notification marked as read')
+    } catch (error) {
+      notify(error.message, 'error')
+    }
   }
 
   return (
@@ -107,8 +125,8 @@ export default function StudentNotifications() {
                     <p className="text-sm font-semibold text-gray-800">{n.title}</p>
                     {!n.read && <span className="h-2 w-2 rounded-full bg-primary-600" />}
                   </div>
-                  <p className="text-sm text-gray-600">{n.description}</p>
-                  <p className="mt-1 text-xs text-gray-400">{n.time}</p>
+                  <p className="text-sm text-gray-600">{n.message}</p>
+                  <p className="mt-1 text-xs text-gray-400">{new Date(n.createdAt).toLocaleString()}</p>
                 </div>
                 <div className="flex flex-col gap-2 sm:flex-row">
                   {!n.read && (
@@ -116,9 +134,6 @@ export default function StudentNotifications() {
                       Mark Read
                     </Button>
                   )}
-                  <Button variant="ghost" size="sm" onClick={() => handleDelete(n.id)}>
-                    Delete
-                  </Button>
                 </div>
               </li>
             )

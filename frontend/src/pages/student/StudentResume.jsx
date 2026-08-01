@@ -21,55 +21,79 @@ import PageHeader from '../../components/PageHeader'
 import Card from '../../components/Card'
 import Button from '../../components/Button'
 import Accordion from '../../components/Accordion'
-import ConfirmationModal from '../../components/ConfirmationModal'
 import SkeletonLoader from '../../components/SkeletonLoader'
 import Alert from '../../components/Alert'
-import { getStudentResume, uploadStudentResume, deleteStudentResume } from '../../services/studentService'
+import { getStudentResume, uploadStudentResume, downloadStudentResume } from '../../services/studentService'
 import { useNotification } from '../../hooks/useNotification'
-import { downloadFile } from '../../utils/downloadFile'
 import { formatDate } from '../../utils/formatDate'
 
-const ACCEPTED_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
-const MAX_SIZE_KB = 2048
+const ACCEPTED_TYPES = ['application/pdf']
+const MAX_SIZE_KB = 5120
 
 export default function StudentResume() {
   const { notify } = useNotification()
   const [resume, setResume] = useState(null)
   const [loading, setLoading] = useState(true)
   const [uploadError, setUploadError] = useState('')
-  const [confirmDelete, setConfirmDelete] = useState(false)
   const fileInputRef = useRef(null)
 
   useEffect(() => {
-    // Backend Integration: replace with real GET /student/resume response.
-    getStudentResume().then((res) => {
-      setResume(res)
-      setLoading(false)
-    })
-  }, [])
+    async function fetchResume() {
+      try {
+        const data = await getStudentResume()
+        setResume(data)
+      } catch (error) {
+        notify('Failed to load resume.', 'error')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchResume()
+    }, [notify])
 
   const handleFileSelect = async (file) => {
     setUploadError('')
     if (!file) return
     if (!ACCEPTED_TYPES.includes(file.type)) {
-      setUploadError('Only PDF, DOC, and DOCX formats are supported.')
+      setUploadError('Only PDF files are supported.')
       return
     }
     if (file.size / 1024 > MAX_SIZE_KB) {
-      setUploadError('File size must not exceed 2 MB.')
+      setUploadError('File size must not exceed 5 MB.')
       return
     }
-    // Backend Integration: replace with real POST /student/resume (multipart) call.
-    const updated = await uploadStudentResume(file)
-    setResume({ ...updated, fileSizeKb: Math.round(file.size / 1024), updatedAt: new Date().toISOString().slice(0, 10) })
-    notify('Resume Uploaded')
+    try {
+      const updated = await uploadStudentResume(file)
+      setResume(updated)
+      notify('Resume uploaded successfully.')
+    } catch (error) {
+      notify(
+        error.response?.data?.message || 'Failed to upload resume.',
+        'error'
+      )
+    }
   }
 
-  const handleDelete = async () => {
-    await deleteStudentResume()
-    setResume(null)
-    setConfirmDelete(false)
-    notify('Resume Deleted')
+  const handleDownload = async () => {
+    try {
+      const response = await downloadStudentResume()
+
+      const url = window.URL.createObjectURL(response.data)
+
+      const link = document.createElement('a')
+      link.href = url
+      link.download = resume?.fileName || 'resume.pdf'
+
+      document.body.appendChild(link)
+      link.click()
+
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error(error)
+      notify('Failed to download resume.', 'error')
+    }
   }
 
   if (loading) {
@@ -99,19 +123,22 @@ export default function StudentResume() {
               <div>
                 <p className="text-sm font-medium text-gray-800">{resume.fileName}</p>
                 <p className="text-xs text-gray-500">
-                  Uploaded {formatDate(resume.uploadedAt)} · {resume.fileSizeKb} KB · Updated {formatDate(resume.updatedAt)}
+                  Uploaded {formatDate(resume.uploadedAt)}
+                  · Updated {formatDate(resume.updatedAt)}
                 </p>
               </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" icon={Download} onClick={() => downloadFile(resume.fileName)}>
+              <Button
+                variant="outline"
+                size="sm"
+                icon={Download}
+                onClick={handleDownload}
+              >
                 Download
               </Button>
               <Button variant="outline" size="sm" icon={RefreshCw} onClick={() => fileInputRef.current?.click()}>
                 Replace
-              </Button>
-              <Button variant="danger" size="sm" icon={Trash2} onClick={() => setConfirmDelete(true)}>
-                Delete
               </Button>
             </div>
           </div>
@@ -139,10 +166,12 @@ export default function StudentResume() {
             ref={fileInputRef}
             type="file"
             className="hidden"
-            accept=".pdf,.doc,.docx"
+            accept=".pdf"
             onChange={(e) => handleFileSelect(e.target.files?.[0])}
           />
-          <p className="text-xs text-gray-400">Accepted formats: PDF, DOC, DOCX (max 2 MB)</p>
+          <p className="text-xs text-gray-400">
+            Accepted format: PDF (maximum 5 MB)
+          </p>
         </div>
       </Card>
 
@@ -162,15 +191,6 @@ export default function StudentResume() {
         ]}
       />
 
-      <ConfirmationModal
-        open={confirmDelete}
-        onClose={() => setConfirmDelete(false)}
-        onConfirm={handleDelete}
-        title="Delete Resume"
-        message="Are you sure you want to delete your resume? Recruiters will no longer be able to view it."
-        confirmLabel="Delete"
-        confirmVariant="danger"
-      />
     </div>
   )
 }

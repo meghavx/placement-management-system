@@ -57,6 +57,22 @@ export async function getStudents() {
   }
 }
 
+export async function importStudents(file) {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const response = await apiClient.post(
+    '/students/import',
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  )
+  return response.data.data
+}
+
 // Future: POST /admin/students (body: student DTO)
 export function createStudent(student) {
   return Promise.resolve({ id: Date.now(), ...student })

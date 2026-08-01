@@ -17,6 +17,7 @@ export const ROUTES = {
   // Student routes
   STUDENT_DASHBOARD: '/student',
   STUDENT_PROFILE: '/student/profile',
+  STUDENT_PROFILE_FORM: '/student/profile/edit',
   STUDENT_RESUME: '/student/resume',
   STUDENT_DRIVES: '/student/drives',
   STUDENT_APPLICATIONS: '/student/applications',
