@@ -26,8 +26,13 @@ export default function Sidebar({ isOpen, onClose }) {
   const { role, logout } = useAuth()
   const menuItems = SIDEBAR_MENUS[role] || []
 
-  const handleLogout = () => {
-    logout()
+  const handleLogout = async () => {
+    console.log('Logout clicked')
+
+    await logout()
+
+    console.log('Logout completed')
+    
     window.location.href = ROUTES.LOGIN
   }
 
