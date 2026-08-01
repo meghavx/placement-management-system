@@ -1,8 +1,9 @@
-package com.application.placementmanagementsystem.services.placementAdmin;
+package com.application.placementmanagementsystem.services.placementadmin;
 
-import com.application.placementmanagementsystem.dtos.placementAdmin.CreatePlacementAdminRequest;
-import com.application.placementmanagementsystem.dtos.placementAdmin.PlacementAdminResponse;
-import com.application.placementmanagementsystem.dtos.placementAdmin.UpdatePlacementAdminRequest;
+import com.application.placementmanagementsystem.dtos.placementadmin.CreatePlacementAdminRequest;
+import com.application.placementmanagementsystem.dtos.placementadmin.PlacementAdminResponse;
+import com.application.placementmanagementsystem.dtos.placementadmin.UpdatePlacementAdminRequest;
+import com.application.placementmanagementsystem.exceptions.DuplicateResourceException;
 import com.application.placementmanagementsystem.exceptions.ResourceAlreadyExistsException;
 import com.application.placementmanagementsystem.exceptions.ResourceNotFoundException;
 import com.application.placementmanagementsystem.mappers.PlacementAdminMapper;
@@ -10,6 +11,7 @@ import com.application.placementmanagementsystem.models.User;
 import com.application.placementmanagementsystem.models.enums.RoleType;
 import com.application.placementmanagementsystem.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,15 +21,20 @@ import java.util.List;
 public class PlacementAdminServiceImpl implements PlacementAdminService {
     private final UserRepository userRepository;
     private final PlacementAdminMapper placementAdminMapper;
+    private final PasswordEncoder passwordEncoder;
+
+    private static final String DEFAULT_PASSWORD = "PlacementAdmin@123";
 
     @Override
     public PlacementAdminResponse createPlacementAdmin(CreatePlacementAdminRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new ResourceAlreadyExistsException(
+            throw new DuplicateResourceException(
                     "User already exists with email: " + request.email()
             );
         }
+
         User placementAdmin = placementAdminMapper.toEntity(request);
+        placementAdmin.setPassword(passwordEncoder.encode(DEFAULT_PASSWORD));
         User savedPlacementAdmin = userRepository.save(placementAdmin);
         return placementAdminMapper.toResponse(savedPlacementAdmin);
     }
