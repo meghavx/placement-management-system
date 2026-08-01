@@ -75,6 +75,13 @@ export function AuthProvider({ children }) {
     return loggedInUser
   }
 
+  const updateUser = (updatedFields) => {
+    setUser((prev) => ({
+      ...prev,
+      ...updatedFields,
+    }))
+  }
+
   const logout = async () => {
     try {
       await logoutUser()
@@ -90,6 +97,7 @@ export function AuthProvider({ children }) {
     isAuthenticated: !!user?.accessToken,
     login,
     logout,
+    updateUser,
   }
 
   return (

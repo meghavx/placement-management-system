@@ -33,6 +33,7 @@ const LoginPage = lazy(() => import('./pages/auth/LoginPage'))
 // Student pages
 const StudentDashboard = lazy(() => import('./pages/student/StudentDashboard'))
 const StudentProfile = lazy(() => import('./pages/student/StudentProfile'))
+const StudentProfileForm = lazy(() => import('./pages/student/StudentProfileForm'))
 const StudentResume = lazy(() => import('./pages/student/StudentResume'))
 const StudentDrives = lazy(() => import('./pages/student/StudentDrives'))
 const StudentApplications = lazy(() => import('./pages/student/StudentApplications'))
@@ -91,6 +92,10 @@ function AppRoutes() {
         >
           <Route path={ROUTES.STUDENT_DASHBOARD} element={<StudentDashboard />} />
           <Route path={ROUTES.STUDENT_PROFILE} element={<StudentProfile />} />
+          <Route
+            path={ROUTES.STUDENT_PROFILE_FORM}
+            element={<StudentProfileForm />}
+          />
           <Route path={ROUTES.STUDENT_RESUME} element={<StudentResume />} />
           <Route path={ROUTES.STUDENT_DRIVES} element={<StudentDrives />} />
           <Route path={ROUTES.STUDENT_APPLICATIONS} element={<StudentApplications />} />

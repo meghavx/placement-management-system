@@ -1,19 +1,39 @@
 /*
 Purpose
-Shared notification actions (mark read / delete) used by Student and
-Recruiter Notification pages, since both roles interact with
-notifications the same way.
+Shared notification APIs used across Student, Recruiter,
+Placement Admin, and Super Admin modules.
 
-Future Features
-- Backend Integration:
-  PUT /student/notifications/{id} or /recruiter/notifications/{id}
-  DELETE /student/notifications/{id} or /recruiter/notifications/{id}
+The backend identifies the logged-in user from the JWT token and
+returns only notifications relevant to that user.
 */
 
-export function markNotificationRead(notificationId) {
-  return Promise.resolve({ id: notificationId, isRead: true })
+import apiClient from './apiClient'
+
+// GET /notifications
+export async function getNotifications() {
+  try {
+    const response = await apiClient.get('/notifications')
+    return response.data.data
+  } catch (error) {
+    console.error('Failed to fetch notifications:', error)
+    throw error
+  }
 }
 
-export function deleteNotification(notificationId) {
-  return Promise.resolve(notificationId)
+// PATCH /notifications/{notificationId}/read
+export async function markNotificationRead(notificationId) {
+  try {
+    const response = await apiClient.patch(
+      `/notifications/${notificationId}/read`
+    )
+
+    return response.data.data
+  } catch (error) {
+    console.error('Failed to mark notification as read:', error)
+
+    throw new Error(
+      error.response?.data?.message ||
+      'Failed to mark notification as read.'
+    )
+  }
 }
