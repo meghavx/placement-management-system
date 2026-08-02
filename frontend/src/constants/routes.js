@@ -30,6 +30,9 @@ export const ROUTES = {
   RECRUITER_INTERVIEWS: '/recruiter/interviews',
   RECRUITER_RESULTS: '/recruiter/results',
   RECRUITER_NOTIFICATIONS: '/recruiter/notifications',
+  RECRUITER_ACTIVITIES: '/recruiter/activities/:driveId',
+  RECRUITER_PROFILE: '/recruiter/profile',
+  RECRUITER_PROFILE_FORM: '/recruiter/profile/edit',
 
   // Placement Admin routes
   ADMIN_DASHBOARD: '/admin',

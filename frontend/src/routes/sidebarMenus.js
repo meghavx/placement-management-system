@@ -39,6 +39,11 @@ export const studentMenu = [
 
 export const recruiterMenu = [
   { label: 'Dashboard', path: ROUTES.RECRUITER_DASHBOARD, icon: LayoutDashboard },
+  {
+    label: 'Profile',
+    path: ROUTES.RECRUITER_PROFILE,
+    icon: User,
+  },
   { label: 'Placement Drives', path: ROUTES.RECRUITER_VIEW_DRIVES, icon: Briefcase },
   { label: 'Create Drive', path: ROUTES.RECRUITER_CREATE_DRIVE, icon: UserPlus },
   { label: 'Applicants', path: ROUTES.RECRUITER_VIEW_APPLICANTS, icon: Users },
@@ -46,6 +51,7 @@ export const recruiterMenu = [
   { label: 'Interviews', path: ROUTES.RECRUITER_INTERVIEWS, icon: ClipboardList },
   { label: 'Results', path: ROUTES.RECRUITER_RESULTS, icon: FileText },
   { label: 'Notifications', path: ROUTES.RECRUITER_NOTIFICATIONS, icon: Bell },
+
 ]
 
 export const placementAdminMenu = [

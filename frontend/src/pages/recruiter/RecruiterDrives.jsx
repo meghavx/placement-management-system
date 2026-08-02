@@ -19,7 +19,7 @@ GET /recruiter/drives, PUT /recruiter/drives/{id}, DELETE /recruiter/drives/{id}
 
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Eye, Pencil } from 'lucide-react'
+import { Plus, Eye, Pencil, ClipboardList  } from 'lucide-react'
 import PageHeader from '../../components/PageHeader'
 import SearchBar from '../../components/SearchBar'
 import FilterBar from '../../components/FilterBar'
@@ -28,13 +28,21 @@ import Badge from '../../components/Badge'
 import Button from '../../components/Button'
 import Modal from '../../components/Modal'
 import SkeletonLoader from '../../components/SkeletonLoader'
-import { getRecruiterDrives, updateDrive, getRecruiterDriveById } from '../../services/recruiterService'
+import {
+  getRecruiterDrives,
+  updateDriveStatus,
+  getRecruiterDriveById,
+  getRecruitmentActivities,
+} from '../../services/recruiterService'
 import { useSearch } from '../../hooks/useSearch'
 import { useNotification } from '../../hooks/useNotification'
 import { formatDate } from '../../utils/formatDate'
 import { formatSalary } from '../../utils/formatSalary'
 import { DRIVE_STATUS } from '../../constants/driveStatus'
 import { ROUTES } from '../../constants/routes'
+import {
+  RECRUITMENT_ACTIVITY_LABELS,
+} from '../../constants/recruitmentActivity'
 
 export default function RecruiterDrives() {
   const navigate = useNavigate()
@@ -55,26 +63,60 @@ export default function RecruiterDrives() {
   //   })
   // }, [])
   useEffect(() => {
-    async function fetchDrives() {
-      try {
-        const res = await getRecruiterDrives()
-        setDrives(res)
-      } catch (error) {
-        console.error('Error fetching recruiter drives:', error)
-        notify('Failed to load placement drives.', 'error')
-      } finally {
-        setLoading(false)
-      }
+  async function fetchDrives() {
+    try {
+      const drives = await getRecruiterDrives()
+
+      const drivesWithActivities = await Promise.all(
+        drives.map(async (drive) => {
+          try {
+            const activities = await getRecruitmentActivities(drive.id)
+
+            const currentActivity =
+              activities.length > 0
+                ? [...activities]
+                    .sort(
+                      (a, b) =>
+                        new Date(a.scheduledAt) -
+                        new Date(b.scheduledAt)
+                    )
+                    .at(-1)
+                : null
+
+            return {
+              ...drive,
+              currentActivity,
+            }
+          } catch {
+            return {
+              ...drive,
+              currentActivity: null,
+            }
+          }
+        })
+      )
+
+      setDrives(drivesWithActivities)
+    } catch (error) {
+      console.error(error)
+      notify('Failed to load placement drives.')
+    } finally {
+      setLoading(false)
     }
-    fetchDrives()
-  }, [])
+  }
+
+  fetchDrives()      // <-- YOU ARE MISSING THIS
+}, [])
 
 
   const handleStatusChange = async (drive, newStatus) => {
     // Backend Integration: replace with real PUT /recruiter/drives/{id} call.
-    await updateDrive(drive.id, { status: newStatus })
+    await updateDriveStatus(
+        drive.id,
+        newStatus
+    )
     setDrives((prev) => prev.map((d) => (d.id === drive.id ? { ...d, status: newStatus } : d)))
-    notify(`Drive ${newStatus}`)
+    notify(`Drive status updated to ${newStatus}.`)
   }
 
   const handleView = async (driveId) => {
@@ -123,6 +165,24 @@ export default function RecruiterDrives() {
               header: 'Drive Date',
               render: (r) => formatDate(r.driveDate),
             },
+            {
+              key: 'currentActivity',
+              header: 'Current Activity',
+              render: (row) =>
+                row.currentActivity ? (
+                  <Badge
+                    label={
+                      RECRUITMENT_ACTIVITY_LABELS[
+                        row.currentActivity.activityType
+                      ]
+                    }
+                  />
+                ) : (
+                  <span className="text-xs text-gray-400">
+                    Not Started
+                  </span>
+                ),
+            },
             { key: 'status', header: 'Status', render: (r) => <Badge label={r.status} /> },
           ]}
           rows={statusFiltered}
@@ -135,30 +195,87 @@ export default function RecruiterDrives() {
                 icon={Eye}
                 onClick={() => handleView(row.id)}
               />
+
               <Button
                 variant="ghost"
                 size="sm"
                 icon={Pencil}
-                onClick={() => navigate(ROUTES.RECRUITER_EDIT_DRIVE.replace(':driveId', row.id))}
+                onClick={() =>
+                  navigate(
+                    ROUTES.RECRUITER_EDIT_DRIVE.replace(':driveId', row.id)
+                  )
+                }
               />
+              <Button
+                size="sm"
+                variant="ghost"
+                icon={ClipboardList}
+                onClick={() =>
+                  navigate(`/recruiter/activities/${row.id}`)
+                }
+              />
+
+              {/* Draft -> Open */}
               {row.status === DRIVE_STATUS.DRAFT && (
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleStatusChange(row, DRIVE_STATUS.OPEN)}
+                  onClick={() =>
+                    handleStatusChange(row, DRIVE_STATUS.OPEN)
+                  }
                 >
                   Open
                 </Button>
               )}
 
+              {/* Open -> Closed */}
               {row.status === DRIVE_STATUS.OPEN && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleStatusChange(row, DRIVE_STATUS.CLOSED)}
-                >
-                  Close
-                </Button>
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      handleStatusChange(row, DRIVE_STATUS.CLOSED)
+                    }
+                  >
+                    Close
+                  </Button>
+
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() =>
+                      handleStatusChange(row, DRIVE_STATUS.CANCELLED)
+                    }
+                  >
+                    Cancel
+                  </Button>
+                </>
+              )}
+
+              {/* Closed -> Completed */}
+              {row.status === DRIVE_STATUS.CLOSED && (
+                <>
+                  <Button
+                    variant="success"
+                    size="sm"
+                    onClick={() =>
+                      handleStatusChange(row, DRIVE_STATUS.COMPLETED)
+                    }
+                  >
+                    Complete
+                  </Button>
+
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() =>
+                      handleStatusChange(row, DRIVE_STATUS.CANCELLED)
+                    }
+                  >
+                    Cancel
+                  </Button>
+                </>
               )}
             </div>
           )}

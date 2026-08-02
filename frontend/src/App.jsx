@@ -28,6 +28,7 @@ import { ROUTES } from './constants/routes'
 import { ROLES } from './constants/roles'
 import { ROLE_HOME_ROUTE } from './routes/sidebarMenus'
 
+
 const LoginPage = lazy(() => import('./pages/auth/LoginPage'))
 
 // Student pages
@@ -48,6 +49,11 @@ const RecruiterShortlisted = lazy(() => import('./pages/recruiter/RecruiterShort
 const RecruiterInterviews = lazy(() => import('./pages/recruiter/RecruiterInterviews'))
 const RecruiterResults = lazy(() => import('./pages/recruiter/RecruiterResults'))
 const RecruiterNotifications = lazy(() => import('./pages/recruiter/RecruiterNotifications'))
+const RecruitmentActivities = lazy(
+  () => import('./pages/recruiter/RecruitmentActivities')
+)
+const RecruiterProfile = lazy(() => import('./pages/recruiter/RecruiterProfile'))
+const RecruiterProfileForm = lazy(() => import('./pages/recruiter/RecruiterProfileForm'))
 
 // Placement Admin pages
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
@@ -112,6 +118,19 @@ function AppRoutes() {
         >
           <Route path={ROUTES.RECRUITER_DASHBOARD} element={<RecruiterDashboard />} />
           <Route path={ROUTES.RECRUITER_VIEW_DRIVES} element={<RecruiterDrives />} />
+          <Route
+            path={ROUTES.RECRUITER_ACTIVITIES}
+            element={<RecruitmentActivities />}
+          />
+          <Route
+            path={ROUTES.RECRUITER_PROFILE}
+            element={<RecruiterProfile />}
+          />
+
+          <Route
+            path={ROUTES.RECRUITER_PROFILE_FORM}
+            element={<RecruiterProfileForm />}
+          />
           <Route path={ROUTES.RECRUITER_CREATE_DRIVE} element={<RecruiterDriveForm />} />
           <Route path={ROUTES.RECRUITER_EDIT_DRIVE} element={<RecruiterDriveForm />} />
           <Route path={ROUTES.RECRUITER_VIEW_APPLICANTS} element={<RecruiterApplicants />} />
