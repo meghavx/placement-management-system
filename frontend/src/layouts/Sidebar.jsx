@@ -30,7 +30,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
   const handleLogout = async () => {
     await logout()
-    navigate(ROUTES.LANDING, { replace: true })
+    navigate(ROUTES.LOGIN, { replace: true })
   }
 
   return (
