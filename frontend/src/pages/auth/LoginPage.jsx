@@ -25,7 +25,7 @@ Future Features
 */
 
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { GraduationCap } from 'lucide-react'
 import Input from '../../components/Input'
 import PasswordInput from '../../components/PasswordInput'
@@ -36,6 +36,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { ROLE_HOME_ROUTE } from '../../routes/sidebarMenus'
 import { ROLES } from '../../constants/roles'
 import { validateRequired } from '../../utils/validators'
+import { ROUTES } from '../../constants/routes'
 
 // Only these three roles are selectable at login, per product decision.
 // Super Admin accounts are provisioned separately and do not appear here.
@@ -126,9 +127,27 @@ export default function LoginPage() {
             error={errors.password}
           />
 
-          <Button type="submit" loading={loading} fullWidth className="bg-[#42e886]! hover:bg-[#28d0ac]! text-white">
-            Log In
-          </Button>
+          
+
+<Button
+  type="submit"
+  loading={loading}
+  fullWidth
+  className="bg-[#42e886]! hover:bg-[#28d0ac]! text-white"
+>
+  Log In
+</Button>
+
+<div className="flex -mt-2">
+          <button
+          type="button"
+          onClick={() => navigate("/forgot-password")}
+          className="text-sm text-primary-600 hover:text-primary-700 hover:underline"
+          >
+           Forgot Password?
+         </button>
+</div>
+
         </form>
 
         {/* <div className="mt-6 rounded-lg bg-gray-50 p-3 text-xs text-gray-500">
