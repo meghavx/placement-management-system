@@ -260,7 +260,7 @@ export default function AdminStudents() {
           : 'Student import completed with some errors'
       )
     } catch (error) {
-      console.error(error)
+      console.error('Failed to import students:', error)
 
       setImportError(
         error.response?.data?.message ??
@@ -315,7 +315,7 @@ export default function AdminStudents() {
 
         <div className="flex flex-wrap gap-2">
           <Button
-            variant="outline"
+            variant="primaryOutline"
             icon={FileSpreadsheet}
             onClick={() => setImportOpen(true)}
           >
@@ -684,15 +684,92 @@ export default function AdminStudents() {
         open={importOpen}
         onClose={handleCloseImport}
         title="Import Students"
+        footer={
+          importResult ? (
+            <Button onClick={handleCloseImport}>
+              Done
+            </Button>
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                onClick={handleCloseImport}
+                disabled={importing}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                onClick={handleImportStudents}
+                disabled={!importFile}
+                loading={importing}
+              >
+                Import Students
+              </Button>
+            </>
+          )
+        }
       >
         <div className="flex flex-col gap-4">
-          <input
-            type="file"
-            accept=".xlsx"
-            onChange={(e) =>
-              setImportFile(e.target.files?.[0] ?? null)
-            }
-          />
+          <div>
+            <p className="text-sm text-gray-700">
+              Upload an Excel (.xlsx) file containing student account details.
+            </p>
+            <p className="mt-1 text-xs text-gray-500">
+              The first row should contain the column headers.
+            </p>
+          </div>
+
+          <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-gray-300 px-4 py-4 transition-colors hover:border-primary-500 hover:bg-primary-50">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+              <FileSpreadsheet className="text-gray-600" size={20} />
+            </div>
+
+            <div className="min-w-0 flex-1">
+              {importFile ? (
+                <>
+                  <p className="truncate text-sm font-medium text-gray-800">
+                    {importFile.name}
+                  </p>
+                  <p className="mt-0.5 text-xs text-gray-500">
+                    Click to choose a different file
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-medium text-primary-600">
+                    Choose Excel file
+                  </p>
+                  <p className="mt-0.5 text-xs text-gray-500">
+                    .xlsx files only
+                  </p>
+                </>
+              )}
+            </div>
+
+            <Upload size={18} className="shrink-0 text-gray-400" />
+
+            <input
+              type="file"
+              accept=".xlsx"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null
+
+                setImportResult(null)
+
+                if (file && !file.name.toLowerCase().endsWith('.xlsx')) {
+                  setImportFile(null)
+                  setImportError('Only .xlsx files are supported.')
+                  e.target.value = ''
+                  return
+                }
+
+                setImportFile(file)
+                setImportError('')
+              }}
+            />
+          </label>
 
           {importError && (
             <p className="text-sm text-red-600">
@@ -701,38 +778,59 @@ export default function AdminStudents() {
           )}
 
           {importResult && (
-            <div className="rounded-lg bg-gray-50 p-4 text-sm">
-              <p>
-                <strong>Total:</strong>{' '}
-                {importResult.total}
-              </p>
-              <p>
-                <strong>Imported:</strong>{' '}
-                {importResult.imported}
-              </p>
-              <p>
-                <strong>Failed:</strong>{' '}
-                {importResult.failed}
-              </p>
+            <div className="flex flex-col gap-4">
+
+              {/* Summary */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="rounded-lg bg-gray-50 p-3 text-center">
+                  <p className="text-xl font-semibold text-gray-900">
+                    {importResult.total}
+                  </p>
+                  <p className="text-xs text-gray-500">Processed</p>
+                </div>
+
+                <div className="rounded-lg bg-green-50 p-3 text-center">
+                  <p className="text-xl font-semibold text-green-700">
+                    {importResult.created}
+                  </p>
+                  <p className="text-xs text-green-600">Created</p>
+                </div>
+
+                <div className="rounded-lg bg-red-50 p-3 text-center">
+                  <p className="text-xl font-semibold text-red-700">
+                    {importResult.failed}
+                  </p>
+                  <p className="text-xs text-red-600">Failed</p>
+                </div>
+              </div>
+
+              {/* Row-level errors */}
+              {importResult.errors?.length > 0 && (
+                <div>
+                  <p className="mb-2 text-sm font-medium text-gray-800">
+                    Failed Rows
+                  </p>
+
+                  <div className="max-h-48 overflow-y-auto rounded-lg border border-gray-200">
+                    {importResult.errors.map((error, index) => (
+                      <div
+                        key={`${error.row}-${index}`}
+                        className="flex gap-4 border-b border-gray-100 px-4 py-3 last:border-b-0"
+                      >
+                        <span className="shrink-0 text-sm font-medium text-red-600">
+                          Row {error.row}
+                        </span>
+
+                        <span className="text-sm text-gray-700">
+                          {error.message}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
-
-          <div className="flex justify-end gap-3">
-            <Button
-              variant="outline"
-              onClick={handleCloseImport}
-            >
-              Cancel
-            </Button>
-
-            <Button
-              icon={Upload}
-              loading={importing}
-              onClick={handleImportStudents}
-            >
-              Import
-            </Button>
-          </div>
         </div>
       </Modal>
     </div>
