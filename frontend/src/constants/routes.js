@@ -10,6 +10,9 @@ Future Features
 
 export const ROUTES = {
   LOGIN: '/',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
+  SUPER_ADMIN_LOGIN: '/super-admin/login',
 
   // Student routes
   STUDENT_DASHBOARD: '/student',
