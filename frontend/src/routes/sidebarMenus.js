@@ -32,31 +32,33 @@ export const studentMenu = [
   { label: 'Dashboard', path: ROUTES.STUDENT_DASHBOARD, icon: LayoutDashboard },
   { label: 'Profile', path: ROUTES.STUDENT_PROFILE, icon: User },
   { label: 'Resume', path: ROUTES.STUDENT_RESUME, icon: FileText },
-  { label: 'Placement Drives', path: ROUTES.STUDENT_DRIVES, icon: Briefcase },
+  { label: 'Job Opportunities', path: ROUTES.STUDENT_DRIVES, icon: Briefcase },
   { label: 'Applications', path: ROUTES.STUDENT_APPLICATIONS, icon: ClipboardList },
   { label: 'Notifications', path: ROUTES.STUDENT_NOTIFICATIONS, icon: Bell },
+  { label: 'Settings', path: '', icon: Settings },
 ]
 
 export const recruiterMenu = [
   { label: 'Dashboard', path: ROUTES.RECRUITER_DASHBOARD, icon: LayoutDashboard },
-  { label: 'Placement Drives', path: ROUTES.RECRUITER_VIEW_DRIVES, icon: Briefcase },
   { label: 'Create Drive', path: ROUTES.RECRUITER_CREATE_DRIVE, icon: UserPlus },
+  { label: 'Placement Drives', path: ROUTES.RECRUITER_VIEW_DRIVES, icon: Briefcase },
   { label: 'Applicants', path: ROUTES.RECRUITER_VIEW_APPLICANTS, icon: Users },
   { label: 'Shortlisted', path: ROUTES.RECRUITER_SHORTLIST, icon: ListChecks },
   { label: 'Interviews', path: ROUTES.RECRUITER_INTERVIEWS, icon: ClipboardList },
   { label: 'Results', path: ROUTES.RECRUITER_RESULTS, icon: FileText },
   { label: 'Notifications', path: ROUTES.RECRUITER_NOTIFICATIONS, icon: Bell },
+  { label: 'Settings', path: '', icon: Settings },
 ]
 
 export const placementAdminMenu = [
   { label: 'Dashboard', path: ROUTES.ADMIN_DASHBOARD, icon: LayoutDashboard },
   { label: 'Students', path: ROUTES.ADMIN_STUDENTS, icon: Users },
-  { label: 'Recruiters', path: ROUTES.ADMIN_RECRUITERS, icon: UserPlus },
-  { label: 'Companies', path: ROUTES.ADMIN_COMPANIES, icon: Building2 },
-  { label: 'Placement Drives', path: ROUTES.ADMIN_DRIVES, icon: Briefcase },
-  { label: 'Eligibility', path: ROUTES.ADMIN_ELIGIBILITY, icon: ListChecks },
   { label: 'Applications', path: ROUTES.ADMIN_APPLICATIONS, icon: ClipboardList },
+  { label: 'Companies', path: ROUTES.ADMIN_COMPANIES, icon: Building2 },
+  { label: 'Recruiters', path: ROUTES.ADMIN_RECRUITERS, icon: UserPlus },
+  { label: 'Placement Drives', path: ROUTES.ADMIN_DRIVES, icon: Briefcase },
   { label: 'Reports & Analytics', path: ROUTES.ADMIN_REPORTS, icon: BarChart3 },
+  { label: 'Settings', path: '', icon: Settings },
 ]
 
 export const superAdminMenu = [
