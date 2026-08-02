@@ -18,15 +18,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/student/profile/resume")
+@RequestMapping("/api")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('STUDENT')")
 @Tag(name = "Resume Management")
 public class ResumeController {
 
     private final ResumeService resumeService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = "/student/profile/resume", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "Upload / Replace Resume")
     public ResponseEntity<ApiResponse<ResumeResponse>> uploadResume(
             @RequestParam("file") MultipartFile file
@@ -44,7 +44,8 @@ public class ResumeController {
                 );
     }
 
-    @GetMapping
+    @GetMapping("/student/profile/resume")
+    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "View Resume Details")
     public ResponseEntity<ApiResponse<ResumeResponse>> getResume() {
 
@@ -58,13 +59,53 @@ public class ResumeController {
         );
     }
 
-    @GetMapping("/download")
+    @GetMapping("/student/profile/resume/download")
+    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "Download Resume")
     public ResponseEntity<ByteArrayResource> downloadResume() {
 
         ResumeResponse response = resumeService.getResume();
 
         byte[] file = resumeService.downloadResume();
+
+        ByteArrayResource resource = new ByteArrayResource(file);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.attachment()
+                                .filename(response.getFileName())
+                                .build()
+                                .toString()
+                )
+                .contentLength(file.length)
+                .body(resource);
+    }
+
+    @GetMapping("/student/{id}/resume")
+    @PreAuthorize("hasAnyRole('PLACEMENT_ADMIN', 'RECRUITER')")
+    @Operation(summary = "View Student Resume Details")
+    public ResponseEntity<ApiResponse<ResumeResponse>> getStudentResume(@PathVariable Long id) {
+
+        ResumeResponse response = resumeService.getStudentResume(id);
+
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "Resume fetched successfully",
+                        response
+                )
+        );
+    }
+
+    @GetMapping("/student/{id}/resume/download")
+    @PreAuthorize("hasAnyRole('PLACEMENT_ADMIN', 'RECRUITER')")
+    @Operation(summary = "Download Student Resume")
+    public ResponseEntity<ByteArrayResource> downloadStudentResume(@PathVariable Long id) {
+
+        ResumeResponse response = resumeService.getStudentResume(id);
+
+        byte[] file = resumeService.downloadStudentResume(id);
 
         ByteArrayResource resource = new ByteArrayResource(file);
 
