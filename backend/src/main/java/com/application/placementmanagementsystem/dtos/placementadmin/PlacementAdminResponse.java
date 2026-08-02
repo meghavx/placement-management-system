@@ -1,4 +1,4 @@
-package com.application.placementmanagementsystem.dtos.placementAdmin;
+package com.application.placementmanagementsystem.dtos.placementadmin;
 
 import lombok.Builder;
 

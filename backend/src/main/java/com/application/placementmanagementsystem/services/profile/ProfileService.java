@@ -1,6 +1,6 @@
 package com.application.placementmanagementsystem.services.profile;
 
-import com.application.placementmanagementsystem.dtos.placementAdmin.PlacementAdminResponse;
+import com.application.placementmanagementsystem.dtos.placementadmin.PlacementAdminResponse;
 import com.application.placementmanagementsystem.dtos.profile.*;
 import com.application.placementmanagementsystem.dtos.recruiter.RecruiterResponse;
 import com.application.placementmanagementsystem.dtos.student.StudentResponse;

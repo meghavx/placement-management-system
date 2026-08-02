@@ -2,10 +2,10 @@ package com.application.placementmanagementsystem.controllers;
 
 import com.application.placementmanagementsystem.common.ApiResponse;
 import com.application.placementmanagementsystem.common.ResponseBuilder;
-import com.application.placementmanagementsystem.dtos.placementAdmin.CreatePlacementAdminRequest;
-import com.application.placementmanagementsystem.dtos.placementAdmin.PlacementAdminResponse;
-import com.application.placementmanagementsystem.dtos.placementAdmin.UpdatePlacementAdminRequest;
-import com.application.placementmanagementsystem.services.placementAdmin.PlacementAdminService;
+import com.application.placementmanagementsystem.dtos.placementadmin.CreatePlacementAdminRequest;
+import com.application.placementmanagementsystem.dtos.placementadmin.PlacementAdminResponse;
+import com.application.placementmanagementsystem.dtos.placementadmin.UpdatePlacementAdminRequest;
+import com.application.placementmanagementsystem.services.placementadmin.PlacementAdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

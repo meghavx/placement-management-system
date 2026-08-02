@@ -1,8 +1,8 @@
 package com.application.placementmanagementsystem.mappers;
 
-import com.application.placementmanagementsystem.dtos.placementAdmin.CreatePlacementAdminRequest;
-import com.application.placementmanagementsystem.dtos.placementAdmin.PlacementAdminResponse;
-import com.application.placementmanagementsystem.dtos.placementAdmin.UpdatePlacementAdminRequest;
+import com.application.placementmanagementsystem.dtos.placementadmin.CreatePlacementAdminRequest;
+import com.application.placementmanagementsystem.dtos.placementadmin.PlacementAdminResponse;
+import com.application.placementmanagementsystem.dtos.placementadmin.UpdatePlacementAdminRequest;
 import com.application.placementmanagementsystem.models.User;
 import com.application.placementmanagementsystem.models.enums.RoleType;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,6 @@ public class PlacementAdminMapper {
                 .fullName(request.fullName())
                 .email(request.email())
                 .phoneNumber(request.phoneNumber())
-                .password(passwordEncoder.encode(request.password()))
                 .role(RoleType.PLACEMENT_ADMIN)
                 .active(true)
                 .build();
