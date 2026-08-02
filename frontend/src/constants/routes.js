@@ -33,6 +33,9 @@ export const ROUTES = {
   RECRUITER_INTERVIEWS: '/recruiter/interviews',
   RECRUITER_RESULTS: '/recruiter/results',
   RECRUITER_NOTIFICATIONS: '/recruiter/notifications',
+  RECRUITER_ACTIVITIES: '/recruiter/activities/:driveId',
+  RECRUITER_PROFILE: '/recruiter/profile',
+  RECRUITER_PROFILE_FORM: '/recruiter/profile/edit',
 
   // Placement Admin routes
   ADMIN_DASHBOARD: '/admin',
@@ -40,9 +43,11 @@ export const ROUTES = {
   ADMIN_RECRUITERS: '/admin/recruiters',
   ADMIN_COMPANIES: '/admin/companies',
   ADMIN_DRIVES: '/admin/drives',
-  ADMIN_ELIGIBILITY: '/admin/eligibility',
+  // ADMIN_ELIGIBILITY: '/admin/eligibility',
   ADMIN_APPLICATIONS: '/admin/applications',
-  ADMIN_REPORTS: '/admin/reports',
+  // ADMIN_REPORTS: '/admin/reports',
+  ADMIN_PROFILE: '/admin/profile',
+  ADMIN_PROFILE_FORM: '/admin/profile/edit',
 
   // Super Admin routes
   SUPER_ADMIN_LOGIN: '/super-admin/login',
