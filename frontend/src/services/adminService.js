@@ -92,9 +92,26 @@ export async function importStudents(file) {
   return response.data.data
 }
 
-// Future: POST /admin/students (body: student DTO)
-export function createStudent(student) {
-  return Promise.resolve({ id: Date.now(), ...student })
+export async function createStudent(student) {
+  try {
+    const response = await apiClient.post('/students', {
+      fullName: student.fullName,
+      email: student.email,
+      phoneNumber: student.phoneNumber,
+      rollNumber: student.rollNumber,
+      department: student.department,
+      graduationYear: Number(student.graduationYear),
+      cgpa: Number(student.cgpa),
+      currentBacklogs: Number(student.currentBacklogs),
+    })
+
+    return response.data
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      'Failed to create student.'
+    )
+  }
 }
 
 // Future: PUT /admin/students/{id}

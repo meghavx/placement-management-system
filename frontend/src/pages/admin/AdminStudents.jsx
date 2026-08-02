@@ -154,11 +154,17 @@ export default function AdminStudents() {
     if (!validateRequired(form.graduationYear))
       newErrors.graduationYear = 'Graduation Year is required.'
 
-    if (form.cgpa === '')
+    if (form.cgpa === '') {
       newErrors.cgpa = 'CGPA is required.'
+    } else if (Number(form.cgpa) < 0 || Number(form.cgpa) > 10) {
+      newErrors.cgpa = 'CGPA must be between 0 and 10.'
+    }
 
-    if (form.currentBacklogs === '')
+    if (form.currentBacklogs === '') {
       newErrors.currentBacklogs = 'Current Backlogs is required.'
+    } else if (Number(form.currentBacklogs) < 0) {
+      newErrors.currentBacklogs = 'Current Backlogs cannot be negative.'
+    }
 
     setErrors(newErrors)
 
@@ -206,9 +212,12 @@ export default function AdminStudents() {
 
         notify('Student updated successfully')
       } else {
-        await createStudent(form)
+        const response = await createStudent(form)
 
-        notify('Student created successfully')
+        notify(
+          response.message || 
+          'Student created successfully'
+        )
       }
 
       const updated = await getStudents()
@@ -217,7 +226,13 @@ export default function AdminStudents() {
       setStudentModalOpen(false)
       setEditingStudent(null)
       setForm(EMPTY_FORM)
-    } finally {
+    } catch (error) {
+      notify(
+        error.message ||
+        'Failed to add student'
+      )
+    } 
+    finally {
       setSaving(false)
     }
   }
