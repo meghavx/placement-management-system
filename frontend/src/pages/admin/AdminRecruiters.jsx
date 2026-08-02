@@ -16,8 +16,15 @@ GET /admin/recruiters, POST /admin/recruiters, PUT /admin/recruiters/{id}, DELET
 ==========================================
 */
 
-import { useEffect, useState } from 'react'
-import { Plus, Eye, Pencil, KeyRound, UserCheck, UserX, Trash2 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  Plus,
+  Eye,
+  Pencil,
+  UserCheck,
+  UserX,
+} from 'lucide-react'
+
 import PageHeader from '../../components/PageHeader'
 import StatisticCard from '../../components/StatisticCard'
 import SearchBar from '../../components/SearchBar'
@@ -26,194 +33,491 @@ import Badge from '../../components/Badge'
 import Button from '../../components/Button'
 import Modal from '../../components/Modal'
 import Input from '../../components/Input'
-import ConfirmationModal from '../../components/ConfirmationModal'
+import Dropdown from '../../components/Dropdown'
+import Avatar from '../../components/Avatar'
 import SkeletonLoader from '../../components/SkeletonLoader'
-import { getRecruiters, createRecruiter, updateRecruiter, deleteRecruiter } from '../../services/adminService'
+
+import {
+  getRecruiters,
+  createRecruiter,
+  updateRecruiter,
+} from '../../services/adminService'
+
+import { getCompanies } from '../../services/companyService'
+
 import { useSearch } from '../../hooks/useSearch'
 import { useNotification } from '../../hooks/useNotification'
-import { validateEmail, validatePhone, validateRequired } from '../../utils/validators'
-import { formatDate } from '../../utils/formatDate'
+import {
+  validateEmail,
+  validatePhone,
+  validateRequired,
+} from '../../utils/validators'
 
-const EMPTY_FORM = { company: '', recruiter: '', email: '', phone: '', website: '', industry: '', address: '' }
+const EMPTY_FORM = {
+  fullName: '',
+  email: '',
+  phone: '',
+  companyId: '',
+  designation: '',
+}
 
 export default function AdminRecruiters() {
   const { notify } = useNotification()
-  const [recruiters, setRecruiters] = useState([])
+
   const [loading, setLoading] = useState(true)
+
+  const [recruiters, setRecruiters] = useState([])
+  const [companies, setCompanies] = useState([])
+
   const [viewRecruiter, setViewRecruiter] = useState(null)
-  const [addOpen, setAddOpen] = useState(false)
+
+  const [formOpen, setFormOpen] = useState(false)
+  const [editingRecruiter, setEditingRecruiter] = useState(null)
+
   const [form, setForm] = useState(EMPTY_FORM)
+
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
-  const [deleteTarget, setDeleteTarget] = useState(null)
 
-  const { searchTerm, setSearchTerm, filteredItems } = useSearch(recruiters, ['recruiter', 'company', 'email'])
-
-  // useEffect(() => {
-  //   // Backend Integration: replace with real GET /admin/recruiters response.
-  //   getRecruiters().then((res) => {
-  //     setRecruiters(res)
-  //     setLoading(false)
-  //   })
-  // }, [])
+  const {
+    searchTerm,
+    setSearchTerm,
+    filteredItems,
+  } = useSearch(recruiters, [
+    'recruiter',
+    'company',
+    'email',
+  ])
 
   useEffect(() => {
-    const fetchRecruiters = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getRecruiters()
-        setRecruiters(data)
+        const [recruiterData, companyData] = await Promise.all([
+          getRecruiters(),
+          getCompanies(),
+        ])
+
+        setRecruiters(recruiterData)
+        setCompanies(companyData)
       } catch (error) {
         console.error(error)
-        notify('Failed to load recruiters')
+        notify('Failed to load recruiters.')
       } finally {
         setLoading(false)
       }
     }
 
-    fetchRecruiters()
+    fetchData()
   }, [])
 
-  const stats = {
-    recruiters: recruiters.length,
-    companies: new Set(recruiters.map((r) => r.company)).size,
+  const stats = useMemo(() => ({
+    total: recruiters.length,
     active: recruiters.filter((r) => r.status === 'Active').length,
     inactive: recruiters.filter((r) => r.status === 'Inactive').length,
-  }
+  }), [recruiters])
 
-  const handleFormChange = (field, value) => setForm((prev) => ({ ...prev, [field]: value }))
+  const companyOptions = companies.map((company) => ({
+    value: company.id,
+    label: company.company,
+  }))
+
+  const handleFormChange = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
+  }
 
   const validate = () => {
     const newErrors = {}
-    if (!validateRequired(form.company)) newErrors.company = 'Company name is required.'
-    if (!validateRequired(form.recruiter)) newErrors.recruiter = 'Recruiter name is required.'
-    if (!validateEmail(form.email)) newErrors.email = 'Enter a valid email address.'
-    if (!validatePhone(form.phone)) newErrors.phone = 'Enter a valid 10-digit phone number.'
+
+    if (!validateRequired(form.fullName))
+      newErrors.fullName = 'Recruiter name is required.'
+
+    if (!validateEmail(form.email))
+      newErrors.email = 'Enter a valid email.'
+
+    if (!validatePhone(form.phone))
+      newErrors.phone = 'Enter a valid phone number.'
+
+    if (!validateRequired(form.companyId))
+      newErrors.companyId = 'Select a company.'
+
+    if (!validateRequired(form.designation))
+      newErrors.designation = 'Designation is required.'
+
     setErrors(newErrors)
+
     return Object.keys(newErrors).length === 0
   }
 
-  const handleAdd = async (e) => {
-    e.preventDefault()
-    if (!validate()) return
-    setSaving(true)
-    // Backend Integration: replace with real POST /admin/recruiters call.
-    const created = await createRecruiter({ ...form, status: 'Active', createdDate: new Date().toISOString().slice(0, 10), id: `REC${200 + recruiters.length + 1}` })
-    setRecruiters((prev) => [...prev, created])
-    setSaving(false)
-    setAddOpen(false)
+  const handleAdd = () => {
+    setEditingRecruiter(null)
+    setErrors({})
     setForm(EMPTY_FORM)
-    notify('Recruiter Account Created')
+    setFormOpen(true)
   }
 
-  const handleToggleStatus = async (recruiter) => {
-    const newStatus = recruiter.status === 'Active' ? 'Inactive' : 'Active'
-    await updateRecruiter(recruiter.id, { status: newStatus })
-    setRecruiters((prev) => prev.map((r) => (r.id === recruiter.id ? { ...r, status: newStatus } : r)))
-    notify(newStatus === 'Active' ? 'Recruiter Activated' : 'Recruiter Deactivated')
+  const handleEdit = (row) => {
+    setEditingRecruiter(row)
+
+    setForm({
+      fullName: row.recruiter,
+      email: row.email,
+      phone: row.phone,
+      designation: row.designation,
+      companyId: row.companyId,
+    })
+
+    setErrors({})
+    setFormOpen(true)
   }
 
-  const handleDelete = async () => {
-    await deleteRecruiter(deleteTarget.id)
-    setRecruiters((prev) => prev.filter((r) => r.id !== deleteTarget.id))
-    setDeleteTarget(null)
-    notify('Recruiter Deleted')
+  const handleSave = async (e) => {
+    e.preventDefault()
+
+    if (!validate()) return
+
+    setSaving(true)
+
+    try {
+      if (editingRecruiter) {
+        await updateRecruiter(editingRecruiter.id, form)
+
+        notify('Recruiter updated successfully.')
+      } else {
+        await createRecruiter(form)
+
+        notify('Recruiter created successfully.')
+      }
+
+      const updated = await getRecruiters()
+      setRecruiters(updated)
+
+      setFormOpen(false)
+      setEditingRecruiter(null)
+      setForm(EMPTY_FORM)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleToggleStatus = async (row) => {
+    notify(
+      row.status === 'Active'
+        ? 'Deactivate endpoint will be integrated later.'
+        : 'Activate endpoint will be integrated later.'
+    )
+  }
+
+  const handleView = (row) => {
+    setViewRecruiter(row)
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <PageHeader
-        title="Recruiter Management"
-        description="Manage recruiter accounts and company associations."
-        breadcrumb={['Dashboard', 'Recruiters']}
-        primaryAction={
-          <Button icon={Plus} onClick={() => setAddOpen(true)}>
-            Add Recruiter
-          </Button>
-        }
+  <div className="flex flex-col gap-6">
+
+    <PageHeader
+      title="Recruiter Management"
+      description="Manage recruiter accounts and company associations."
+      breadcrumb={['Dashboard', 'Recruiters']}
+    />
+
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <StatisticCard
+        title="Total Recruiters"
+        value={stats.total}
       />
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatisticCard title="Recruiters" value={stats.recruiters} />
-        <StatisticCard title="Companies" value={stats.companies} />
-        <StatisticCard title="Active" value={stats.active} />
-        <StatisticCard title="Inactive" value={stats.inactive} />
-      </div>
+      <StatisticCard
+        title="Active Recruiters"
+        value={stats.active}
+      />
 
-      <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder="Search by recruiter, company, or email" className="sm:max-w-sm" />
+      <StatisticCard
+        title="Inactive Recruiters"
+        value={stats.inactive}
+      />
+    </div>
 
-      {loading ? (
-        <SkeletonLoader rows={6} />
-      ) : (
-        <Table
-          columns={[
-            { key: 'recruiter', header: 'Recruiter' },
-            { key: 'company', header: 'Company' },
-            { key: 'email', header: 'Email' },
-            { key: 'phone', header: 'Phone' },
-            { key: 'status', header: 'Status', render: (r) => <Badge label={r.status} /> },
-            {
-              key: 'createdDate',
-              header: 'Created',
-              render: (r) => (r.createdDate ? formatDate(r.createdDate) : '-'),
-            },
-          ]}
-          rows={filteredItems}
-          emptyMessage="No recruiters found."
-          actions={(row) => (
-            <div className="flex flex-wrap gap-1">
-              <Button variant="ghost" size="sm" icon={Eye} onClick={() => setViewRecruiter(row)} />
-              <Button variant="ghost" size="sm" icon={Pencil} />
-              <Button variant="ghost" size="sm" icon={KeyRound} onClick={() => notify('Password Reset Email Sent')} />
-              <Button variant="ghost" size="sm" icon={row.status === 'Active' ? UserX : UserCheck} onClick={() => handleToggleStatus(row)} />
-              <Button variant="ghost" size="sm" icon={Trash2} onClick={() => setDeleteTarget(row)} />
-            </div>
-          )}
-        />
-      )}
+    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 
-      <Modal open={!!viewRecruiter} onClose={() => setViewRecruiter(null)} title={viewRecruiter?.recruiter}>
-        {viewRecruiter && (
-          <div className="flex flex-col gap-2 text-sm text-gray-700">
-            <p><span className="font-medium">Company:</span> {viewRecruiter.company}</p>
-            <p><span className="font-medium">Email:</span> {viewRecruiter.email}</p>
-            <p><span className="font-medium">Phone:</span> {viewRecruiter.phone}</p>
-            <p><span className="font-medium">Status:</span> <Badge label={viewRecruiter.status} /></p>
-            <p><span className="font-medium">Created:</span> {formatDate(viewRecruiter.createdDate)}</p>
+      <SearchBar
+        value={searchTerm}
+        onChange={setSearchTerm}
+        placeholder="Search by recruiter name or email"
+        className="md:max-w-md"
+      />
+
+      <Button
+        icon={Plus}
+        onClick={handleAdd}
+      >
+        Add Recruiter
+      </Button>
+
+    </div>
+
+    {loading ? (
+      <SkeletonLoader rows={6} />
+    ) : (
+      <Table
+        columns={[
+          {
+            key: 'userId',
+            header: 'User ID',
+          },
+          {
+            key: 'recruiter',
+            header: 'Recruiter Name',
+          },
+          {
+            key: 'company',
+            header: 'Company',
+          },
+          {
+            key: 'email',
+            header: 'Email',
+          },
+          {
+            key: 'status',
+            header: 'Status',
+            render: (row) => (
+              <Badge label={row.status} />
+            ),
+          },
+        ]}
+        rows={filteredItems}
+        emptyMessage="No recruiters found."
+        actions={(row) => (
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              icon={Eye}
+              onClick={() => handleView(row)}
+            >
+              View
+            </Button>
+
+            <Button
+              size="sm"
+              variant="outline"
+              icon={Pencil}
+              onClick={() => handleEdit(row)}
+            >
+              Edit
+            </Button>
+
+            <Button
+              size="sm"
+              variant={
+                row.status === 'Active'
+                  ? 'danger'
+                  : 'success'
+              }
+              icon={
+                row.status === 'Active'
+                  ? UserX
+                  : UserCheck
+              }
+              onClick={() => handleToggleStatus(row)}
+            >
+              {row.status === 'Active'
+                ? 'Deactivate'
+                : 'Activate'}
+            </Button>
           </div>
         )}
-      </Modal>
+      />
+    )}
+    {/* View Recruiter */}
+      {viewRecruiter && (
+        <Modal
+          open={!!viewRecruiter}
+          onClose={() => setViewRecruiter(null)}
+          title="Recruiter Details"
+          size="lg"
+        >
+          <div className="space-y-6">
 
+            <div className="flex items-center gap-4">
+              <Avatar
+                name={viewRecruiter.recruiter}
+                size="lg"
+              />
+
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {viewRecruiter.recruiter}
+                </h2>
+
+                <p className="text-sm text-gray-500">
+                  {viewRecruiter.designation}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-8 gap-y-5">
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  User ID
+                </p>
+                <p className="mt-1 text-sm text-gray-800">
+                  {viewRecruiter.userId}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Company
+                </p>
+                <p className="mt-1 text-sm text-gray-800">
+                  {viewRecruiter.company}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Email
+                </p>
+                <p className="mt-1 text-sm text-gray-800">
+                  {viewRecruiter.email}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Phone Number
+                </p>
+                <p className="mt-1 text-sm text-gray-800">
+                  {viewRecruiter.phone}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Designation
+                </p>
+                <p className="mt-1 text-sm text-gray-800">
+                  {viewRecruiter.designation}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Status
+                </p>
+
+                <div className="mt-1">
+                  <Badge label={viewRecruiter.status} />
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Add / Edit Recruiter */}
       <Modal
-        open={addOpen}
-        onClose={() => setAddOpen(false)}
-        title="Add Recruiter"
-        footer={
-          <>
-            <Button variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
-            <Button onClick={handleAdd} loading={saving}>Create Account</Button>
-          </>
+        open={formOpen}
+        onClose={() => {
+          setFormOpen(false)
+          setEditingRecruiter(null)
+          setForm(EMPTY_FORM)
+          setErrors({})
+        }}
+        title={
+          editingRecruiter
+            ? 'Edit Recruiter'
+            : 'Add Recruiter'
         }
+        size="lg"
       >
-        <form onSubmit={handleAdd} className="flex flex-col gap-4" noValidate>
-          <Input label="Company" name="company" value={form.company} onChange={(e) => handleFormChange('company', e.target.value)} required error={errors.company} />
-          <Input label="Recruiter Name" name="recruiter" value={form.recruiter} onChange={(e) => handleFormChange('recruiter', e.target.value)} required error={errors.recruiter} />
-          <Input label="Email" name="email" type="email" value={form.email} onChange={(e) => handleFormChange('email', e.target.value)} required error={errors.email} />
-          <Input label="Phone" name="phone" type="tel" value={form.phone} onChange={(e) => handleFormChange('phone', e.target.value)} required error={errors.phone} />
-          <Input label="Website" name="website" value={form.website} onChange={(e) => handleFormChange('website', e.target.value)} />
-          <Input label="Industry" name="industry" value={form.industry} onChange={(e) => handleFormChange('industry', e.target.value)} />
-          <Input label="Address" name="address" value={form.address} onChange={(e) => handleFormChange('address', e.target.value)} />
+        <form
+          onSubmit={handleSave}
+          className="flex flex-col gap-4"
+        >
+          <Input
+            label="Recruiter Name"
+            value={form.fullName}
+            onChange={(e) =>
+              handleFormChange('fullName', e.target.value)
+            }
+            error={errors.fullName}
+            required
+          />
+
+          <Input
+            label="Email"
+            type="email"
+            value={form.email}
+            onChange={(e) =>
+              handleFormChange('email', e.target.value)
+            }
+            error={errors.email}
+            required
+          />
+
+          <Input
+            label="Phone Number"
+            value={form.phone}
+            onChange={(e) =>
+              handleFormChange('phone', e.target.value)
+            }
+            error={errors.phone}
+            required
+          />
+
+          <Dropdown
+            label="Company"
+            value={form.companyId}
+            onChange={(e) =>
+              handleFormChange('companyId', e.target.value)
+            }
+            options={companyOptions}
+            error={errors.companyId}
+            required
+          />
+
+          <Input
+            label="Designation"
+            value={form.designation}
+            onChange={(e) =>
+              handleFormChange('designation', e.target.value)
+            }
+            error={errors.designation}
+            required
+          />
+
+          <div className="flex justify-end gap-3 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setFormOpen(false)
+                setEditingRecruiter(null)
+                setForm(EMPTY_FORM)
+                setErrors({})
+              }}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              type="submit"
+              loading={saving}
+            >
+              {editingRecruiter
+                ? 'Save Changes'
+                : 'Create Recruiter'}
+            </Button>
+          </div>
         </form>
       </Modal>
 
-      <ConfirmationModal
-        open={!!deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={handleDelete}
-        title="Delete Recruiter"
-        message={deleteTarget ? `Are you sure you want to delete ${deleteTarget.recruiter}'s account? This cannot be undone.` : ''}
-        confirmLabel="Delete"
-        confirmVariant="danger"
-      />
     </div>
   )
 }

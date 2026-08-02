@@ -40,9 +40,11 @@ export const ROUTES = {
   ADMIN_RECRUITERS: '/admin/recruiters',
   ADMIN_COMPANIES: '/admin/companies',
   ADMIN_DRIVES: '/admin/drives',
-  ADMIN_ELIGIBILITY: '/admin/eligibility',
+  // ADMIN_ELIGIBILITY: '/admin/eligibility',
   ADMIN_APPLICATIONS: '/admin/applications',
-  ADMIN_REPORTS: '/admin/reports',
+  // ADMIN_REPORTS: '/admin/reports',
+  ADMIN_PROFILE: '/admin/profile',
+  ADMIN_PROFILE_FORM: '/admin/profile/edit',
 
   // Super Admin routes
   SUPER_ADMIN_LOGIN: '/super-admin/login',

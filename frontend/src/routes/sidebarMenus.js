@@ -56,13 +56,16 @@ export const recruiterMenu = [
 
 export const placementAdminMenu = [
   { label: 'Dashboard', path: ROUTES.ADMIN_DASHBOARD, icon: LayoutDashboard },
+  {
+    label: 'Profile',
+    path: ROUTES.ADMIN_PROFILE,
+    icon: User,
+  },
   { label: 'Students', path: ROUTES.ADMIN_STUDENTS, icon: Users },
-  { label: 'Recruiters', path: ROUTES.ADMIN_RECRUITERS, icon: UserPlus },
   { label: 'Companies', path: ROUTES.ADMIN_COMPANIES, icon: Building2 },
+  { label: 'Recruiters', path: ROUTES.ADMIN_RECRUITERS, icon: UserPlus },
   { label: 'Placement Drives', path: ROUTES.ADMIN_DRIVES, icon: Briefcase },
-  { label: 'Eligibility', path: ROUTES.ADMIN_ELIGIBILITY, icon: ListChecks },
   { label: 'Applications', path: ROUTES.ADMIN_APPLICATIONS, icon: ClipboardList },
-  { label: 'Reports & Analytics', path: ROUTES.ADMIN_REPORTS, icon: BarChart3 },
 ]
 
 export const superAdminMenu = [

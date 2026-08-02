@@ -23,6 +23,25 @@ export function getAdminDashboard() {
   return Promise.resolve(adminDashboardData)
 }
 
+// Future: GET /placement-admin/profile
+export async function getAdminProfile() {
+  const response = await apiClient.get('/placement-admin/profile')
+  return response.data.data
+}
+
+export async function updateAdminProfile(profile) {
+  const response = await apiClient.put(
+    '/placement-admin/profile',
+    {
+      fullName: profile.fullName,
+      phoneNumber: profile.phoneNumber,
+    }
+  )
+
+  return response.data.data
+}
+
+
 // Future: GET /admin/students
 export async function getStudents() {
   try {
@@ -206,3 +225,40 @@ export function getReports() {
 export function exportReport(format) {
   return Promise.resolve({ format, status: 'exported' })
 }
+
+// ================================
+// Placement Drives
+// ================================
+
+// export const getPlacementDrives = async () => {
+//   const response = await api.get('/drives')
+//   return response.data.data
+// }
+
+// // ================================
+// // Applications
+// // ================================
+
+// export const getDriveApplications = async (driveId) => {
+//   const response = await api.get(
+//     `/recruiter/drives/${driveId}/applications`
+//   )
+
+//   return response.data.data
+// }
+
+// export const getApplicationById = async (applicationId) => {
+//   const response = await api.get(
+//     `/student/applications/${applicationId}`
+//   )
+
+//   return response.data.data
+// }
+
+export const getPlacementDrives = async () => placementDriveManagementData
+
+export const getDriveApplications = async (driveId) =>
+  applicationData.filter(app => app.driveId === Number(driveId))
+
+export const getApplicationById = async (applicationId) =>
+  applicationData.find(app => app.id === Number(applicationId))

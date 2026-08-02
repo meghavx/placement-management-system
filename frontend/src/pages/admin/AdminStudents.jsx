@@ -19,7 +19,17 @@ GET /admin/students, POST /admin/students, PUT /admin/students/{id}, DELETE /adm
 */
 
 import { useEffect, useState } from 'react'
-import { Plus, Eye, Pencil, KeyRound, UserCheck, UserX, Trash2, Upload, FileSpreadsheet } from 'lucide-react'
+import Avatar from '../../components/Avatar'
+import {
+  Plus,
+  Eye,
+  Pencil,
+  UserCheck,
+  UserX,
+  Upload,
+  FileSpreadsheet,
+} from 'lucide-react'
+
 import PageHeader from '../../components/PageHeader'
 import StatisticCard from '../../components/StatisticCard'
 import SearchBar from '../../components/SearchBar'
@@ -30,47 +40,69 @@ import Button from '../../components/Button'
 import Modal from '../../components/Modal'
 import Input from '../../components/Input'
 import Dropdown from '../../components/Dropdown'
-import ConfirmationModal from '../../components/ConfirmationModal'
 import SkeletonLoader from '../../components/SkeletonLoader'
-import { getStudents, createStudent, updateStudent, deleteStudent, importStudents } from '../../services/adminService'
+
+import {
+  getStudents,
+  createStudent,
+  updateStudent,
+  importStudents,
+} from '../../services/adminService'
+
 import { useSearch } from '../../hooks/useSearch'
 import { useNotification } from '../../hooks/useNotification'
-import { validateEmail, validatePhone, validateRequired } from '../../utils/validators'
+import {
+  validateEmail,
+  validatePhone,
+  validateRequired,
+} from '../../utils/validators'
 import { DEPARTMENTS } from '../../constants/departments'
 
-const EMPTY_FORM = { name: '', email: '', phone: '', department: '', batch: '', rollNumber: '', enrollmentNumber: '' }
+const EMPTY_FORM = {
+  fullName: '',
+  email: '',
+  phoneNumber: '',
+  rollNumber: '',
+  department: '',
+  graduationYear: '',
+  cgpa: '',
+  currentBacklogs: '',
+}
 
 export default function AdminStudents() {
   const { notify } = useNotification()
+
   const [students, setStudents] = useState([])
   const [loading, setLoading] = useState(true)
+
   const [department, setDepartment] = useState('')
   const [status, setStatus] = useState('')
+
   const [viewStudent, setViewStudent] = useState(null)
-  const [addOpen, setAddOpen] = useState(false)
+
+  // Shared for Add + Edit
+  const [studentModalOpen, setStudentModalOpen] = useState(false)
+  const [editingStudent, setEditingStudent] = useState(null)
+
   const [form, setForm] = useState(EMPTY_FORM)
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
-  const [deleteTarget, setDeleteTarget] = useState(null)
-  
+
+  // Import
   const [importOpen, setImportOpen] = useState(false)
   const [importFile, setImportFile] = useState(null)
   const [importing, setImporting] = useState(false)
   const [importResult, setImportResult] = useState(null)
   const [importError, setImportError] = useState('')
 
-  const { searchTerm, setSearchTerm, filteredItems } = useSearch(students, ['name', 'id', 'email'])
+  const { searchTerm, setSearchTerm, filteredItems } = useSearch(
+    students,
+    ['name', 'id', 'email']
+  )
+
   const filtered = filteredItems
     .filter((s) => (department ? s.department === department : true))
     .filter((s) => (status ? s.status === status : true))
-
-  // useEffect(() => {
-  //   // Backend Integration: replace with real GET /admin/students response.
-  //   getStudents().then((res) => {
-  //     setStudents(res)
-  //     setLoading(false)
-  //   })
-  // }, [])
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -94,30 +126,109 @@ export default function AdminStudents() {
     inactive: students.filter((s) => s.status === 'Inactive').length,
   }
 
-  const handleFormChange = (field, value) => setForm((prev) => ({ ...prev, [field]: value }))
+  const handleFormChange = (field, value) => {
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
+  }
 
   const validate = () => {
     const newErrors = {}
-    if (!validateRequired(form.name)) newErrors.name = 'Full name is required.'
-    if (!validateEmail(form.email)) newErrors.email = 'Enter a valid email address.'
-    if (students.some((s) => s.email === form.email)) newErrors.email = 'This email is already registered.'
-    if (!validatePhone(form.phone)) newErrors.phone = 'Enter a valid 10-digit phone number.'
-    if (!validateRequired(form.department)) newErrors.department = 'Department is required.'
+
+    if (!validateRequired(form.fullName))
+      newErrors.fullName = 'Full name is required.'
+
+    if (!validateEmail(form.email))
+      newErrors.email = 'Enter a valid email.'
+
+    if (!validatePhone(form.phoneNumber))
+      newErrors.phoneNumber = 'Enter a valid phone number.'
+
+    if (!validateRequired(form.rollNumber))
+      newErrors.rollNumber = 'Roll Number is required.'
+
+    if (!validateRequired(form.department))
+      newErrors.department = 'Department is required.'
+
+    if (!validateRequired(form.graduationYear))
+      newErrors.graduationYear = 'Graduation Year is required.'
+
+    if (form.cgpa === '')
+      newErrors.cgpa = 'CGPA is required.'
+
+    if (form.currentBacklogs === '')
+      newErrors.currentBacklogs = 'Current Backlogs is required.'
+
     setErrors(newErrors)
+
     return Object.keys(newErrors).length === 0
   }
 
-  const handleAddStudent = async (e) => {
-    e.preventDefault()
-    if (!validate()) return
-    setSaving(true)
-    // Backend Integration: replace with real POST /admin/students call.
-    const created = await createStudent({ ...form, cgpa: 0, status: 'Inactive', id: `STU${1000 + students.length + 1}` })
-    setStudents((prev) => [...prev, created])
-    setSaving(false)
-    setAddOpen(false)
+  const openAddModal = () => {
+    setEditingStudent(null)
     setForm(EMPTY_FORM)
-    notify('Student Account Created')
+    setErrors({})
+    setStudentModalOpen(true)
+  }
+
+  const openEditModal = (student) => {
+    setEditingStudent(student)
+
+    setForm({
+      fullName: student.name,
+      email: student.email,
+      phoneNumber: student.phone,
+      rollNumber: student.rollNumber,
+      department: student.department,
+      graduationYear:
+        student.batch !== '-'
+          ? Number(student.batch.split('-')[1])
+          : '',
+      cgpa: student.cgpa,
+      currentBacklogs: student.backlogs,
+    })
+
+    setErrors({})
+    setStudentModalOpen(true)
+  }
+
+  const handleSaveStudent = async (e) => {
+    e.preventDefault()
+
+    if (!validate()) return
+
+    setSaving(true)
+
+    try {
+      if (editingStudent) {
+        await updateStudent(editingStudent.id, form)
+
+        notify('Student updated successfully')
+      } else {
+        await createStudent(form)
+
+        notify('Student created successfully')
+      }
+
+      const updated = await getStudents()
+      setStudents(updated)
+
+      setStudentModalOpen(false)
+      setEditingStudent(null)
+      setForm(EMPTY_FORM)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleToggleStatus = async (student) => {
+    // PATCH integration later
+    notify(
+      student.status === 'Active'
+        ? 'Deactivate endpoint pending integration'
+        : 'Activate endpoint pending integration'
+    )
   }
 
   const handleImportStudents = async () => {
@@ -140,7 +251,6 @@ export default function AdminStudents() {
 
       setImportResult(result)
 
-      // Refresh the student list so newly imported students appear immediately.
       const updatedStudents = await getStudents()
       setStudents(updatedStudents)
 
@@ -150,13 +260,12 @@ export default function AdminStudents() {
           : 'Student import completed with some errors'
       )
     } catch (error) {
-      console.error('Failed to import students:', error)
+      console.error(error)
 
-      const message =
-        error.response?.data?.message ||
-        'Failed to import students. Please try again.'
-
-      setImportError(message)
+      setImportError(
+        error.response?.data?.message ??
+          'Failed to import students.'
+      )
     } finally {
       setImporting(false)
     }
@@ -169,217 +278,421 @@ export default function AdminStudents() {
     setImportError('')
   }
 
-  const handleToggleStatus = async (student) => {
-    const newStatus = student.status === 'Active' ? 'Inactive' : 'Active'
-    // Backend Integration: replace with real PUT /admin/students/{id} call.
-    await updateStudent(student.id, { status: newStatus })
-    setStudents((prev) => prev.map((s) => (s.id === student.id ? { ...s, status: newStatus } : s)))
-    notify(newStatus === 'Active' ? 'Student Activated' : 'Student Deactivated')
-  }
-
-  const handleDelete = async () => {
-    await deleteStudent(deleteTarget.id)
-    setStudents((prev) => prev.filter((s) => s.id !== deleteTarget.id))
-    setDeleteTarget(null)
-    notify('Student Deleted')
-  }
-
-  return (
+    return (
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Student Management"
-        description="Create and manage student accounts."
+        description="Manage student accounts, academic information, and placement eligibility."
         breadcrumb={['Dashboard', 'Students']}
-        primaryAction={
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="primaryOutline" 
-              icon={Upload}
-              onClick={() => setImportOpen(true)}
-            >
-              Import Students
-            </Button>
-            <Button icon={Plus} onClick={() => setAddOpen(true)}>
-              Add Student
-            </Button>
-          </div>
-        }
       />
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-        <StatisticCard title="Total Students" value={stats.total} />
-        <StatisticCard title="Active" value={stats.active} />
-        <StatisticCard title="Inactive" value={stats.inactive} />
+      {/* Statistics */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <StatisticCard
+          title="Total Students"
+          value={stats.total}
+        />
+
+        <StatisticCard
+          title="Active Students"
+          value={stats.active}
+        />
+
+        <StatisticCard
+          title="Inactive Students"
+          value={stats.inactive}
+        />
       </div>
 
-      <SearchBar value={searchTerm} onChange={setSearchTerm} placeholder="Search by name, ID, or email" className="sm:max-w-sm" />
+      {/* Header Actions */}
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <SearchBar
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder="Search by name, roll number or email"
+          className="w-full lg:max-w-md"
+        />
 
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            icon={FileSpreadsheet}
+            onClick={() => setImportOpen(true)}
+          >
+            Import Students
+          </Button>
+
+          <Button
+            icon={Plus}
+            onClick={openAddModal}
+          >
+            Add Student
+          </Button>
+        </div>
+      </div>
+
+      {/* Filters */}
       <FilterBar
         filters={[
-          { name: 'department', label: 'Department', value: department, onChange: (e) => setDepartment(e.target.value), options: DEPARTMENTS },
-          { name: 'status', label: 'Status', value: status, onChange: (e) => setStatus(e.target.value), options: ['Active', 'Inactive'] },
+          {
+            name: 'department',
+            label: 'Department',
+            value: department,
+            onChange: (e) => setDepartment(e.target.value),
+            options: DEPARTMENTS,
+          },
+          {
+            name: 'status',
+            label: 'Status',
+            value: status,
+            onChange: (e) => setStatus(e.target.value),
+            options: ['Active', 'Inactive'],
+          },
         ]}
-        onReset={() => { setDepartment(''); setStatus('') }}
+        onReset={() => {
+          setDepartment('')
+          setStatus('')
+        }}
       />
 
+      {/* Students Table */}
       {loading ? (
-        <SkeletonLoader rows={6} />
+        <SkeletonLoader rows={8} />
       ) : (
-        <Table
+                <Table
           columns={[
-            { key: 'id', header: 'Student ID' },
-            { key: 'name', header: 'Name' },
-            { key: 'department', header: 'Department' },
-            { key: 'batch', header: 'Batch' },
-            { key: 'cgpa', header: 'CGPA' },
-            { key: 'email', header: 'Email' },
-            { key: 'status', header: 'Status', render: (r) => <Badge label={r.status} /> },
+            {
+              key: 'id',
+              header: 'Roll Number',
+            },
+            {
+              key: 'name',
+              header: 'Student Name',
+            },
+            {
+              key: 'department',
+              header: 'Department',
+            },
+            {
+              key: 'batch',
+              header: 'Batch',
+            },
+            {
+              key: 'cgpa',
+              header: 'CGPA',
+            },
+            {
+              key: 'email',
+              header: 'Email',
+            },
+            {
+              key: 'status',
+              header: 'Status',
+              render: (row) => (
+                <Badge
+                  label={row.status}
+                  variant={
+                    row.status === 'Active'
+                      ? 'success'
+                      : 'secondary'
+                  }
+                />
+              ),
+            },
           ]}
           rows={filtered}
           emptyMessage="No students found."
           actions={(row) => (
-            <div className="flex flex-wrap gap-1">
-              <Button variant="ghost" size="sm" icon={Eye} onClick={() => setViewStudent(row)} />
-              <Button variant="ghost" size="sm" icon={Pencil} />
-              <Button variant="ghost" size="sm" icon={KeyRound} onClick={() => notify('Password Reset Email Sent')} />
+            <div className="flex items-center gap-2">
               <Button
-                variant="ghost"
                 size="sm"
-                icon={row.status === 'Active' ? UserX : UserCheck}
+                variant="outline"
+                icon={Eye}
+                onClick={() => setViewStudent(row)}
+              >
+                View
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
+                icon={Pencil}
+                onClick={() => openEditModal(row)}
+              >
+                Edit
+              </Button>
+
+              <Button
+                size="sm"
+                variant={
+                  row.status === 'Active'
+                    ? 'danger'
+                    : 'success'
+                }
+                icon={
+                  row.status === 'Active'
+                    ? UserX
+                    : UserCheck
+                }
                 onClick={() => handleToggleStatus(row)}
-              />
-              <Button variant="ghost" size="sm" icon={Trash2} onClick={() => setDeleteTarget(row)} />
+              >
+                {row.status === 'Active'
+                  ? 'Deactivate'
+                  : 'Activate'}
+              </Button>
             </div>
           )}
         />
       )}
+      
+      {/* View Student */}
+      {viewStudent && (
+        <Modal
+          open={!!viewStudent}
+          onClose={() => setViewStudent(null)}
+          title="Student Details"
+          size="lg"
+        >
+          <div className="space-y-6">
 
-      <Modal open={!!viewStudent} onClose={() => setViewStudent(null)} title={viewStudent?.name}>
-        {viewStudent && (
-          <div className="flex flex-col gap-2 text-sm text-gray-700">
-            <p><span className="font-medium">Student ID:</span> {viewStudent.id}</p>
-            <p><span className="font-medium">Department:</span> {viewStudent.department}</p>
-            <p><span className="font-medium">Batch:</span> {viewStudent.batch}</p>
-            <p><span className="font-medium">CGPA:</span> {viewStudent.cgpa}</p>
-            <p><span className="font-medium">Email:</span> {viewStudent.email}</p>
-            <p><span className="font-medium">Phone:</span> {viewStudent.phone}</p>
-            <p><span className="font-medium">Status:</span> <Badge label={viewStudent.status} /></p>
+            <div className="flex items-center gap-4">
+              <Avatar
+                name={viewStudent.name}
+                size="lg"
+              />
+
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {viewStudent.name}
+                </h2>
+
+                <p className="text-sm text-gray-500">
+                  {viewStudent.department}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-8 gap-y-5">
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Roll Number
+                </p>
+                <p className="mt-1 text-sm text-gray-800">
+                  {viewStudent.rollNumber}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Email
+                </p>
+                <p className="mt-1 text-sm text-gray-800">
+                  {viewStudent.email}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Phone Number
+                </p>
+                <p className="mt-1 text-sm text-gray-800">
+                  {viewStudent.phone}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Batch
+                </p>
+                <p className="mt-1 text-sm text-gray-800">
+                  {viewStudent.batch}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  CGPA
+                </p>
+                <p className="mt-1 text-sm text-gray-800">
+                  {viewStudent.cgpa}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Current Backlogs
+                </p>
+                <p className="mt-1 text-sm text-gray-800">
+                  {viewStudent.backlogs}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Status
+                </p>
+
+                <div className="mt-1">
+                  <Badge label={viewStudent.status} />
+                </div>
+              </div>
+
+            </div>
           </div>
-        )}
-      </Modal>
+        </Modal>
+      )}
 
+      {/* Add / Edit Student */}
       <Modal
-        open={addOpen}
-        onClose={() => setAddOpen(false)}
-        title="Add Student"
-        footer={
-          <>
-            <Button variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
-            <Button onClick={handleAddStudent} loading={saving}>Create Account</Button>
-          </>
+        open={studentModalOpen}
+        onClose={() => {
+          setStudentModalOpen(false)
+          setEditingStudent(null)
+          setForm(EMPTY_FORM)
+          setErrors({})
+        }}
+        title={
+          editingStudent
+            ? 'Edit Student'
+            : 'Add Student'
         }
+        size="xl"
       >
-        <form onSubmit={handleAddStudent} className="flex flex-col gap-4" noValidate>
-          <Input label="Full Name" name="name" value={form.name} onChange={(e) => handleFormChange('name', e.target.value)} required error={errors.name} />
-          <Input label="Email" name="email" type="email" value={form.email} onChange={(e) => handleFormChange('email', e.target.value)} required error={errors.email} />
-          <Input label="Phone" name="phone" type="tel" value={form.phone} onChange={(e) => handleFormChange('phone', e.target.value)} required error={errors.phone} />
-          <Dropdown label="Department" name="department" value={form.department} onChange={(e) => handleFormChange('department', e.target.value)} options={DEPARTMENTS} required error={errors.department} />
-          <Input label="Batch" name="batch" value={form.batch} onChange={(e) => handleFormChange('batch', e.target.value)} placeholder="e.g. 2022-2026" />
-          <Input label="Roll Number" name="rollNumber" value={form.rollNumber} onChange={(e) => handleFormChange('rollNumber', e.target.value)} />
-          <Input label="Enrollment Number" name="enrollmentNumber" value={form.enrollmentNumber} onChange={(e) => handleFormChange('enrollmentNumber', e.target.value)} />
+        <form
+          onSubmit={handleSaveStudent}
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+        >
+          <Input
+            label="Full Name"
+            value={form.fullName}
+            onChange={(e) =>
+              handleFormChange('fullName', e.target.value)
+            }
+            error={errors.fullName}
+            required
+          />
+
+          <Input
+            label="Email"
+            type="email"
+            value={form.email}
+            onChange={(e) =>
+              handleFormChange('email', e.target.value)
+            }
+            error={errors.email}
+            required
+          />
+
+          <Input
+            label="Phone Number"
+            value={form.phoneNumber}
+            onChange={(e) =>
+              handleFormChange('phoneNumber', e.target.value)
+            }
+            error={errors.phoneNumber}
+            required
+          />
+
+          <Input
+            label="Roll Number"
+            value={form.rollNumber}
+            onChange={(e) =>
+              handleFormChange('rollNumber', e.target.value)
+            }
+            error={errors.rollNumber}
+            required
+          />
+
+          <Dropdown
+            label="Department"
+            value={form.department}
+            onChange={(e) =>
+              handleFormChange('department', e.target.value)
+            }
+            options={DEPARTMENTS}
+            error={errors.department}
+            required
+          />
+
+          <Input
+            label="Graduation Year"
+            type="number"
+            value={form.graduationYear}
+            onChange={(e) =>
+              handleFormChange(
+                'graduationYear',
+                e.target.value
+              )
+            }
+            error={errors.graduationYear}
+            required
+          />
+
+          <Input
+            label="CGPA"
+            type="number"
+            step="0.01"
+            value={form.cgpa}
+            onChange={(e) =>
+              handleFormChange('cgpa', e.target.value)
+            }
+            error={errors.cgpa}
+            required
+          />
+
+          <Input
+            label="Current Backlogs"
+            type="number"
+            value={form.currentBacklogs}
+            onChange={(e) =>
+              handleFormChange(
+                'currentBacklogs',
+                e.target.value
+              )
+            }
+            error={errors.currentBacklogs}
+            required
+          />
+
+          <div className="col-span-full flex justify-end gap-3 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setStudentModalOpen(false)
+                setEditingStudent(null)
+              }}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              type="submit"
+              loading={saving}
+            >
+              {editingStudent
+                ? 'Save Changes'
+                : 'Create Student'}
+            </Button>
+          </div>
         </form>
       </Modal>
 
+      {/* Import Students */}
       <Modal
         open={importOpen}
         onClose={handleCloseImport}
         title="Import Students"
-        footer={
-          importResult ? (
-            <Button onClick={handleCloseImport}>
-              Done
-            </Button>
-          ) : (
-            <>
-              <Button
-                variant="outline"
-                onClick={handleCloseImport}
-                disabled={importing}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                onClick={handleImportStudents}
-                disabled={!importFile}
-                loading={importing}
-              >
-                Import Students
-              </Button>
-            </>
-          )
-        }
       >
         <div className="flex flex-col gap-4">
-          <div>
-            <p className="text-sm text-gray-700">
-              Upload an Excel (.xlsx) file containing student account details.
-            </p>
-            <p className="mt-1 text-xs text-gray-500">
-              The first row should contain the column headers.
-            </p>
-          </div>
-
-          <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-gray-300 px-4 py-4 transition-colors hover:border-primary-500 hover:bg-primary-50">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-100">
-              <FileSpreadsheet className="text-gray-600" size={20} />
-            </div>
-
-            <div className="min-w-0 flex-1">
-              {importFile ? (
-                <>
-                  <p className="truncate text-sm font-medium text-gray-800">
-                    {importFile.name}
-                  </p>
-                  <p className="mt-0.5 text-xs text-gray-500">
-                    Click to choose a different file
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-sm font-medium text-primary-600">
-                    Choose Excel file
-                  </p>
-                  <p className="mt-0.5 text-xs text-gray-500">
-                    .xlsx files only
-                  </p>
-                </>
-              )}
-            </div>
-
-            <Upload size={18} className="shrink-0 text-gray-400" />
-
-            <input
-              type="file"
-              accept=".xlsx"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0] || null
-
-                setImportResult(null)
-
-                if (file && !file.name.toLowerCase().endsWith('.xlsx')) {
-                  setImportFile(null)
-                  setImportError('Only .xlsx files are supported.')
-                  e.target.value = ''
-                  return
-                }
-
-                setImportFile(file)
-                setImportError('')
-              }}
-            />
-          </label>
+          <input
+            type="file"
+            accept=".xlsx"
+            onChange={(e) =>
+              setImportFile(e.target.files?.[0] ?? null)
+            }
+          />
 
           {importError && (
             <p className="text-sm text-red-600">
@@ -388,71 +701,41 @@ export default function AdminStudents() {
           )}
 
           {importResult && (
-            <div className="flex flex-col gap-4">
-
-              {/* Summary */}
-              <div className="grid grid-cols-3 gap-3">
-                <div className="rounded-lg bg-gray-50 p-3 text-center">
-                  <p className="text-xl font-semibold text-gray-900">
-                    {importResult.total}
-                  </p>
-                  <p className="text-xs text-gray-500">Processed</p>
-                </div>
-
-                <div className="rounded-lg bg-green-50 p-3 text-center">
-                  <p className="text-xl font-semibold text-green-700">
-                    {importResult.created}
-                  </p>
-                  <p className="text-xs text-green-600">Created</p>
-                </div>
-
-                <div className="rounded-lg bg-red-50 p-3 text-center">
-                  <p className="text-xl font-semibold text-red-700">
-                    {importResult.failed}
-                  </p>
-                  <p className="text-xs text-red-600">Failed</p>
-                </div>
-              </div>
-
-              {/* Row-level errors */}
-              {importResult.errors?.length > 0 && (
-                <div>
-                  <p className="mb-2 text-sm font-medium text-gray-800">
-                    Failed Rows
-                  </p>
-
-                  <div className="max-h-48 overflow-y-auto rounded-lg border border-gray-200">
-                    {importResult.errors.map((error, index) => (
-                      <div
-                        key={`${error.row}-${index}`}
-                        className="flex gap-4 border-b border-gray-100 px-4 py-3 last:border-b-0"
-                      >
-                        <span className="shrink-0 text-sm font-medium text-red-600">
-                          Row {error.row}
-                        </span>
-
-                        <span className="text-sm text-gray-700">
-                          {error.message}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+            <div className="rounded-lg bg-gray-50 p-4 text-sm">
+              <p>
+                <strong>Total:</strong>{' '}
+                {importResult.total}
+              </p>
+              <p>
+                <strong>Imported:</strong>{' '}
+                {importResult.imported}
+              </p>
+              <p>
+                <strong>Failed:</strong>{' '}
+                {importResult.failed}
+              </p>
             </div>
           )}
+
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={handleCloseImport}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              icon={Upload}
+              loading={importing}
+              onClick={handleImportStudents}
+            >
+              Import
+            </Button>
+          </div>
         </div>
       </Modal>
-
-      <ConfirmationModal
-        open={!!deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        onConfirm={handleDelete}
-        title="Delete Student"
-        message={deleteTarget ? `Are you sure you want to delete ${deleteTarget.name}'s account? This cannot be undone.` : ''}
-        confirmLabel="Delete"
-        confirmVariant="danger"
-      />
     </div>
   )
 }
+

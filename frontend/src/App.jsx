@@ -62,9 +62,9 @@ const AdminStudents = lazy(() => import('./pages/admin/AdminStudents'))
 const AdminRecruiters = lazy(() => import('./pages/admin/AdminRecruiters'))
 const AdminCompanies = lazy(() => import('./pages/admin/AdminCompanies'))
 const AdminDrives = lazy(() => import('./pages/admin/AdminDrives'))
-const AdminEligibility = lazy(() => import('./pages/admin/AdminEligibility'))
 const AdminApplications = lazy(() => import('./pages/admin/AdminApplications'))
-const AdminReports = lazy(() => import('./pages/admin/AdminReports'))
+const AdminProfile = lazy(() => import('./pages/admin/AdminProfile'))
+const AdminProfileForm = lazy(() => import('./pages/admin/AdminProfileForm'))
 
 // Super Admin pages
 const SuperAdminDashboard = lazy(() => import('./pages/superAdmin/SuperAdminDashboard'))
@@ -150,14 +150,20 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         >
+          <Route
+            path={ROUTES.ADMIN_PROFILE}
+            element={<AdminProfile />}
+          />
+          <Route
+            path={ROUTES.ADMIN_PROFILE_FORM}
+            element={<AdminProfileForm />}
+          />
           <Route path={ROUTES.ADMIN_DASHBOARD} element={<AdminDashboard />} />
           <Route path={ROUTES.ADMIN_STUDENTS} element={<AdminStudents />} />
           <Route path={ROUTES.ADMIN_RECRUITERS} element={<AdminRecruiters />} />
           <Route path={ROUTES.ADMIN_COMPANIES} element={<AdminCompanies />} />
           <Route path={ROUTES.ADMIN_DRIVES} element={<AdminDrives />} />
-          <Route path={ROUTES.ADMIN_ELIGIBILITY} element={<AdminEligibility />} />
           <Route path={ROUTES.ADMIN_APPLICATIONS} element={<AdminApplications />} />
-          <Route path={ROUTES.ADMIN_REPORTS} element={<AdminReports />} />
         </Route>
 
         {/* Super Admin Module */}
