@@ -82,4 +82,43 @@ public class ResumeController {
                 .contentLength(file.length)
                 .body(resource);
     }
+
+    @GetMapping("/student/{id}/resume")
+    @PreAuthorize("hasAnyRole('PLACEMENT_ADMIN', 'RECRUITER')")
+    @Operation(summary = "View Student Resume Details")
+    public ResponseEntity<ApiResponse<ResumeResponse>> getStudentResume(@PathVariable Long id) {
+
+        ResumeResponse response = resumeService.getStudentResume(id);
+
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "Resume fetched successfully",
+                        response
+                )
+        );
+    }
+
+    @GetMapping("/student/{id}/resume/download")
+    @PreAuthorize("hasAnyRole('PLACEMENT_ADMIN', 'RECRUITER')")
+    @Operation(summary = "Download Student Resume")
+    public ResponseEntity<ByteArrayResource> downloadStudentResume(@PathVariable Long id) {
+
+        ResumeResponse response = resumeService.getStudentResume(id);
+
+        byte[] file = resumeService.downloadStudentResume(id);
+
+        ByteArrayResource resource = new ByteArrayResource(file);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.attachment()
+                                .filename(response.getFileName())
+                                .build()
+                                .toString()
+                )
+                .contentLength(file.length)
+                .body(resource);
+    }
 }

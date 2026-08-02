@@ -10,4 +10,8 @@ public interface ResumeService {
     ResumeResponse getResume();
 
     byte[] downloadResume();
+
+    ResumeResponse getStudentResume(Long id);
+
+    byte[] downloadStudentResume(Long id);
 }
