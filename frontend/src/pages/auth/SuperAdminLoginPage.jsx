@@ -128,6 +128,17 @@ export default function SuperAdminLoginPage() {
           >
             Sign In
           </Button>
+          
+          <div className="flex -mt-2">
+            <button
+              type="button"
+              onClick={() => navigate("/forgot-password")}
+              className="text-sm text-primary-600 hover:text-primary-700 hover:underline"
+            >
+              Forgot Password?
+          </button>
+          </div>
+
         </form>
 
         {/* <div className="mt-6 text-center">
