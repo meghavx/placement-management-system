@@ -36,3 +36,18 @@ export function validateUrl(url) {
     return false
   }
 }
+
+export function validatePassword(password) {
+  if (!password) {
+    return 'Password is required.'
+  }
+
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+
+  if (!passwordRegex.test(password)) {
+    return 'Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.'
+  }
+
+  return ''
+}

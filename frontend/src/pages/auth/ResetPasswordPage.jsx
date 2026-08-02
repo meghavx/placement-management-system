@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { GraduationCap } from 'lucide-react'
 
+import { resetPassword } from '../../services/authService'
 import PasswordInput from '../../components/PasswordInput'
 import Button from '../../components/Button'
 import Alert from '../../components/Alert'
 
 import { ROUTES } from '../../constants/routes'
-import { validateRequired } from '../../utils/validators'
+import { validateRequired, validatePassword } from '../../utils/validators'
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams()
@@ -27,10 +28,12 @@ export default function ResetPasswordPage() {
   const validate = () => {
     const newErrors = {}
 
-    if (!validateRequired(newPassword)) {
-      newErrors.newPassword = 'New password is required.'
-    }
+    const passwordError = validatePassword(newPassword)
 
+    if (passwordError) {
+      newErrors.newPassword = passwordError
+    }
+    
     if (!validateRequired(confirmPassword)) {
       newErrors.confirmPassword = 'Please confirm your password.'
     }
@@ -59,12 +62,12 @@ export default function ResetPasswordPage() {
     setLoading(true)
 
     try {
-      // TODO:
-      // await resetPassword(token, newPassword)
+      const response = await resetPassword(token, newPassword)
 
       setSuccessMessage(
-  'Password reset successful. You can now sign in with your new password.'
-)
+      response.message ||
+      'Password reset successful. You can now sign in with your new password.'
+      )
 
     } catch (err) {
       setErrorMessage(
