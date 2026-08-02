@@ -149,6 +149,25 @@ export async function updateDriveEligibility(driveId, eligibility) {
   }
 }
 
+export async function updateDriveStatus(driveId, status) {
+  try {
+    const response = await apiClient.patch(
+      `/recruiter/drives/${driveId}/status`,
+      null,
+      {
+        params: {
+          status,
+        },
+      }
+    )
+
+    return response.data.data
+  } catch (error) {
+    console.error('Failed to update drive status:', error)
+    throw error
+  }
+}
+
 
 // Future: GET /recruiter/applicants
 // export function getApplicants() {
@@ -172,6 +191,7 @@ export async function getApplicants(driveId) {
       driveDate: application.driveDate,
       appliedAt: application.appliedAt,
       status: application.status,
+      updatedAt: application.updatedAt,
     }))
   } catch (error) {
     console.error('Failed to fetch applicants:', error)
@@ -179,15 +199,38 @@ export async function getApplicants(driveId) {
   }
 }
 
+// GET /recruiter/profile
+export async function getRecruiterProfile() {
+  try {
+    const response = await apiClient.get('/recruiter/profile')
+    return response.data.data
+  } catch (error) {
+    console.error('Failed to fetch recruiter profile:', error)
+    throw error
+  }
+}
+
+// PUT /recruiter/profile
+export async function updateRecruiterProfile(profile) {
+  try {
+    const response = await apiClient.put(
+      '/recruiter/profile',
+      profile
+    )
+
+    return response.data.data
+  } catch (error) {
+    console.error('Failed to update recruiter profile:', error)
+    throw error
+  }
+}
+
+
 // Future: GET /recruiter/student/{id}
 export function getApplicantProfile(studentId) {
   return Promise.resolve(applicantData.find((a) => a.id === studentId))
 }
 
-// Future: GET /recruiter/shortlisted
-export function getShortlistedCandidates() {
-  return Promise.resolve(shortlistedData)
-}
 
 // Future: PUT /recruiter/shortlist (body: { studentId, status })
 // export function updateShortlistStatus(studentId, status) {
@@ -209,32 +252,53 @@ export async function updateApplicationStatus(applicationId, status) {
   }
 }
 
-// Future: GET /recruiter/interviews
-export function getInterviews() {
-  return Promise.resolve(interviewData)
-}
-
-// Future: POST /recruiter/interviews (body: interview DTO)
-export function scheduleInterview(interview) {
-  return Promise.resolve({ id: Date.now(), ...interview })
-}
-
-// Future: PUT /recruiter/interviews/{id}
-export function updateInterview(interviewId, updates) {
-  return Promise.resolve({ id: interviewId, ...updates })
-}
-
-// Future: GET /recruiter/results
-export function getResults() {
-  return Promise.resolve(resultData)
-}
-
-// Future: PUT /recruiter/results (body: { studentId, result })
-export function publishResult(studentId, result) {
-  return Promise.resolve({ studentId, result })
-}
-
 // Future: GET /recruiter/notifications
 export function getRecruiterNotifications() {
   return Promise.resolve(recruiterNotificationData)
 }
+
+
+// GET /drives/{driveId}/activities
+export async function getRecruitmentActivities(driveId) {
+  try {
+    const response = await apiClient.get(`/drives/${driveId}/activities`)
+    return response.data.data
+  } catch (error) {
+    console.error('Failed to fetch recruitment activities:', error)
+    throw error
+  }
+}
+
+// POST /drives/{driveId}/activities
+export async function createRecruitmentActivity(driveId, activity) {
+  try {
+    const response = await apiClient.post(
+      `/drives/${driveId}/activities`,
+      activity
+    )
+
+    return response.data.data
+  } catch (error) {
+    console.error('Failed to create recruitment activity:', error)
+    throw error
+  }
+}
+
+// PUT /drives/{driveId}/activities/{activityId}
+export async function updateRecruitmentActivity(
+  driveId,
+  activityId,
+  activity
+) {
+  try {
+    const response = await apiClient.put(
+      `/drives/${driveId}/activities/${activityId}`,
+      activity
+    )
+
+    return response.data.data
+  } catch (error) {
+    console.error('Failed to update recruitment activity:', error)
+    throw error
+  }
+}   

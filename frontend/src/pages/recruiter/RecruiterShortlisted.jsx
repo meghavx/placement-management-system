@@ -16,66 +16,229 @@ GET /recruiter/shortlisted, PUT /recruiter/shortlist.
 */
 
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+
 import PageHeader from '../../components/PageHeader'
+import SearchBar from '../../components/SearchBar'
+import Dropdown from '../../components/Dropdown'
 import Table from '../../components/Table'
 import Badge from '../../components/Badge'
 import Button from '../../components/Button'
 import SkeletonLoader from '../../components/SkeletonLoader'
-import { getShortlistedCandidates, updateShortlistStatus } from '../../services/recruiterService'
+import Card from '../../components/Card'
+
+import {
+  getRecruiterDrives,
+  getApplicants,
+  getRecruitmentActivities,
+  updateApplicationStatus,
+} from '../../services/recruiterService'
+
 import { useNotification } from '../../hooks/useNotification'
+import { useSearch } from '../../hooks/useSearch'
+
 import { formatDate } from '../../utils/formatDate'
 
+import {
+  APPLICATION_STATUS,
+} from '../../constants/applicationStatus'
+
+import {
+  RECRUITMENT_ACTIVITY_LABELS,
+} from '../../constants/recruitmentActivity'
+
 export default function RecruiterShortlisted() {
+  const navigate = useNavigate()
   const { notify } = useNotification()
-  const [candidates, setCandidates] = useState([])
+
   const [loading, setLoading] = useState(true)
 
+  const [drives, setDrives] = useState([])
+  const [selectedDrive, setSelectedDrive] = useState('')
+
+  const [applications, setApplications] = useState([])
+
+  const [currentActivity, setCurrentActivity] = useState(null)
+
+  const {
+    searchTerm,
+    setSearchTerm,
+    filteredItems,
+  } = useSearch(applications, [
+    'studentName',
+    'rollNumber',
+    'jobRole',
+  ])
+
   useEffect(() => {
-    // Backend Integration: replace with real GET /recruiter/shortlisted response.
-    getShortlistedCandidates().then((res) => {
-      setCandidates(res)
-      setLoading(false)
-    })
+    async function loadDrives() {
+      try {
+        const driveData = await getRecruiterDrives()
+
+        setDrives(driveData)
+
+        if (driveData.length > 0) {
+          setSelectedDrive(String(driveData[0].id))
+        }
+      } catch (error) {
+        console.error(error)
+        notify('Failed to load placement drives.')
+      }
+    }
+
+    loadDrives()
   }, [])
 
-  const handleAction = async (candidate, status) => {
-    // Backend Integration: replace with real PUT /recruiter/shortlist call.
-    await updateShortlistStatus(candidate.id, status)
-    setCandidates((prev) => prev.map((c) => (c.id === candidate.id ? { ...c, status } : c)))
-    notify(`Candidate marked as ${status}`)
+  useEffect(() => {
+    if (!selectedDrive) return
+
+    loadData()
+  }, [selectedDrive])
+
+  async function loadData() {
+    try {
+      setLoading(true)
+
+      const [applicationData, activityData] =
+        await Promise.all([
+          getApplicants(selectedDrive),
+          getRecruitmentActivities(selectedDrive),
+        ])
+
+      setApplications(
+        applicationData.filter(
+          (app) =>
+            app.status ===
+            APPLICATION_STATUS.SHORTLISTED
+        )
+      )
+
+      if (activityData.length > 0) {
+        const latest = [...activityData]
+          .sort(
+            (a, b) =>
+              new Date(a.scheduledAt) -
+              new Date(b.scheduledAt)
+          )
+          .at(-1)
+
+        setCurrentActivity(latest)
+      } else {
+        setCurrentActivity(null)
+      }
+    } catch (error) {
+      console.error(error)
+      notify('Failed to load shortlisted candidates.')
+    } finally {
+      setLoading(false)
+    }
   }
 
-  return (
+  async function handleReject(applicationId) {
+    try {
+      await updateApplicationStatus(
+        applicationId,
+        APPLICATION_STATUS.REJECTED
+      )
+
+      setApplications((prev) =>
+        prev.filter(
+          (application) =>
+            application.id !== applicationId
+        )
+      )
+
+      notify('Candidate rejected successfully.')
+    } catch (error) {
+      console.error(error)
+      notify('Failed to reject candidate.')
+    }
+  }
+
+    return (
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Shortlisted Candidates"
-        description="Manage candidates who have progressed past the applicant stage."
+        description="Review shortlisted candidates before they enter the interview process."
         breadcrumb={['Dashboard', 'Shortlisted']}
       />
+
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <Dropdown
+          label="Placement Drive"
+          value={selectedDrive}
+          onChange={(e) => setSelectedDrive(e.target.value)}
+          options={drives.map((drive) => ({
+            label: `${drive.company} - ${drive.role}`,
+            value: drive.id,
+          }))}
+        />
+
+        <SearchBar
+          label="Search"
+          value={searchTerm}
+          onChange={setSearchTerm}
+          placeholder="Search by student name"
+          className="w-full md:max-w-sm"
+        />
+      </div>
+
+      
 
       {loading ? (
         <SkeletonLoader rows={6} />
       ) : (
         <Table
           columns={[
-            { key: 'student', header: 'Student' },
-            { key: 'company', header: 'Company' },
-            { key: 'role', header: 'Role' },
-            { key: 'interviewRound', header: 'Interview Round' },
-            { key: 'interviewDate', header: 'Interview Date', render: (r) => formatDate(r.interviewDate) },
-            { key: 'status', header: 'Status', render: (r) => <Badge label={r.status} /> },
+            {
+              key: 'studentName',
+              header: 'Student',
+            },
+            {
+              key: 'rollNumber',
+              header: 'Roll No.',
+            },
+            {
+              key: 'jobRole',
+              header: 'Job Role',
+            },
+            {
+              key: 'activity',
+              header: 'Recruitment Activity',
+              render: () => (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() =>
+                    navigate(`/recruiter/activities/${selectedDrive}`)
+                  }
+                >
+                  View Activity
+                </Button>
+              ),
+            },
+            {
+              key: 'appliedAt',
+              header: 'Applied On',
+              render: (row) => formatDate(row.appliedAt),
+            },
+            {
+              key: 'status',
+              header: 'Status',
+              render: (row) => (
+                <Badge label={row.status} />
+              ),
+            },
           ]}
-          rows={candidates}
-          emptyMessage="No candidates have been shortlisted yet."
+          rows={filteredItems}
+          emptyMessage="No shortlisted candidates found."
           actions={(row) => (
-            <div className="flex flex-wrap gap-1">
-              <Button variant="outline" size="sm" onClick={() => notify('Redirect to Interview scheduling')}>
-                Schedule
-              </Button>
-              <Button variant="success" size="sm" onClick={() => handleAction(row, 'Selected')}>
-                Select
-              </Button>
-              <Button variant="danger" size="sm" onClick={() => handleAction(row, 'Rejected')}>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="danger"
+                onClick={() => handleReject(row.id)}
+              >
                 Reject
               </Button>
             </div>

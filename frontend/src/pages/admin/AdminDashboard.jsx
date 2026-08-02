@@ -19,148 +19,279 @@ Replace mock getAdminDashboard() with GET /admin/dashboard.
 ==========================================
 */
 
+
 import { useEffect, useState } from 'react'
-import { Users, UserCheck, Building2, Briefcase, ClipboardList, Award, TrendingUp, IndianRupee } from 'lucide-react'
+
 import PageHeader from '../../components/PageHeader'
 import StatisticCard from '../../components/StatisticCard'
 import Card from '../../components/Card'
 import Table from '../../components/Table'
 import Badge from '../../components/Badge'
 import SkeletonLoader from '../../components/SkeletonLoader'
-import { getAdminDashboard } from '../../services/adminService'
+import DashboardBarChart from '../../components/charts/DashboardBarChart'
+import DashboardPieChart from '../../components/charts/DashboardPieChart'
+import Dropdown from '../../components/Dropdown'
+
+import {
+  getAdminDashboard,
+  getPlacementDrives,
+  getDriveApplications,
+  getRecruiters,
+  getStudents,
+} from '../../services/adminService'
+
 import { formatDate } from '../../utils/formatDate'
+import { formatSalary } from '../../utils/formatSalary'
 
 export default function AdminDashboard() {
-  const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  const [dashboard, setDashboard] = useState(null)
+
+  const [drives, setDrives] = useState([])
+  const [students, setStudents] = useState([])
+  const [recruiters, setRecruiters] = useState([])
+
+  const [selectedDrive, setSelectedDrive] = useState('')
+  const [applications, setApplications] = useState([])
+
   useEffect(() => {
-    // Backend Integration: replace with the real dashboard API response.
-    getAdminDashboard().then((res) => {
-      setData(res)
-      setLoading(false)
-    })
+    const loadDashboard = async () => {
+      try {
+        const [
+          dashboardData,
+          driveData,
+          recruiterData,
+          studentData,
+        ] = await Promise.all([
+          getAdminDashboard(),
+          getPlacementDrives(),
+          getRecruiters(),
+          getStudents(),
+        ])
+
+        setDashboard(dashboardData)
+
+        setDrives(driveData)
+        setRecruiters(recruiterData)
+        setStudents(studentData)
+
+        if (driveData.length) {
+          setSelectedDrive(String(driveData[0].id))
+        }
+      } catch (error) {
+        console.error(error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadDashboard()
   }, [])
 
-  if (loading || !data) {
+  useEffect(() => {
+    if (!selectedDrive) return
+
+    const loadApplications = async () => {
+      try {
+        const data = await getDriveApplications(selectedDrive)
+        setApplications(data)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    loadApplications()
+  }, [selectedDrive])
+
+  if (loading) {
     return (
-      <div className="flex flex-col gap-6">
-        <PageHeader title="Admin Dashboard" breadcrumb={['Dashboard']} />
-        <SkeletonLoader rows={8} />
+      <div className="flex flex-col gap-8">
+        <PageHeader
+          title="Placement Admin Dashboard"
+          breadcrumb={['Dashboard']}
+        />
+
+        <SkeletonLoader rows={10} />
       </div>
     )
   }
 
-  const maxDeptPlaced = Math.max(...data.charts.departmentWisePlacement.map((d) => d.placed))
-  const maxMonthPlaced = Math.max(...data.charts.monthlyPlacementTrend.map((d) => d.placed))
+  const stats = dashboard || {
+    totalStudents: 0,
+    totalRecruiters: 0,
+    totalCompanies: 0,
+    totalPlacementDrives: 0,
+    activePlacementDrives: 0,
+    totalApplications: 0,
+    selectedStudents: 0,
+  }
 
+  const driveStatusCount = {
+    OPEN: 0,
+    CLOSED: 0,
+    COMPLETED: 0,
+    CANCELLED: 0,
+  }
+
+  drives.forEach((drive) => {
+    if (driveStatusCount[drive.status] !== undefined) {
+      driveStatusCount[drive.status]++
+    }
+  })
+
+  const driveStatusData = [
+    {
+      name: 'Open',
+      value: driveStatusCount.OPEN,
+    },
+    {
+      name: 'Closed',
+      value: driveStatusCount.CLOSED,
+    },
+    {
+      name: 'Completed',
+      value: driveStatusCount.COMPLETED,
+    },
+    {
+      name: 'Cancelled',
+      value: driveStatusCount.CANCELLED,
+    },
+  ]
+
+  const applicationStatusCount = {
+    APPLIED: 0,
+    SHORTLISTED: 0,
+    INTERVIEW: 0,
+    SELECTED: 0,
+    REJECTED: 0,
+  }
+
+  applications.forEach((application) => {
+    if (applicationStatusCount[application.status] !== undefined) {
+      applicationStatusCount[application.status]++
+    }
+  })
+
+  const applicationChartData = [
+    {
+      status: 'Applied',
+      count: applicationStatusCount.APPLIED,
+    },
+    {
+      status: 'Shortlisted',
+      count: applicationStatusCount.SHORTLISTED,
+    },
+    {
+      status: 'Interview',
+      count: applicationStatusCount.INTERVIEW,
+    },
+    {
+      status: 'Selected',
+      count: applicationStatusCount.SELECTED,
+    },
+    {
+      status: 'Rejected',
+      count: applicationStatusCount.REJECTED,
+    },
+  ]
   return (
-    <div className="flex flex-col gap-6">
-      <PageHeader
-        title="Placement Admin Dashboard"
-        description="Complete visibility into the campus placement ecosystem."
-        breadcrumb={['Dashboard']}
+  <div className="flex flex-col gap-8">
+    <PageHeader
+      title="Placement Admin Dashboard"
+      description="Complete overview of the campus placement ecosystem."
+      breadcrumb={['Dashboard']}
+    />
+
+    {/* Statistics */}
+
+    <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
+      <StatisticCard
+        title="Students"
+        value={stats.totalStudents ?? 0}
       />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatisticCard title="Total Students" value={data.stats.totalStudents} icon={Users} />
-        <StatisticCard title="Total Recruiters" value={data.stats.totalRecruiters} icon={UserCheck} />
-        <StatisticCard title="Total Companies" value={data.stats.totalCompanies} icon={Building2} />
-        <StatisticCard title="Active Drives" value={data.stats.activeDrives} icon={Briefcase} />
-        <StatisticCard title="Applications Received" value={data.stats.applicationsReceived} icon={ClipboardList} />
-        <StatisticCard title="Students Selected" value={data.stats.studentsSelected} icon={Award} />
-        <StatisticCard title="Placement %" value={`${data.stats.placementPercentage}%`} icon={TrendingUp} />
-        <StatisticCard title="Average Package" value={`₹${data.stats.averagePackage} LPA`} icon={IndianRupee} />
-      </div>
+      <StatisticCard
+        title="Recruiters"
+        value={stats.totalRecruiters ?? 0}
+      />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Card title="Monthly Placement Trend">
-          <div className="flex h-40 items-end gap-3">
-            {data.charts.monthlyPlacementTrend.map((m) => (
-              <div key={m.month} className="flex flex-1 flex-col items-center gap-1">
-                <div
-                  className="w-full rounded-t bg-primary-500"
-                  style={{ height: `${(m.placed / maxMonthPlaced) * 100}%` }}
-                  title={`${m.placed} placed`}
-                />
-                <span className="text-xs text-gray-500">{m.month}</span>
-              </div>
-            ))}
-          </div>
-        </Card>
+      <StatisticCard
+        title="Companies"
+        value={stats.totalCompanies ?? 0}
+      />
 
-        <Card title="Department-wise Placement">
-          <div className="flex flex-col gap-3">
-            {data.charts.departmentWisePlacement.map((d) => (
-              <div key={d.department}>
-                <div className="mb-1 flex justify-between text-xs text-gray-600">
-                  <span>{d.department}</span>
-                  <span>{d.placed}</span>
-                </div>
-                <div className="h-2 w-full rounded-full bg-gray-100">
-                  <div className="h-2 rounded-full bg-primary-500" style={{ width: `${(d.placed / maxDeptPlaced) * 100}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </div>
-
-      <Card title="Recent Placement Drives">
-        <Table
-          columns={[
-            { key: 'company', header: 'Company' },
-            { key: 'role', header: 'Role' },
-            { key: 'deadline', header: 'Deadline', render: (r) => formatDate(r.deadline) },
-            { key: 'applicants', header: 'Applicants' },
-            { key: 'status', header: 'Status', render: (r) => <Badge label={r.status} /> },
-          ]}
-          rows={data.recentDrives}
-          emptyMessage="No recent drives."
-        />
-      </Card>
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Card title="Recent Recruiters">
-          <Table
-            columns={[
-              { key: 'company', header: 'Company' },
-              { key: 'recruiter', header: 'Recruiter' },
-              { key: 'status', header: 'Status', render: (r) => <Badge label={r.status} /> },
-              { key: 'createdDate', header: 'Created', render: (r) => formatDate(r.createdDate) },
-            ]}
-            rows={data.recentRecruiters}
-            emptyMessage="No recent recruiters."
-          />
-        </Card>
-
-        <Card title="Recent Students">
-          <Table
-            columns={[
-              { key: 'name', header: 'Name' },
-              { key: 'department', header: 'Department' },
-              { key: 'cgpa', header: 'CGPA' },
-              { key: 'accountStatus', header: 'Status', render: (r) => <Badge label={r.accountStatus} /> },
-            ]}
-            rows={data.recentStudents}
-            emptyMessage="No recent students."
-          />
-        </Card>
-      </div>
-
-      <Card title="Upcoming Placement Activities">
-        <ul className="flex flex-col divide-y divide-gray-100">
-          {data.upcomingActivities.map((a) => (
-            <li key={a.id} className="flex items-center justify-between py-3 text-sm">
-              <div>
-                <p className="font-medium text-gray-800">{a.drive}</p>
-                <p className="text-xs text-gray-500">{a.activity}</p>
-              </div>
-              <span className="text-xs text-gray-400">{formatDate(a.deadline)}</span>
-            </li>
-          ))}
-        </ul>
-      </Card>
+      <StatisticCard
+        title="Placement Drives"
+        value={stats.totalPlacementDrives ?? 0}
+      />
     </div>
-  )
+
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <StatisticCard
+        title="Active Drives"
+        value={stats.activePlacementDrives ?? 0}
+      />
+
+      <StatisticCard
+        title="Applications"
+        value={stats.totalApplications ?? 0}
+      />
+
+      <StatisticCard
+        title="Selected Students"
+        value={stats.selectedStudents ?? 0}
+      />
+    </div>
+
+    {/* Charts */}
+
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+
+      <Card title="Applications by Status">
+
+        <div className="mb-4 flex justify-end">
+
+          <Dropdown
+            name="drive"
+            value={selectedDrive}
+            onChange={(e) => setSelectedDrive(e.target.value)}
+            options={drives.map((drive) => ({
+              label: `${drive.company} - ${drive.role}`,
+              value: String(drive.id),
+            }))}
+            placeholder="Select Placement Drive"
+            className="w-80"
+          />
+
+        </div>
+
+        <DashboardBarChart
+          title=""
+          data={applicationChartData}
+          xKey="status"
+          dataKey="count"
+        />
+
+      </Card>
+
+      <DashboardPieChart
+        title="Placement Drive Status"
+        data={driveStatusData}
+        centerText={stats.totalPlacementDrives ?? 0}
+        colors={[
+          '#22c55e',
+          '#3b82f6',
+          '#f59e0b',
+          '#ef4444',
+        ]}
+      />
+
+    </div>
+      
+
+
+
+  </div>
+)
 }

@@ -292,7 +292,7 @@ export default function StudentDrives() {
 
             <div>
 
-              <div className="mb-4 flex items-center justify-between">
+              {/* <div className="mb-4 flex items-center justify-between">
 
                 <h3 className="text-lg font-semibold text-gray-900">
                   Eligibility Criteria
@@ -311,7 +311,7 @@ export default function StudentDrives() {
                   }
                 />
 
-              </div>
+              </div> */}
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
 
@@ -357,7 +357,7 @@ export default function StudentDrives() {
 
             {/* ================= Eligibility Reason ================= */}
 
-            {!selectedDrive.eligible &&
+            {/* {!selectedDrive.eligible &&
               selectedDrive.ineligibilityReasons?.length > 0 && (
 
                 <div>
@@ -376,7 +376,7 @@ export default function StudentDrives() {
 
                 </div>
 
-            )}
+            )} */}
 
           </div>
         )}
