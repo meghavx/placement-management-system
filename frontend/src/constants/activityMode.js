@@ -1,0 +1,9 @@
+export const ACTIVITY_MODE = {
+  ONLINE: 'ONLINE',
+  OFFLINE: 'OFFLINE',
+}
+
+export const ACTIVITY_MODE_LABELS = {
+  [ACTIVITY_MODE.ONLINE]: 'Online',
+  [ACTIVITY_MODE.OFFLINE]: 'Offline',
+}

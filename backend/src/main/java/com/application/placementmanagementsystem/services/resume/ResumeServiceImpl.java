@@ -71,9 +71,20 @@ public class ResumeServiceImpl implements ResumeService {
         return getStudentResume().getFile();
     }
 
-    /**
-     * Returns resume of authenticated student.
-     */
+    @Override
+    @Transactional(readOnly = true)
+    public ResumeResponse getStudentResume(Long id) {
+        return resumeMapper.toResponse(getStudentResumeEntity(id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public byte[] downloadStudentResume(Long id) {
+        return getStudentResumeEntity(id).getFile();
+    }
+
+    // Private Helper Methods
+
     private Resume getStudentResume() {
 
         Student student = getAuthenticatedStudent();
@@ -84,9 +95,6 @@ public class ResumeServiceImpl implements ResumeService {
                 );
     }
 
-    /**
-     * Returns authenticated student.
-     */
     private Student getAuthenticatedStudent() {
 
         CustomUserPrincipal principal =
@@ -106,9 +114,21 @@ public class ResumeServiceImpl implements ResumeService {
                 );
     }
 
-    /**
-     * Validates uploaded resume.
-     */
+    private Resume getStudentResumeEntity(Long studentId) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Student not found with id: " + studentId
+                        )
+                );
+        return resumeRepository.findByStudent(student)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Resume not found."
+                        )
+                );
+    }
+
     private void validateFile(MultipartFile file) {
 
         if (file == null || file.isEmpty()) {

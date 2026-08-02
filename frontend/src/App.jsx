@@ -28,7 +28,7 @@ import { ROUTES } from './constants/routes'
 import { ROLES } from './constants/roles'
 import { ROLE_HOME_ROUTE } from './routes/sidebarMenus'
 
-const LoginPage = lazy(() => import('./pages/auth/LoginPage'))
+const LoginPage = lazy(() => import('./pages/landing/LandingPage'))
 const SuperAdminLoginPage = lazy(() => import('./pages/auth/SuperAdminLoginPage'))
 const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPasswordPage'))
 const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage'))
@@ -51,6 +51,11 @@ const RecruiterShortlisted = lazy(() => import('./pages/recruiter/RecruiterShort
 const RecruiterInterviews = lazy(() => import('./pages/recruiter/RecruiterInterviews'))
 const RecruiterResults = lazy(() => import('./pages/recruiter/RecruiterResults'))
 const RecruiterNotifications = lazy(() => import('./pages/recruiter/RecruiterNotifications'))
+const RecruitmentActivities = lazy(
+  () => import('./pages/recruiter/RecruitmentActivities')
+)
+const RecruiterProfile = lazy(() => import('./pages/recruiter/RecruiterProfile'))
+const RecruiterProfileForm = lazy(() => import('./pages/recruiter/RecruiterProfileForm'))
 
 // Placement Admin pages
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
@@ -58,9 +63,9 @@ const AdminStudents = lazy(() => import('./pages/admin/AdminStudents'))
 const AdminRecruiters = lazy(() => import('./pages/admin/AdminRecruiters'))
 const AdminCompanies = lazy(() => import('./pages/admin/AdminCompanies'))
 const AdminDrives = lazy(() => import('./pages/admin/AdminDrives'))
-const AdminEligibility = lazy(() => import('./pages/admin/AdminEligibility'))
 const AdminApplications = lazy(() => import('./pages/admin/AdminApplications'))
-const AdminReports = lazy(() => import('./pages/admin/AdminReports'))
+const AdminProfile = lazy(() => import('./pages/admin/AdminProfile'))
+const AdminProfileForm = lazy(() => import('./pages/admin/AdminProfileForm'))
 
 // Super Admin pages
 const SuperAdminDashboard = lazy(() => import('./pages/superAdmin/SuperAdminDashboard'))
@@ -118,6 +123,19 @@ function AppRoutes() {
         >
           <Route path={ROUTES.RECRUITER_DASHBOARD} element={<RecruiterDashboard />} />
           <Route path={ROUTES.RECRUITER_VIEW_DRIVES} element={<RecruiterDrives />} />
+          <Route
+            path={ROUTES.RECRUITER_ACTIVITIES}
+            element={<RecruitmentActivities />}
+          />
+          <Route
+            path={ROUTES.RECRUITER_PROFILE}
+            element={<RecruiterProfile />}
+          />
+
+          <Route
+            path={ROUTES.RECRUITER_PROFILE_FORM}
+            element={<RecruiterProfileForm />}
+          />
           <Route path={ROUTES.RECRUITER_CREATE_DRIVE} element={<RecruiterDriveForm />} />
           <Route path={ROUTES.RECRUITER_EDIT_DRIVE} element={<RecruiterDriveForm />} />
           <Route path={ROUTES.RECRUITER_VIEW_APPLICANTS} element={<RecruiterApplicants />} />
@@ -135,14 +153,20 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         >
+          <Route
+            path={ROUTES.ADMIN_PROFILE}
+            element={<AdminProfile />}
+          />
+          <Route
+            path={ROUTES.ADMIN_PROFILE_FORM}
+            element={<AdminProfileForm />}
+          />
           <Route path={ROUTES.ADMIN_DASHBOARD} element={<AdminDashboard />} />
           <Route path={ROUTES.ADMIN_STUDENTS} element={<AdminStudents />} />
           <Route path={ROUTES.ADMIN_RECRUITERS} element={<AdminRecruiters />} />
           <Route path={ROUTES.ADMIN_COMPANIES} element={<AdminCompanies />} />
           <Route path={ROUTES.ADMIN_DRIVES} element={<AdminDrives />} />
-          <Route path={ROUTES.ADMIN_ELIGIBILITY} element={<AdminEligibility />} />
           <Route path={ROUTES.ADMIN_APPLICATIONS} element={<AdminApplications />} />
-          <Route path={ROUTES.ADMIN_REPORTS} element={<AdminReports />} />
         </Route>
 
         {/* Super Admin Module */}

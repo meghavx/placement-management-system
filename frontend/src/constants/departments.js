@@ -21,8 +21,9 @@ export const DEPARTMENTS = [
   { label: 'Computer Science', value: 'CSE' },
   { label: 'Information Technology', value: 'IT' },
   { label: 'Electronics & Communication', value: 'ECE' },
-  { label: 'Electrical Engineering', value: 'EE' },
-  { label: 'Mechanical Engineering', value: 'ME' },
-  { label: 'Civil Engineering', value: 'CE' },
-  { label: 'Artificial Intelligence & Data Science', value: 'AIDS' },
+  { label: 'Mechanical Engineering', value: 'MECHANICAL' },
+  { label: 'Civil Engineering', value: 'CIVIL' },
+  { label: 'Chemical Engineering', value: 'CHEMICAL' },
+  { label: 'Biotechnology', value: 'BIOTECHNOLOGY' },
+  { label: 'Other', value: 'OTHER' },
 ]
