@@ -115,9 +115,9 @@ export async function forgotPassword(email) {
 
     return response.data
   } catch (error) {
-    throw (
-      error.response?.data ||
-      new Error('Unable to send password reset link.')
+    throw new Error(
+      error.response?.data?.message ||
+      'Unable to send password reset link.'
     )
   }
 }

@@ -41,20 +41,13 @@ export default function ForgotPasswordPage() {
     setLoading(true)
 
     try {
-      // TODO:
-      // await forgotPassword(email)
-
-      await forgotPassword(email)
-
-setSuccessMessage(
-  'If an account exists with this email, a password reset link has been sent.'
-)
+      const response = await forgotPassword(email)
+      setSuccessMessage(
+        response.message ||
+        'Password reset link sent successfully.'
+      )
     } catch (err) {
-      setErrorMessage(
-  err?.message ||
-  err?.error ||
-  'Unable to send reset link.'
-)
+      setErrorMessage(err.message)
     } finally {
       setLoading(false)
     }
