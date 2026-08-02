@@ -107,6 +107,37 @@ export async function loginUser(username, password, role) {
   }
 }
 
+export async function forgotPassword(email) {
+  try {
+    const response = await apiClient.post('/auth/forgot-password', {
+      email,
+    })
+
+    return response.data
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      'Unable to send password reset link.'
+    )
+  }
+}
+
+export async function resetPassword(token, newPassword) {
+  try {
+    const response = await apiClient.post('/auth/reset-password', {
+      token,
+      newPassword,
+    })
+
+    return response.data
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      'Unable to reset password.'
+    )
+  }
+}
+
 export async function logoutUser() {
   try {
     await apiClient.post('/auth/logout')
