@@ -48,6 +48,9 @@ export async function getStudents() {
     const response = await apiClient.get('/students')
 
     return response.data.data.map((student) => ({
+      // Database ID (used for API calls)
+      studentId: student.id,
+
       id: student.rollNumber || student.id,
 
       userId: student.userId,
@@ -114,14 +117,62 @@ export async function createStudent(student) {
   }
 }
 
-// Future: PUT /admin/students/{id}
-export function updateStudent(studentId, updates) {
-  return Promise.resolve({ id: studentId, ...updates })
+export async function updateStudent(studentId, studentData) {
+  try {
+    const response = await apiClient.put(
+      `/students/${studentId}`,
+      studentData
+    )
+
+    return response.data.data
+  } catch (error) {
+    console.error('Failed to update student:', error)
+
+    throw new Error(
+      error.response?.data?.message ||
+      'Failed to update student'
+    )
+  }
 }
 
-// Future: DELETE /admin/students/{id}
-export function deleteStudent(studentId) {
-  return Promise.resolve(studentId)
+export async function updateStudentStatus(studentId, active) {
+  try {
+    const response = await apiClient.patch(
+      `/students/${studentId}/status`,
+      null,
+      {
+        params: {
+          active,
+        },
+      }
+    )
+
+    return response.data.data
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      'Failed to update student status.'
+    )
+  }
+}
+
+export async function getStudentResume(studentId) {
+  const response = await apiClient.get(
+    `/student/${studentId}/resume`
+  )
+
+  return response.data.data
+}
+
+export async function downloadStudentResume(studentId) {
+  const response = await apiClient.get(
+    `/student/${studentId}/resume/download`,
+    {
+      responseType: 'blob',
+    }
+  )
+
+  return response.data
 }
 
 // Future: GET /admin/recruiters

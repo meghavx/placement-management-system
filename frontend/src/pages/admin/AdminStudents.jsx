@@ -28,6 +28,8 @@ import {
   UserX,
   Upload,
   FileSpreadsheet,
+  FileText,
+  Download
 } from 'lucide-react'
 
 import PageHeader from '../../components/PageHeader'
@@ -47,6 +49,9 @@ import {
   createStudent,
   updateStudent,
   importStudents,
+  getStudentResume,
+  downloadStudentResume,
+  updateStudentStatus
 } from '../../services/adminService'
 
 import { useSearch } from '../../hooks/useSearch'
@@ -88,12 +93,20 @@ export default function AdminStudents() {
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
 
-  // Import
+  // Import students from Excel file
   const [importOpen, setImportOpen] = useState(false)
   const [importFile, setImportFile] = useState(null)
   const [importing, setImporting] = useState(false)
   const [importResult, setImportResult] = useState(null)
   const [importError, setImportError] = useState('')
+
+  // Resume
+  const [resumeDetails, setResumeDetails] = useState(null)
+  const [resumeLoading, setResumeLoading] = useState(false)
+
+  // Deactivate/Activate 
+  const [statusStudent, setStatusStudent] = useState(null)
+  const [statusLoading, setStatusLoading] = useState(false)
 
   const { searchTerm, setSearchTerm, filteredItems } = useSearch(
     students,
@@ -208,8 +221,19 @@ export default function AdminStudents() {
 
     try {
       if (editingStudent) {
-        await updateStudent(editingStudent.id, form)
-
+        await updateStudent(
+          editingStudent.studentId,
+          {
+            fullName: form.fullName,
+            email: form.email,
+            phoneNumber: form.phoneNumber,
+            rollNumber: form.rollNumber,
+            department: form.department,
+            graduationYear: Number(form.graduationYear),
+            cgpa: Number(form.cgpa),
+            currentBacklogs: Number(form.currentBacklogs),
+          }
+        )
         notify('Student updated successfully')
       } else {
         const response = await createStudent(form)
@@ -237,13 +261,101 @@ export default function AdminStudents() {
     }
   }
 
-  const handleToggleStatus = async (student) => {
-    // PATCH integration later
-    notify(
-      student.status === 'Active'
-        ? 'Deactivate endpoint pending integration'
-        : 'Activate endpoint pending integration'
-    )
+  const handleToggleStatus = (student) => {
+    setStatusStudent(student)
+  }
+
+  const confirmToggleStatus = async () => {
+    if (!statusStudent) return
+
+    setStatusLoading(true)
+
+    try {
+      await updateStudentStatus(
+        statusStudent.studentId,
+        statusStudent.status !== 'Active'
+      )
+
+      notify(
+        statusStudent.status === 'Active'
+          ? 'Student deactivated successfully.'
+          : 'Student activated successfully.'
+      )
+
+      const updatedStudents = await getStudents()
+      setStudents(updatedStudents)
+
+      setStatusStudent(null)
+    } catch (error) {
+      notify(
+        error.message ||
+        'Failed to update student status.'
+      )
+    } finally {
+      setStatusLoading(false)
+    }
+  }
+
+  const handleViewStudent = async (student) => {
+    setViewStudent(student)
+
+    setResumeDetails(null)
+    setResumeLoading(true)
+
+    try {
+      const resume = await getStudentResume(student.studentId)
+      console.log('Student:', student)
+      console.log('Resume response:', resume)
+      setResumeDetails(resume)
+    } catch (error) {
+      setResumeDetails(null)
+    } finally {
+      setResumeLoading(false)
+    }
+  }
+
+  const handleViewResume = async () => {
+    if (!viewStudent) return
+
+    try {
+      const blob = await downloadStudentResume(viewStudent.studentId)
+
+      const url = window.URL.createObjectURL(blob)
+
+      window.open(url, '_blank', 'noopener,noreferrer')
+
+      // Cleanup after a minute
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url)
+      }, 60000)
+
+    } catch {
+      notify('Failed to open resume')
+    }
+  }
+
+  const handleDownloadResume = async () => {
+    if (!viewStudent) return
+
+    try {
+      const blob = await downloadStudentResume(viewStudent.studentId)
+
+      const url = window.URL.createObjectURL(blob)
+
+      const link = document.createElement('a')
+
+      link.href = url
+      link.download = resumeDetails.fileName
+
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+
+      window.URL.revokeObjectURL(url)
+
+    } catch {
+      notify('Failed to download resume')
+    }
   }
 
   const handleImportStudents = async () => {
@@ -423,7 +535,7 @@ export default function AdminStudents() {
                 size="sm"
                 variant="outline"
                 icon={Eye}
-                onClick={() => setViewStudent(row)}
+                onClick={() => handleViewStudent(row)}
               >
                 View
               </Button>
@@ -464,7 +576,10 @@ export default function AdminStudents() {
       {viewStudent && (
         <Modal
           open={!!viewStudent}
-          onClose={() => setViewStudent(null)}
+          onClose={() => {
+            setViewStudent(null)
+            setResumeDetails(null)
+          }}
           title="Student Details"
           size="lg"
         >
@@ -552,7 +667,69 @@ export default function AdminStudents() {
                   <Badge label={viewStudent.status} />
                 </div>
               </div>
+              <div className="col-span-2 border-t pt-5">
+                <p className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">
+                  Resume
+                </p>
 
+                {resumeLoading ? (
+
+                  <p className="text-sm text-gray-500">
+                    Loading resume...
+                  </p>
+
+                ) : resumeDetails ? (
+
+                  <div className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3">
+
+                    <button
+                      type="button"
+                      onClick={handleViewResume}
+                      className="flex items-center gap-2 text-primary-600 hover:underline"
+                    >
+                      <FileText
+                        size={20}
+                        className="text-primary-600 flex-shrink-0"
+                      />
+
+                      <span className="font-medium">
+                        {resumeDetails.fileName}
+                      </span>
+                    </button>
+
+                    <div className="flex items-center gap-2">
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={Eye}
+                        onClick={handleViewResume}
+                      >
+                        View
+                      </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={Download}
+                        onClick={handleDownloadResume}
+                      >
+                        Download
+                      </Button>
+
+                    </div>
+
+                  </div>
+
+                ) : (
+
+                  <p className="text-sm text-gray-500">
+                    No resume uploaded.
+                  </p>
+
+                )}
+
+              </div>
             </div>
           </div>
         </Modal>
@@ -693,6 +870,48 @@ export default function AdminStudents() {
           </div>
         </form>
       </Modal>
+
+      <Modal
+        open={!!statusStudent}
+        onClose={() => setStatusStudent(null)}
+        title={
+          statusStudent?.status === 'Active'
+            ? 'Deactivate Student'
+            : 'Activate Student'
+        }
+      >
+        <div className="space-y-5">
+          <p className="text-gray-700">
+            {statusStudent?.status === 'Active'
+              ? `Are you sure you want to deactivate ${statusStudent?.name}?`
+              : `Are you sure you want to activate ${statusStudent?.name}?`}
+          </p>
+
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setStatusStudent(null)}
+              disabled={statusLoading}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              variant={
+                statusStudent?.status === 'Active'
+                  ? 'danger'
+                  : 'success'
+              }
+              loading={statusLoading}
+              onClick={confirmToggleStatus}
+            >
+              {statusStudent?.status === 'Active'
+                ? 'Deactivate'
+                : 'Activate'}
+            </Button>
+          </div>
+        </div>
+      </Modal> 
 
       {/* Import Students */}
       <Modal
