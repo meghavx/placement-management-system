@@ -18,15 +18,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/student/profile/resume")
+@RequestMapping("/api")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('STUDENT')")
 @Tag(name = "Resume Management")
 public class ResumeController {
 
     private final ResumeService resumeService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = "/student/profile/resume", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "Upload / Replace Resume")
     public ResponseEntity<ApiResponse<ResumeResponse>> uploadResume(
             @RequestParam("file") MultipartFile file
@@ -44,7 +44,8 @@ public class ResumeController {
                 );
     }
 
-    @GetMapping
+    @GetMapping("/student/profile/resume")
+    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "View Resume Details")
     public ResponseEntity<ApiResponse<ResumeResponse>> getResume() {
 
@@ -58,7 +59,8 @@ public class ResumeController {
         );
     }
 
-    @GetMapping("/download")
+    @GetMapping("/student/profile/resume/download")
+    @PreAuthorize("hasRole('STUDENT')")
     @Operation(summary = "Download Resume")
     public ResponseEntity<ByteArrayResource> downloadResume() {
 
