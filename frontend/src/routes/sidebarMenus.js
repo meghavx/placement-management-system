@@ -35,7 +35,7 @@ export const studentMenu = [
   { label: 'Job Opportunities', path: ROUTES.STUDENT_DRIVES, icon: Briefcase },
   { label: 'Applications', path: ROUTES.STUDENT_APPLICATIONS, icon: ClipboardList },
   { label: 'Notifications', path: ROUTES.STUDENT_NOTIFICATIONS, icon: Bell },
-  { label: 'Settings', path: '', icon: Settings },
+  // { label: 'Settings', path: '', icon: Settings },
 ]
 
 export const recruiterMenu = [
@@ -53,7 +53,7 @@ export const recruiterMenu = [
   { label: 'Interviews', path: ROUTES.RECRUITER_INTERVIEWS, icon: ClipboardList },
   { label: 'Results', path: ROUTES.RECRUITER_RESULTS, icon: FileText },
   { label: 'Notifications', path: ROUTES.RECRUITER_NOTIFICATIONS, icon: Bell },
-  { label: 'Settings', path: '', icon: Settings },
+  // { label: 'Settings', path: '', icon: Settings },
 ]
 
 export const placementAdminMenu = [
@@ -64,11 +64,11 @@ export const placementAdminMenu = [
     icon: User,
   },
   { label: 'Students', path: ROUTES.ADMIN_STUDENTS, icon: Users },
-  { label: 'Applications', path: ROUTES.ADMIN_APPLICATIONS, icon: ClipboardList },
   { label: 'Companies', path: ROUTES.ADMIN_COMPANIES, icon: Building2 },
   { label: 'Recruiters', path: ROUTES.ADMIN_RECRUITERS, icon: UserPlus },
   { label: 'Placement Drives', path: ROUTES.ADMIN_DRIVES, icon: Briefcase },
-  { label: 'Settings', path: '', icon: Settings },
+  { label: 'Applications', path: ROUTES.ADMIN_APPLICATIONS, icon: ClipboardList },
+  // { label: 'Settings', path: '', icon: Settings },
 ]
 
 export const superAdminMenu = [
