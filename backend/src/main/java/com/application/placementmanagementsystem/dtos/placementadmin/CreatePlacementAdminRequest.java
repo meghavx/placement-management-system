@@ -1,4 +1,4 @@
-package com.application.placementmanagementsystem.dtos.placementAdmin;
+package com.application.placementmanagementsystem.dtos.placementadmin;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -19,9 +19,5 @@ public record CreatePlacementAdminRequest(
                 regexp = "^[6-9]\\d{9}$",
                 message = "Phone number must be a valid 10-digit Indian mobile number."
         )
-        String phoneNumber,
-
-        @NotBlank(message = "Password is required")
-        @Size(min = 8, max = 100, message = "Password length must be between 8 and 100")
-        String password
+        String phoneNumber
 ) {}

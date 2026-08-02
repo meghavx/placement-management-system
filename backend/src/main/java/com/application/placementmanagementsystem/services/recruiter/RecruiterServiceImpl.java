@@ -53,6 +53,7 @@ public class RecruiterServiceImpl implements RecruiterService {
                 .role(RoleType.RECRUITER)
                 .active(true)
                 .build();
+
         User savedUser = userRepository.save(user);
         Recruiter recruiter = Recruiter.builder()
                 .user(savedUser)

@@ -1,7 +1,7 @@
 package com.application.placementmanagementsystem.services.profile;
 
 import com.application.placementmanagementsystem.auth.CustomUserPrincipal;
-import com.application.placementmanagementsystem.dtos.placementAdmin.PlacementAdminResponse;
+import com.application.placementmanagementsystem.dtos.placementadmin.PlacementAdminResponse;
 import com.application.placementmanagementsystem.dtos.profile.PlacementAdminProfileUpdateRequest;
 import com.application.placementmanagementsystem.dtos.profile.RecruiterProfileUpdateRequest;
 import com.application.placementmanagementsystem.dtos.profile.StudentProfileUpdateRequest;

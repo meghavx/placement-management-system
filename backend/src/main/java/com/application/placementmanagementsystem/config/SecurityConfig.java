@@ -131,6 +131,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/companies/**")
                         .hasRole("PLACEMENT_ADMIN")
 
+                        .requestMatchers("/api/reports/**")
+                        .hasAnyRole(
+                                "SUPER_ADMIN",
+                                "PLACEMENT_ADMIN"
+                        )
+
                         .anyRequest()
                         .authenticated()
                 )
