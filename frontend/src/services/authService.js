@@ -122,6 +122,22 @@ export async function forgotPassword(email) {
   }
 }
 
+export async function resetPassword(token, newPassword) {
+  try {
+    const response = await apiClient.post('/auth/reset-password', {
+      token,
+      newPassword,
+    })
+
+    return response.data
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      'Unable to reset password.'
+    )
+  }
+}
+
 export async function logoutUser() {
   try {
     await apiClient.post('/auth/logout')
