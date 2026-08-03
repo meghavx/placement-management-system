@@ -42,13 +42,15 @@ export async function updateAdminProfile(profile) {
   return response.data.data
 }
 
-
 // Future: GET /admin/students
 export async function getStudents() {
   try {
     const response = await apiClient.get('/students')
 
     return response.data.data.map((student) => ({
+      // Database ID (used for API calls)
+      studentId: student.id,
+
       id: student.rollNumber || student.id,
 
       userId: student.userId,
@@ -93,22 +95,86 @@ export async function importStudents(file) {
   return response.data.data
 }
 
-// Future: POST /admin/students (body: student DTO)
-export function createStudent(student) {
-  return Promise.resolve({ id: Date.now(), ...student })
+export async function createStudent(student) {
+  try {
+    const response = await apiClient.post('/students', {
+      fullName: student.fullName,
+      email: student.email,
+      phoneNumber: student.phoneNumber,
+      rollNumber: student.rollNumber,
+      department: student.department,
+      graduationYear: Number(student.graduationYear),
+      cgpa: Number(student.cgpa),
+      currentBacklogs: Number(student.currentBacklogs),
+    })
+
+    return response.data
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      'Failed to create student.'
+    )
+  }
 }
 
-// Future: PUT /admin/students/{id}
-export function updateStudent(studentId, updates) {
-  return Promise.resolve({ id: studentId, ...updates })
+export async function updateStudent(studentId, studentData) {
+  try {
+    const response = await apiClient.put(
+      `/students/${studentId}`,
+      studentData
+    )
+
+    return response.data.data
+  } catch (error) {
+    console.error('Failed to update student:', error)
+
+    throw new Error(
+      error.response?.data?.message ||
+      'Failed to update student'
+    )
+  }
 }
 
-// Future: DELETE /admin/students/{id}
-export function deleteStudent(studentId) {
-  return Promise.resolve(studentId)
+export async function updateStudentStatus(studentId, active) {
+  try {
+    const response = await apiClient.patch(
+      `/students/${studentId}/status`,
+      null,
+      {
+        params: {
+          active,
+        },
+      }
+    )
+
+    return response.data.data
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      'Failed to update student status.'
+    )
+  }
 }
 
-// Future: GET /admin/recruiters
+export async function getStudentResume(studentId) {
+  const response = await apiClient.get(
+    `/student/${studentId}/resume`
+  )
+
+  return response.data.data
+}
+
+export async function downloadStudentResume(studentId) {
+  const response = await apiClient.get(
+    `/student/${studentId}/resume/download`,
+    {
+      responseType: 'blob',
+    }
+  )
+
+  return response.data
+}
+
 export async function getRecruiters() {
   try {
     const response = await apiClient.get('/recruiters')
@@ -118,18 +184,16 @@ export async function getRecruiters() {
       userId: recruiter.userId,
 
       recruiter: recruiter.fullName,
-      company: recruiter.companyName,
-
       email: recruiter.email,
       phone: recruiter.phoneNumber,
 
-      status: recruiter.active ? 'Active' : 'Inactive',
+      companyId: recruiter.companyId,
+      company: recruiter.companyName,
 
       designation: recruiter.designation,
-      companyId: recruiter.companyId,
 
-      // Backend doesn't provide this yet
-      createdDate: null,
+      active: recruiter.active,
+      status: recruiter.active ? 'Active' : 'Inactive',
     }))
   } catch (error) {
     console.error('Failed to fetch recruiters:', error)
@@ -137,60 +201,75 @@ export async function getRecruiters() {
   }
 }
 
-// Future: POST /admin/recruiters (body: recruiter DTO)
-export function createRecruiter(recruiter) {
-  return Promise.resolve({ id: Date.now(), ...recruiter })
+export async function createRecruiter(recruiter) {
+  try {
+    const response = await apiClient.post('/recruiters', {
+      fullName: recruiter.fullName,
+      email: recruiter.email,
+      phoneNumber: recruiter.phone,
+      companyId: Number(recruiter.companyId),
+      designation: recruiter.designation,
+    })
+
+    return response.data.data
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      'Failed to create recruiter.'
+    )
+  }
 }
 
-// Future: PUT /admin/recruiters/{id}
-export function updateRecruiter(recruiterId, updates) {
-  return Promise.resolve({ id: recruiterId, ...updates })
+export async function updateRecruiter(id, recruiter) {
+  try {
+    const response = await apiClient.put(
+      `/recruiters/${id}`,
+      {
+        fullName: recruiter.fullName,
+        email: recruiter.email,
+        phoneNumber: recruiter.phone,
+        companyId: Number(recruiter.companyId),
+        designation: recruiter.designation,
+      }
+    )
+
+    return response.data.data
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      'Failed to update recruiter.'
+    )
+  }
 }
 
-// Future: DELETE /admin/recruiters/{id}
-export function deleteRecruiter(recruiterId) {
-  return Promise.resolve(recruiterId)
+export async function updateRecruiterStatus(id, active) {
+  try {
+    const response = await apiClient.patch(
+      `/recruiters/${id}/status`,
+      null,
+      {
+        params: {
+          active,
+        },
+      }
+    )
+
+    return response.data.data
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      'Failed to update recruiter status.'
+    )
+  }
 }
 
-// Future: GET /admin/drives
-// export function getAdminDrives() {
-//   return Promise.resolve(placementDriveManagementData)
-// }
 export async function getAdminDrives() {
   try {
     const response = await apiClient.get('/drives')
 
-    const statusMap = {
-      DRAFT: 'Draft',
-      PUBLISHED: 'Published',
-      CLOSED: 'Closed',
-      EXPIRED: 'Expired',
-    }
-
-    return response.data.data.map((drive) => ({
-      id: drive.id,
-
-      drive: `${drive.companyName} - ${drive.jobRole}`,
-
-      company: drive.companyName,
-
-      role: drive.jobRole,
-
-      package: drive.packageOffered,
-
-      deadline: drive.driveDate,
-
-      status: statusMap[drive.status] ?? drive.status,
-
-      // Backend doesn't provide these yet
-      applicants: 0,
-
-      location: drive.location,
-
-      eligible: drive.eligible,
-
-      ineligibilityReasons: drive.ineligibilityReasons,
-    }))
+    return response.data.data.filter(
+      (drive) => drive.status !== 'DRAFT'
+    )
   } catch (error) {
     console.error('Failed to fetch drives:', error)
     throw error

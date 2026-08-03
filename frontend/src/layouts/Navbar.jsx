@@ -42,7 +42,7 @@ export default function Navbar({ onToggleSidebar }) {
         </span>
         
         <span className="text-sm font-semibold sm:text-base">
-          Placement Management System
+          College Placement Management System
         </span>
       </div>
 

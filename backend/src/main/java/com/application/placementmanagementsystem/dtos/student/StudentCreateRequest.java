@@ -11,17 +11,16 @@ import java.math.BigDecimal;
 @Builder
 public class StudentCreateRequest {
     @NotBlank(message = "Student name is required")
+    @Size(max = 100, message = "Student name cannot exceed 100 characters")
     private String fullName;
 
     @NotBlank(message = "Student email is required")
-    @Email
+    @Email(message = "Please enter a valid email address")
+    @Size(max = 100, message = "Email address cannot exceed 100 characters")
     private String email;
 
     @NotBlank(message = "Phone number is required")
-    @Pattern(
-            regexp = "^[6-9]\\d{9}$",
-            message = "Phone number must be a valid 10-digit Indian mobile number"
-    )
+    @Pattern(regexp = "^[6-9]\\d{9}$", message = "Phone number must be a valid 10-digit Indian mobile number")
     private String phoneNumber;
 
     @NotBlank(message = "Roll number is required")
@@ -31,13 +30,13 @@ public class StudentCreateRequest {
     private Department department;
 
     @NotNull(message = "Graduation year is required")
-    @Min(value = 2000, message = "Graduation year must be after 2026")
-    @Max(value = 2100, message = "Graduation year is invalid")
+    @Min(value = 2000, message = "Graduation year must be after 2000")
+    @Max(value = 2100, message = "Graduation year cannot be later than 2100")
     private Integer graduationYear;
 
     @NotNull(message = "CGPA is required")
-    @DecimalMin("0.00")
-    @DecimalMax("10.00")
+    @DecimalMin(value = "0.00", message = "CGPA cannot be less than 0.00")
+    @DecimalMax(value = "10.00", message = "CGPA cannot be greater than 10.00")
     private BigDecimal cgpa;
 
     @NotNull(message = "Current backlogs field is required")

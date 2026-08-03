@@ -18,4 +18,6 @@ public class CompanyResponse {
     private String location;
 
     private String description;
+
+    private Boolean active;
 }

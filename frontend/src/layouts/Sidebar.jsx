@@ -16,7 +16,7 @@ Future:
 ========================================
 */
 
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { LogOut } from 'lucide-react'
 import { SIDEBAR_MENUS } from '../routes/sidebarMenus'
 import { useAuth } from '../hooks/useAuth'
@@ -24,16 +24,13 @@ import { ROUTES } from '../constants/routes'
 
 export default function Sidebar({ isOpen, onClose }) {
   const { role, logout } = useAuth()
+  const navigate = useNavigate()
+
   const menuItems = SIDEBAR_MENUS[role] || []
 
   const handleLogout = async () => {
-    console.log('Logout clicked')
-
     await logout()
-
-    console.log('Logout completed')
-    
-    window.location.href = ROUTES.LOGIN
+    navigate(ROUTES.LOGIN, { replace: true })
   }
 
   return (

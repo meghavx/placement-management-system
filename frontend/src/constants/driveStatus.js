@@ -22,7 +22,7 @@ export const DRIVE_STATUS = {
 export const DRIVE_STATUS_COLORS = {
   [DRIVE_STATUS.DRAFT]: 'gray',
   [DRIVE_STATUS.OPEN]: 'green',
-  [DRIVE_STATUS.CLOSED]: 'red',
+  [DRIVE_STATUS.CLOSED]: 'yellow',
   [DRIVE_STATUS.COMPLETED]: 'blue',
-  [DRIVE_STATUS.CANCELLED]: 'yellow',
+  [DRIVE_STATUS.CANCELLED]: 'red',
 }

@@ -7,12 +7,15 @@ Provides Placement Admins with visibility into every student
 application across all placement drives.
 
 Current Features:
-- Status statistic cards
-- Search and status filter
-- Applications table with View/Export actions
+Current Features
+- Backend-integrated application list
+- Statistics
+- Search by student/company/job role
+- View application details
 
-Future Backend Integration:
-GET /admin/applications.
+Backend APIs
+- GET /api/placement-admin/applications
+- GET /api/placement-admin/applications/{id}
 ==========================================
 */
 
@@ -41,6 +44,8 @@ import { useNotification } from '../../hooks/useNotification'
 
 import { formatDate } from '../../utils/formatDate'
 import { formatSalary } from '../../utils/formatSalary'
+import { formatApplicationStatus } from '../../utils/formatApplicationStatus'
+import { APPLICATION_STATUS } from '../../constants/applicationStatus'
 
 export default function AdminApplications() {
   const { notify } = useNotification()
@@ -65,25 +70,39 @@ export default function AdminApplications() {
         notify('Failed to load applications')
       } finally {
         setLoading(false)
+      } finally {
+        setLoading(false)
       }
     }
 
     fetchApplications()
   }, [])
+  }, [])
 
   const filteredApplications = useMemo(() => {
-    return applications.filter((app) =>
-      `${app.studentName} ${app.rollNumber} ${app.companyName} ${app.jobRole}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    )
-  }, [applications, searchTerm])
+    return applications.filter((app) => {
+      const matchesSearch =
+        `${app.studentName} ${app.rollNumber} ${app.companyName} ${app.jobRole}`
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+
+      const matchesStatus =
+        statusFilter === 'ALL' ||
+        app.status === statusFilter
+
+      return matchesSearch && matchesStatus
+    })
+  }, [applications, searchTerm, statusFilter])
 
   const stats = {
     total: applications.length,
-    applied: applications.filter((a) => a.status === 'APPLIED').length,
-    shortlisted: applications.filter((a) => a.status === 'SHORTLISTED').length,
-    rejected: applications.filter((a) => a.status === 'REJECTED').length,
+    applied: applications.filter(a => a.status === 'APPLIED').length,
+    shortlisted: applications.filter(a => a.status === 'SHORTLISTED').length,
+    interviewScheduled: applications.filter(
+      a => a.status === 'INTERVIEW_SCHEDULED'
+    ).length,
+    selected: applications.filter(a => a.status === 'SELECTED').length,
+    rejected: applications.filter(a => a.status === 'REJECTED').length,
   }
 
   const handleView = async (applicationId) => {
@@ -131,33 +150,43 @@ const handleResumeDownload = async (studentId) => {
 
   return (
     <div className="flex flex-col gap-6">
-  <PageHeader
-    title="Application Management"
-    description="View all applications submitted for placement drives."
-    breadcrumb={['Dashboard', 'Applications']}
-  />
+      <PageHeader
+        title="Application Management"
+        description="View all applications submitted for placement drives."
+        breadcrumb={['Dashboard', 'Applications']}
+      />
 
-  <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-    <StatisticCard
-      title="Total Applications"
-      value={stats.total}
-    />
+    <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
+      <StatisticCard
+        title="Total Applications"
+        value={stats.total}
+      />
 
-    <StatisticCard
-      title="Applied"
-      value={stats.applied}
-    />
+      <StatisticCard
+        title="Applied"
+        value={stats.applied}
+      />
 
-    <StatisticCard
-      title="Shortlisted"
-      value={stats.shortlisted}
-    />
+      <StatisticCard
+        title="Shortlisted"
+        value={stats.shortlisted}
+      />
 
-    <StatisticCard
-      title="Rejected"
-      value={stats.rejected}
-    />
-  </div>
+      <StatisticCard
+        title="Interview Scheduled"
+        value={stats.interviewScheduled}
+      />
+
+      <StatisticCard
+        title="Selected"
+        value={stats.selected}
+      />
+
+      <StatisticCard
+        title="Rejected"
+        value={stats.rejected}
+      />
+    </div>
 
   <div className="flex justify-end">
     <SearchBar
@@ -311,7 +340,7 @@ const handleResumeDownload = async (studentId) => {
                 </p>
 
                 <div className="mt-1">
-                  <Badge label={viewApplication.status || '-'} />
+                  <Badge label={viewApplication?.status} />
                 </div>
               </div>
 

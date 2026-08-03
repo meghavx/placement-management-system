@@ -28,8 +28,7 @@ import { ROUTES } from './constants/routes'
 import { ROLES } from './constants/roles'
 import { ROLE_HOME_ROUTE } from './routes/sidebarMenus'
 
-
-const LoginPage = lazy(() => import('./pages/auth/LoginPage'))
+const LoginPage = lazy(() => import('./pages/landing/LandingPage'))
 const SuperAdminLoginPage = lazy(() => import('./pages/auth/SuperAdminLoginPage'))
 const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPasswordPage'))
 const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPasswordPage'))
