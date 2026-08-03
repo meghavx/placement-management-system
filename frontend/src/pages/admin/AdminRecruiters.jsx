@@ -41,6 +41,7 @@ import {
   getRecruiters,
   createRecruiter,
   updateRecruiter,
+  updateRecruiterStatus,
 } from '../../services/adminService'
 
 import { getCompanies } from '../../services/companyService'
@@ -67,6 +68,8 @@ export default function AdminRecruiters() {
   const [loading, setLoading] = useState(true)
 
   const [recruiters, setRecruiters] = useState([])
+  const [statusRecruiter, setStatusRecruiter] = useState(null)
+  
   const [companies, setCompanies] = useState([])
 
   const [viewRecruiter, setViewRecruiter] = useState(null)
@@ -202,12 +205,38 @@ export default function AdminRecruiters() {
     }
   }
 
-  const handleToggleStatus = async (row) => {
-    notify(
-      row.status === 'Active'
-        ? 'Deactivate endpoint will be integrated later.'
-        : 'Activate endpoint will be integrated later.'
-    )
+  const handleToggleStatus = (row) => {
+    setStatusRecruiter(row)
+  }
+
+  const confirmToggleStatus = async () => {
+    if (!statusRecruiter) return
+
+    try {
+      await updateRecruiterStatus(
+        statusRecruiter.id,
+        !statusRecruiter.active
+      )
+
+      notify(
+        `Recruiter ${
+          statusRecruiter.active
+            ? 'deactivated'
+            : 'activated'
+        } successfully.`
+      )
+
+      const updated = await getRecruiters()
+      setRecruiters(updated)
+
+      setStatusRecruiter(null)
+
+    } catch (error) {
+      notify(
+        error.message ||
+        'Failed to update recruiter status.'
+      )
+    }
   }
 
   const handleView = (row) => {
@@ -518,6 +547,52 @@ export default function AdminRecruiters() {
         </form>
       </Modal>
 
+      <Modal
+        open={!!statusRecruiter}
+        onClose={() => setStatusRecruiter(null)}
+        title={
+          statusRecruiter?.active
+            ? 'Deactivate Recruiter'
+            : 'Activate Recruiter'
+        }
+        footer={
+          <>
+            <Button
+              variant="outline"
+              onClick={() => setStatusRecruiter(null)}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              variant={
+                statusRecruiter?.active
+                  ? 'danger'
+                  : 'success'
+              }
+              onClick={confirmToggleStatus}
+            >
+              {statusRecruiter?.active
+                ? 'Deactivate'
+                : 'Activate'}
+            </Button>
+          </>
+        }
+      >
+        <p>
+          Are you sure you want to{' '}
+          <strong>
+            {statusRecruiter?.active
+              ? 'deactivate'
+              : 'activate'}
+          </strong>{' '}
+          recruiter{' '}
+          <strong>
+            {statusRecruiter?.recruiter}
+          </strong>
+          ?
+        </p>
+      </Modal>
     </div>
   )
 }

@@ -185,18 +185,16 @@ export async function getRecruiters() {
       userId: recruiter.userId,
 
       recruiter: recruiter.fullName,
-      company: recruiter.companyName,
-
       email: recruiter.email,
       phone: recruiter.phoneNumber,
 
-      status: recruiter.active ? 'Active' : 'Inactive',
+      companyId: recruiter.companyId,
+      company: recruiter.companyName,
 
       designation: recruiter.designation,
-      companyId: recruiter.companyId,
 
-      // Backend doesn't provide this yet
-      createdDate: null,
+      active: recruiter.active,
+      status: recruiter.active ? 'Active' : 'Inactive',
     }))
   } catch (error) {
     console.error('Failed to fetch recruiters:', error)
@@ -204,19 +202,66 @@ export async function getRecruiters() {
   }
 }
 
-// Future: POST /admin/recruiters (body: recruiter DTO)
-export function createRecruiter(recruiter) {
-  return Promise.resolve({ id: Date.now(), ...recruiter })
+export async function createRecruiter(recruiter) {
+  try {
+    const response = await apiClient.post('/recruiters', {
+      fullName: recruiter.fullName,
+      email: recruiter.email,
+      phoneNumber: recruiter.phone,
+      companyId: Number(recruiter.companyId),
+      designation: recruiter.designation,
+    })
+
+    return response.data.data
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      'Failed to create recruiter.'
+    )
+  }
 }
 
-// Future: PUT /admin/recruiters/{id}
-export function updateRecruiter(recruiterId, updates) {
-  return Promise.resolve({ id: recruiterId, ...updates })
+export async function updateRecruiter(id, recruiter) {
+  try {
+    const response = await apiClient.put(
+      `/recruiters/${id}`,
+      {
+        fullName: recruiter.fullName,
+        email: recruiter.email,
+        phoneNumber: recruiter.phone,
+        companyId: Number(recruiter.companyId),
+        designation: recruiter.designation,
+      }
+    )
+
+    return response.data.data
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      'Failed to update recruiter.'
+    )
+  }
 }
 
-// Future: DELETE /admin/recruiters/{id}
-export function deleteRecruiter(recruiterId) {
-  return Promise.resolve(recruiterId)
+export async function updateRecruiterStatus(id, active) {
+  try {
+    const response = await apiClient.patch(
+      `/recruiters/${id}/status`,
+      null,
+      {
+        params: {
+          active,
+        },
+      }
+    )
+
+    return response.data.data
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      'Failed to update recruiter status.'
+    )
+  }
 }
 
 // Future: GET /admin/drives
