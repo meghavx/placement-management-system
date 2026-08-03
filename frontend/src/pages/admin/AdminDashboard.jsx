@@ -30,14 +30,11 @@ import Badge from '../../components/Badge'
 import SkeletonLoader from '../../components/SkeletonLoader'
 import DashboardBarChart from '../../components/charts/DashboardBarChart'
 import DashboardPieChart from '../../components/charts/DashboardPieChart'
-import Dropdown from '../../components/Dropdown'
 
 import {
   getAdminDashboard,
-  getPlacementDrives,
-  getDriveApplications,
-  getRecruiters,
-  getStudents,
+  getAdminDrives,
+  getAllApplications,
 } from '../../services/adminService'
 
 import { formatDate } from '../../utils/formatDate'
@@ -47,12 +44,10 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
 
   const [dashboard, setDashboard] = useState(null)
-
   const [drives, setDrives] = useState([])
+
   const [students, setStudents] = useState([])
   const [recruiters, setRecruiters] = useState([])
-
-  const [selectedDrive, setSelectedDrive] = useState('')
   const [applications, setApplications] = useState([])
 
   useEffect(() => {
@@ -61,24 +56,14 @@ export default function AdminDashboard() {
         const [
           dashboardData,
           driveData,
-          recruiterData,
-          studentData,
         ] = await Promise.all([
           getAdminDashboard(),
-          getPlacementDrives(),
-          getRecruiters(),
-          getStudents(),
+          getAdminDrives(),
         ])
 
         setDashboard(dashboardData)
-
         setDrives(driveData)
-        setRecruiters(recruiterData)
-        setStudents(studentData)
 
-        if (driveData.length) {
-          setSelectedDrive(String(driveData[0].id))
-        }
       } catch (error) {
         console.error(error)
       } finally {
@@ -90,11 +75,9 @@ export default function AdminDashboard() {
   }, [])
 
   useEffect(() => {
-    if (!selectedDrive) return
-
     const loadApplications = async () => {
       try {
-        const data = await getDriveApplications(selectedDrive)
+        const data = await getAllApplications()
         setApplications(data)
       } catch (error) {
         console.error(error)
@@ -102,7 +85,8 @@ export default function AdminDashboard() {
     }
 
     loadApplications()
-  }, [selectedDrive])
+  }, [])
+  
 
   if (loading) {
     return (
@@ -135,8 +119,8 @@ export default function AdminDashboard() {
   }
 
   drives.forEach((drive) => {
-    if (driveStatusCount[drive.status] !== undefined) {
-      driveStatusCount[drive.status]++
+    if (driveStatusCount[drive.status.toUpperCase()] !== undefined) {
+      driveStatusCount[drive.status.toUpperCase()]++
     }
   })
 
@@ -248,32 +232,12 @@ export default function AdminDashboard() {
 
     <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
 
-      <Card title="Applications by Status">
-
-        <div className="mb-4 flex justify-end">
-
-          <Dropdown
-            name="drive"
-            value={selectedDrive}
-            onChange={(e) => setSelectedDrive(e.target.value)}
-            options={drives.map((drive) => ({
-              label: `${drive.company} - ${drive.role}`,
-              value: String(drive.id),
-            }))}
-            placeholder="Select Placement Drive"
-            className="w-80"
-          />
-
-        </div>
-
-        <DashboardBarChart
-          title=""
-          data={applicationChartData}
-          xKey="status"
-          dataKey="count"
-        />
-
-      </Card>
+      <DashboardBarChart
+        title="Applications by Status"
+        data={applicationChartData}
+        xKey="status"
+        dataKey="count"
+      />
 
       <DashboardPieChart
         title="Placement Drive Status"

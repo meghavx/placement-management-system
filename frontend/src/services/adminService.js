@@ -19,8 +19,9 @@ import { reportData } from '../data/reportData'
 import apiClient from './apiClient'
 
 // Future: GET /admin/dashboard
-export function getAdminDashboard() {
-  return Promise.resolve(adminDashboardData)
+export async function getAdminDashboard() {
+  const response = await apiClient.get('/placement-admin/dashboard')
+  return response.data.data
 }
 
 // Future: GET /placement-admin/profile
@@ -212,8 +213,33 @@ export function updateEligibilityCriteria(driveId, criteria) {
 }
 
 // Future: GET /admin/applications
-export function getAllApplications() {
-  return Promise.resolve(adminApplicationData)
+export async function getAllApplications() {
+  const response = await apiClient.get(
+    '/placement-admin/applications'
+  )
+
+    return response.data.data.map((application) => ({
+    id: application.id,
+
+    studentId: application.studentId,
+    studentName: application.studentName,
+
+    rollNumber: application.rollNumber,
+
+    driveId: application.driveId,
+
+    companyName: application.companyName,
+
+    jobRole: application.jobRole,
+
+    packageOffered: application.packageOffered,
+
+    appliedAt: application.appliedAt,
+
+    driveDate: application.driveDate,
+
+    status: application.status,
+  }))
 }
 
 // Future: GET /admin/reports  and  GET /admin/analytics
@@ -260,5 +286,51 @@ export const getPlacementDrives = async () => placementDriveManagementData
 export const getDriveApplications = async (driveId) =>
   applicationData.filter(app => app.driveId === Number(driveId))
 
-export const getApplicationById = async (applicationId) =>
-  applicationData.find(app => app.id === Number(applicationId))
+export async function getApplicationById(applicationId) {
+  const response = await apiClient.get(
+    `/placement-admin/applications/${applicationId}`
+  )
+
+  const application = response.data.data
+
+  return {
+    id: application.id,
+    studentId: application.studentId,
+    studentName: application.studentName,
+    rollNumber: application.rollNumber,
+
+    driveId: application.driveId,
+
+    companyName: application.companyName,
+    jobRole: application.jobRole,
+    packageOffered: application.packageOffered,
+
+    driveDate: application.driveDate,
+    appliedAt: application.appliedAt,
+
+    status: application.status,
+
+    // Backend doesn't provide these yet
+    interviewDate: null,
+    resumeUrl: null,
+  }
+}
+
+export async function getResume(studentId) {
+  const response = await apiClient.get(
+    `/student/${studentId}/resume`
+  )
+
+  return response.data.data
+}
+
+export async function downloadResume(studentId) {
+  const response = await apiClient.get(
+    `/student/${studentId}/resume/download`,
+    {
+      responseType: 'blob',
+    }
+  )
+
+  return response.data
+}

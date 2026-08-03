@@ -31,9 +31,10 @@ import SkeletonLoader from '../../components/SkeletonLoader'
 import Avatar from '../../components/Avatar'
 
 import {
-  getPlacementDrives,
-  getDriveApplications,
+  getAllApplications,
   getApplicationById,
+  getResume,
+  downloadResume,
 } from '../../services/adminService'
 
 import { useNotification } from '../../hooks/useNotification'
@@ -46,49 +47,29 @@ export default function AdminApplications() {
 
   const [loading, setLoading] = useState(true)
 
-  const [drives, setDrives] = useState([])
-  const [selectedDrive, setSelectedDrive] = useState('')
-
   const [applications, setApplications] = useState([])
 
   const [searchTerm, setSearchTerm] = useState('')
 
+  const [resume, setResume] = useState(null)
+
   const [viewApplication, setViewApplication] = useState(null)
 
   useEffect(() => {
-    const fetchDrives = async () => {
+    const fetchApplications = async () => {
       try {
-        const data = await getPlacementDrives()
-        setDrives(data)
+        const data = await getAllApplications()
+        setApplications(data)
       } catch (error) {
         console.error(error)
-        notify('Failed to load placement drives')
+        notify('Failed to load applications')
       } finally {
         setLoading(false)
       }
     }
 
-    fetchDrives()
-  }, [])
-
-  useEffect(() => {
-    if (!selectedDrive) {
-      setApplications([])
-      return
-    }
-
-    const fetchApplications = async () => {
-      try {
-        const data = await getDriveApplications(selectedDrive)
-        setApplications(data)
-      } catch (error) {
-        console.error(error)
-        notify('Failed to load applications')
-      }
-    }
-
     fetchApplications()
-  }, [selectedDrive])
+  }, [])
 
   const filteredApplications = useMemo(() => {
     return applications.filter((app) =>
@@ -106,14 +87,47 @@ export default function AdminApplications() {
   }
 
   const handleView = async (applicationId) => {
+  try {
+    setViewApplication(null)
+    const data = await getApplicationById(applicationId)
+    setViewApplication(data)
     try {
-      const data = await getApplicationById(applicationId)
-      setViewApplication(data)
+      const resumeData = await getResume(data.studentId)
+      setResume(resumeData)
     } catch (error) {
-      console.error(error)
-      notify('Failed to load application details')
+      setResume(null)
     }
+  } catch (error) {
+    console.error(error)
+    notify('Failed to load application details')
   }
+}
+
+const handleResumeDownload = async (studentId) => {
+  try {
+    const blob = await downloadResume(studentId)
+
+    const url = window.URL.createObjectURL(blob)
+
+    const link = document.createElement('a')
+
+    link.href = url
+
+    link.download = resume?.fileName || 'resume'
+
+    document.body.appendChild(link)
+
+    link.click()
+
+    link.remove()
+
+    window.URL.revokeObjectURL(url)
+
+  } catch (error) {
+    console.error(error)
+    notify('Failed to download resume')
+  }
+}
 
   return (
     <div className="flex flex-col gap-6">
@@ -145,33 +159,7 @@ export default function AdminApplications() {
     />
   </div>
 
-  <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-
-    <div className="w-full md:w-80">
-      <label className="mb-2 block text-sm font-medium text-gray-700">
-        Placement Drive
-      </label>
-
-      <select
-        value={selectedDrive}
-        onChange={(e) => setSelectedDrive(e.target.value)}
-        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
-      >
-        <option value="">
-          Select Placement Drive
-        </option>
-
-        {drives.map((drive) => (
-          <option
-            key={drive.id}
-            value={drive.id}
-          >
-            {drive.companyName} — {drive.jobRole}
-          </option>
-        ))}
-      </select>
-    </div>
-
+  <div className="flex justify-end">
     <SearchBar
       value={searchTerm}
       onChange={setSearchTerm}
@@ -179,15 +167,9 @@ export default function AdminApplications() {
       className="w-full md:max-w-sm"
     />
   </div>
-        {loading ? (
-        <SkeletonLoader rows={6} />
-      ) : !selectedDrive ? (
-        <Card>
-          <div className="py-12 text-center text-gray-500">
-            Select a placement drive to view applications.
-          </div>
-        </Card>
-      ) : (
+  {loading ? (
+      <SkeletonLoader rows={6} />
+    ) : (
         <Card title="Applications">
           <Table
             columns={[
@@ -222,7 +204,7 @@ export default function AdminApplications() {
               },
             ]}
             rows={filteredApplications}
-            emptyMessage="No applications found for this placement drive."
+            emptyMessage="No applications found."
             actions={(row) => (
               <Button
                 size="sm"
@@ -239,7 +221,10 @@ export default function AdminApplications() {
             {viewApplication && (
         <Modal
           open={!!viewApplication}
-          onClose={() => setViewApplication(null)}
+          onClose={() => {
+            setViewApplication(null)
+            setResume(null)
+          }}
           title="Application Details"
           size="lg"
         >
@@ -338,18 +323,24 @@ export default function AdminApplications() {
               </p>
 
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">
-                {viewApplication.resumeUrl
-                  ? (
-                    <a
-                      href={viewApplication.resumeUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-primary-600 hover:underline"
+                {resume ? (
+                  <div className="flex items-center justify-between">
+
+                    <span>{resume.fileName}</span>
+
+                    <Button
+                      size="sm"
+                      onClick={() =>
+                        handleResumeDownload(viewApplication.studentId)
+                      }
                     >
-                      View Resume
-                    </a>
-                  )
-                  : 'Resume not available.'}
+                      Download
+                    </Button>
+
+                  </div>
+                ) : (
+                  'Resume not available.'
+                )}
               </div>
             </div>
 

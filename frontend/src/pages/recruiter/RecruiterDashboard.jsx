@@ -29,6 +29,8 @@ import Badge from '../../components/Badge'
 import SkeletonLoader from '../../components/SkeletonLoader'
 import { getRecruiterDashboard } from '../../services/recruiterService'
 import { formatDate } from '../../utils/formatDate'
+import DashboardBarChart from '../../components/charts/DashboardBarChart'
+import DashboardPieChart from '../../components/charts/DashboardPieChart'
 
 export default function RecruiterDashboard() {
   const [data, setData] = useState(null)
@@ -55,6 +57,42 @@ export default function RecruiterDashboard() {
 
     fetchDashboard()
   }, [])
+
+  const recruitmentData = [
+    {
+      stage: 'Applications',
+      count: data?.stats?.applicationsReceived ?? 0,
+    },
+    {
+      stage: 'Shortlisted',
+      count: data?.stats?.candidatesShortlisted ?? 0,
+    },
+    {
+      stage: 'Selected',
+      count: data?.stats?.selectedCandidates ?? 0,
+    },
+  ]
+
+  const hiringData = [
+    {
+      name: 'Selected',
+      value: data?.stats?.selectedCandidates ?? 0,
+    },
+    {
+      name: 'Remaining',
+      value: Math.max(
+        (data?.stats?.applicationsReceived ?? 0) -
+          (data?.stats?.selectedCandidates ?? 0),
+        0
+      ),
+    },
+  ]
+
+  const selectionRate = `${Math.round(
+    ((data?.stats?.selectedCandidates ?? 0) /
+      Math.max(data?.stats?.applicationsReceived ?? 1, 1)) *
+      100
+  )}%`
 
   return (
     <div className="flex flex-col gap-6">
@@ -110,6 +148,25 @@ export default function RecruiterDashboard() {
                 icon={UserCheck}
               />
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+            <DashboardBarChart
+              title="Recruitment Funnel"
+              data={recruitmentData}
+              xKey="stage"
+              dataKey="count"
+              color="#22c55e"
+            />
+
+            <DashboardPieChart
+              title="Hiring Success"
+              data={hiringData}
+              centerText={selectionRate}
+              subtitle="Selection Rate"
+            />
+
           </div>
 
           {/* <Card title="Recent Placement Drives">
