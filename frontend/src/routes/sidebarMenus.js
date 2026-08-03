@@ -32,9 +32,10 @@ export const studentMenu = [
   { label: 'Dashboard', path: ROUTES.STUDENT_DASHBOARD, icon: LayoutDashboard },
   { label: 'Profile', path: ROUTES.STUDENT_PROFILE, icon: User },
   { label: 'Resume', path: ROUTES.STUDENT_RESUME, icon: FileText },
-  { label: 'Placement Drives', path: ROUTES.STUDENT_DRIVES, icon: Briefcase },
+  { label: 'Job Opportunities', path: ROUTES.STUDENT_DRIVES, icon: Briefcase },
   { label: 'Applications', path: ROUTES.STUDENT_APPLICATIONS, icon: ClipboardList },
   { label: 'Notifications', path: ROUTES.STUDENT_NOTIFICATIONS, icon: Bell },
+  // { label: 'Settings', path: '', icon: Settings },
 ]
 
 export const recruiterMenu = [
@@ -46,12 +47,13 @@ export const recruiterMenu = [
   },
   { label: 'Placement Drives', path: ROUTES.RECRUITER_VIEW_DRIVES, icon: Briefcase },
   { label: 'Create Drive', path: ROUTES.RECRUITER_CREATE_DRIVE, icon: UserPlus },
+  { label: 'Placement Drives', path: ROUTES.RECRUITER_VIEW_DRIVES, icon: Briefcase },
   { label: 'Applicants', path: ROUTES.RECRUITER_VIEW_APPLICANTS, icon: Users },
   { label: 'Shortlisted', path: ROUTES.RECRUITER_SHORTLIST, icon: ListChecks },
   { label: 'Interviews', path: ROUTES.RECRUITER_INTERVIEWS, icon: ClipboardList },
   { label: 'Results', path: ROUTES.RECRUITER_RESULTS, icon: FileText },
   { label: 'Notifications', path: ROUTES.RECRUITER_NOTIFICATIONS, icon: Bell },
-
+  // { label: 'Settings', path: '', icon: Settings },
 ]
 
 export const placementAdminMenu = [
@@ -66,6 +68,7 @@ export const placementAdminMenu = [
   { label: 'Recruiters', path: ROUTES.ADMIN_RECRUITERS, icon: UserPlus },
   { label: 'Placement Drives', path: ROUTES.ADMIN_DRIVES, icon: Briefcase },
   { label: 'Applications', path: ROUTES.ADMIN_APPLICATIONS, icon: ClipboardList },
+  // { label: 'Settings', path: '', icon: Settings },
 ]
 
 export const superAdminMenu = [
