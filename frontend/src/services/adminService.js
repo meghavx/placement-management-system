@@ -41,7 +41,6 @@ export async function updateAdminProfile(profile) {
   return response.data.data
 }
 
-
 // Future: GET /admin/students
 export async function getStudents() {
   try {
@@ -175,7 +174,6 @@ export async function downloadStudentResume(studentId) {
   return response.data
 }
 
-// Future: GET /admin/recruiters
 export async function getRecruiters() {
   try {
     const response = await apiClient.get('/recruiters')
@@ -264,54 +262,30 @@ export async function updateRecruiterStatus(id, active) {
   }
 }
 
-// Future: GET /admin/drives
-// export function getAdminDrives() {
-//   return Promise.resolve(placementDriveManagementData)
-// }
 export async function getAdminDrives() {
   try {
     const response = await apiClient.get('/drives')
 
-    const statusMap = {
-      DRAFT: 'Draft',
-      PUBLISHED: 'Published',
-      CLOSED: 'Closed',
-      EXPIRED: 'Expired',
-    }
-
-    return response.data.data.map((drive) => ({
-      id: drive.id,
-
-      drive: `${drive.companyName} - ${drive.jobRole}`,
-
-      company: drive.companyName,
-
-      role: drive.jobRole,
-
-      package: drive.packageOffered,
-
-      deadline: drive.driveDate,
-
-      status: statusMap[drive.status] ?? drive.status,
-
-      // Backend doesn't provide these yet
-      applicants: 0,
-
-      location: drive.location,
-
-      eligible: drive.eligible,
-
-      ineligibilityReasons: drive.ineligibilityReasons,
-    }))
+    return response.data.data.filter(
+      (drive) => drive.status !== 'DRAFT'
+    )
   } catch (error) {
     console.error('Failed to fetch drives:', error)
     throw error
   }
 }
 
-// Future: PUT /admin/drives/{id}
-export function updateAdminDrive(driveId, updates) {
-  return Promise.resolve({ id: driveId, ...updates })
+export async function getDriveById(id) {
+  try {
+    const response = await apiClient.get(`/drives/${id}`)
+
+    return response.data.data
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      'Failed to load drive details.'
+    )
+  }
 }
 
 // Future: GET /admin/applications
@@ -328,8 +302,6 @@ export function getReports() {
 export function exportReport(format) {
   return Promise.resolve({ format, status: 'exported' })
 }
-
-export const getPlacementDrives = async () => placementDriveManagementData
 
 export const getDriveApplications = async (driveId) =>
   applicationData.filter(app => app.driveId === Number(driveId))

@@ -34,7 +34,6 @@ import Dropdown from '../../components/Dropdown'
 
 import {
   getAdminDashboard,
-  getPlacementDrives,
   getDriveApplications,
   getRecruiters,
   getStudents,
@@ -60,12 +59,10 @@ export default function AdminDashboard() {
       try {
         const [
           dashboardData,
-          driveData,
           recruiterData,
           studentData,
         ] = await Promise.all([
           getAdminDashboard(),
-          getPlacementDrives(),
           getRecruiters(),
           getStudents(),
         ])

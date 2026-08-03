@@ -48,7 +48,7 @@ import Button from '../../components/Button'
 import Modal from '../../components/Modal'
 import SkeletonLoader from '../../components/SkeletonLoader'
 
-import { getAdminDrives } from '../../services/adminService'
+import { getAdminDrives, getDriveById } from '../../services/adminService'
 
 import { useSearch } from '../../hooks/useSearch'
 import { useNotification } from '../../hooks/useNotification'
@@ -86,14 +86,30 @@ export default function AdminDrives() {
   }, [])
 
   const stats = {
-    total: drives.length,
-    open: drives.filter((d) => d.status === 'OPEN').length,
-    completed: drives.filter((d) => d.status === 'COMPLETED').length,
-    cancelled: drives.filter((d) => d.status === 'CANCELLED').length,
+    total: drives.filter(d => d.status !== 'CANCELLED').length,
+    open: drives.filter(d => d.status === 'OPEN').length,
+    closed: drives.filter(d => d.status === 'CLOSED').length,
+    completed: drives.filter(d => d.status === 'COMPLETED').length,
   }
 
-  const handleView = (drive) => {
-    setViewDrive(drive)
+  const statusColors = {
+    OPEN: 'success',
+    CLOSED: 'warning',
+    COMPLETED: 'primary',
+    CANCELLED: 'danger',
+  }
+
+  const handleView = async (drive) => {
+    try {
+      const details = await getDriveById(drive.id)
+      setViewDrive(details)
+    } catch (error) {
+      notify(
+        error.message ||
+        'Failed to load drive details.',
+        'error'
+      )
+    }
   }
 
   return (
@@ -116,13 +132,13 @@ export default function AdminDrives() {
         />
 
         <StatisticCard
-          title="Completed"
-          value={stats.completed}
+          title="Closed"
+          value={stats.closed}
         />
 
         <StatisticCard
-          title="Cancelled"
-          value={stats.cancelled}
+          title="Completed"
+          value={stats.completed}
         />
       </div>
 
@@ -160,7 +176,18 @@ export default function AdminDrives() {
               key: 'status',
               header: 'Status',
               render: (row) => (
-                <Badge label={row.status} />
+                <Badge
+                  label={row.status}
+                  variant={
+                    row.status === 'OPEN'
+                      ? 'success'
+                      : row.status === 'CLOSED'
+                      ? 'warning'
+                      : row.status === 'COMPLETED'
+                      ? 'primary'
+                      : 'danger'
+                  }
+                />
               ),
             },
           ]}
