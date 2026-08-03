@@ -7,12 +7,15 @@ Provides Placement Admins with visibility into every student
 application across all placement drives.
 
 Current Features:
-- Status statistic cards
-- Search and status filter
-- Applications table with View/Export actions
+Current Features
+- Backend-integrated application list
+- Statistics
+- Search by student/company/job role
+- View application details
 
-Future Backend Integration:
-GET /admin/applications.
+Backend APIs
+- GET /api/placement-admin/applications
+- GET /api/placement-admin/applications/{id}
 ==========================================
 */
 
@@ -30,24 +33,19 @@ import Card from '../../components/Card'
 import SkeletonLoader from '../../components/SkeletonLoader'
 import Avatar from '../../components/Avatar'
 
-import {
-  getPlacementDrives,
-  getDriveApplications,
-  getApplicationById,
-} from '../../services/adminService'
+import { getDriveApplications, getApplicationById } from '../../services/adminService'
 
 import { useNotification } from '../../hooks/useNotification'
 
 import { formatDate } from '../../utils/formatDate'
 import { formatSalary } from '../../utils/formatSalary'
+import { formatApplicationStatus } from '../../utils/formatApplicationStatus'
+import { APPLICATION_STATUS } from '../../constants/applicationStatus'
 
 export default function AdminApplications() {
   const { notify } = useNotification()
 
   const [loading, setLoading] = useState(true)
-
-  const [drives, setDrives] = useState([])
-  const [selectedDrive, setSelectedDrive] = useState('')
 
   const [applications, setApplications] = useState([])
 
@@ -55,54 +53,48 @@ export default function AdminApplications() {
 
   const [viewApplication, setViewApplication] = useState(null)
 
+  const [statusFilter, setStatusFilter] = useState('ALL')
+
   useEffect(() => {
-    const fetchDrives = async () => {
+    const fetchApplications = async () => {
       try {
-        const data = await getPlacementDrives()
-        setDrives(data)
+        const data = await getDriveApplications()
+        setApplications(data)
       } catch (error) {
         console.error(error)
-        notify('Failed to load placement drives')
+        notify('Failed to load applications')
       } finally {
         setLoading(false)
       }
     }
 
-    fetchDrives()
+    fetchApplications()
   }, [])
 
-  useEffect(() => {
-    if (!selectedDrive) {
-      setApplications([])
-      return
-    }
-
-    const fetchApplications = async () => {
-      try {
-        const data = await getDriveApplications(selectedDrive)
-        setApplications(data)
-      } catch (error) {
-        console.error(error)
-        notify('Failed to load applications')
-      }
-    }
-
-    fetchApplications()
-  }, [selectedDrive])
-
   const filteredApplications = useMemo(() => {
-    return applications.filter((app) =>
-      `${app.studentName} ${app.rollNumber} ${app.companyName} ${app.jobRole}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    )
-  }, [applications, searchTerm])
+    return applications.filter((app) => {
+      const matchesSearch =
+        `${app.studentName} ${app.rollNumber} ${app.companyName} ${app.jobRole}`
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+
+      const matchesStatus =
+        statusFilter === 'ALL' ||
+        app.status === statusFilter
+
+      return matchesSearch && matchesStatus
+    })
+  }, [applications, searchTerm, statusFilter])
 
   const stats = {
     total: applications.length,
-    applied: applications.filter((a) => a.status === 'APPLIED').length,
-    shortlisted: applications.filter((a) => a.status === 'SHORTLISTED').length,
-    rejected: applications.filter((a) => a.status === 'REJECTED').length,
+    applied: applications.filter(a => a.status === 'APPLIED').length,
+    shortlisted: applications.filter(a => a.status === 'SHORTLISTED').length,
+    interviewScheduled: applications.filter(
+      a => a.status === 'INTERVIEW_SCHEDULED'
+    ).length,
+    selected: applications.filter(a => a.status === 'SELECTED').length,
+    rejected: applications.filter(a => a.status === 'REJECTED').length,
   }
 
   const handleView = async (applicationId) => {
@@ -117,78 +109,64 @@ export default function AdminApplications() {
 
   return (
     <div className="flex flex-col gap-6">
-  <PageHeader
-    title="Application Management"
-    description="View all applications submitted for placement drives."
-    breadcrumb={['Dashboard', 'Applications']}
-  />
+      <PageHeader
+        title="Application Management"
+        description="View all applications submitted for placement drives."
+        breadcrumb={['Dashboard', 'Applications']}
+      />
 
-  <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-    <StatisticCard
-      title="Total Applications"
-      value={stats.total}
-    />
+    <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
+      <StatisticCard
+        title="Total Applications"
+        value={stats.total}
+      />
 
-    <StatisticCard
-      title="Applied"
-      value={stats.applied}
-    />
+      <StatisticCard
+        title="Applied"
+        value={stats.applied}
+      />
 
-    <StatisticCard
-      title="Shortlisted"
-      value={stats.shortlisted}
-    />
+      <StatisticCard
+        title="Shortlisted"
+        value={stats.shortlisted}
+      />
 
-    <StatisticCard
-      title="Rejected"
-      value={stats.rejected}
-    />
-  </div>
+      <StatisticCard
+        title="Interview Scheduled"
+        value={stats.interviewScheduled}
+      />
 
-  <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <StatisticCard
+        title="Selected"
+        value={stats.selected}
+      />
 
-    <div className="w-full md:w-80">
-      <label className="mb-2 block text-sm font-medium text-gray-700">
-        Placement Drive
-      </label>
+      <StatisticCard
+        title="Rejected"
+        value={stats.rejected}
+      />
+    </div>
 
+    <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <select
-        value={selectedDrive}
-        onChange={(e) => setSelectedDrive(e.target.value)}
-        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+        value={statusFilter}
+        onChange={(e) => setStatusFilter(e.target.value)}
+        className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
       >
-        <option value="">
-          Select Placement Drive
-        </option>
+        <option value="ALL">Filter by Status</option>
 
-        {drives.map((drive) => (
-          <option
-            key={drive.id}
-            value={drive.id}
-          >
-            {drive.companyName} — {drive.jobRole}
+        {Object.entries(APPLICATION_STATUS).map(([key, label]) => (
+          <option key={key} value={key}>
+            {label}
           </option>
         ))}
       </select>
     </div>
 
-    <SearchBar
-      value={searchTerm}
-      onChange={setSearchTerm}
-      placeholder="Search by student, roll number or company"
-      className="w-full md:max-w-sm"
-    />
-  </div>
         {loading ? (
-        <SkeletonLoader rows={6} />
-      ) : !selectedDrive ? (
-        <Card>
-          <div className="py-12 text-center text-gray-500">
-            Select a placement drive to view applications.
-          </div>
-        </Card>
-      ) : (
-        <Card title="Applications">
+          <SkeletonLoader rows={6} />
+        ) : (
+        <Card title="All Applications">
           <Table
             columns={[
               {
@@ -222,7 +200,7 @@ export default function AdminApplications() {
               },
             ]}
             rows={filteredApplications}
-            emptyMessage="No applications found for this placement drive."
+            emptyMessage="No applications match your search."
             actions={(row) => (
               <Button
                 size="sm"
@@ -326,33 +304,11 @@ export default function AdminApplications() {
                 </p>
 
                 <div className="mt-1">
-                  <Badge label={viewApplication.status || '-'} />
+                  <Badge label={viewApplication?.status} />
                 </div>
               </div>
 
             </div>
-
-            <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                Resume
-              </p>
-
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">
-                {viewApplication.resumeUrl
-                  ? (
-                    <a
-                      href={viewApplication.resumeUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-primary-600 hover:underline"
-                    >
-                      View Resume
-                    </a>
-                  )
-                  : 'Resume not available.'}
-              </div>
-            </div>
-
           </div>
         </Modal>
       )}

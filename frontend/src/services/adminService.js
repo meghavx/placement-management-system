@@ -288,9 +288,32 @@ export async function getDriveById(id) {
   }
 }
 
-// Future: GET /admin/applications
-export function getAllApplications() {
-  return Promise.resolve(adminApplicationData)
+export async function getDriveApplications() {
+  try {
+    const response = await apiClient.get(
+      '/placement-admin/applications'
+    )
+
+    return response.data.data
+  } catch (error) {
+    console.error('Failed to fetch applications:', error)
+    throw error
+  }
+}
+
+export async function getApplicationById(applicationId) {
+  try {
+    const response = await apiClient.get(
+      `/placement-admin/applications/${applicationId}`
+    )
+
+    return response.data.data
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      'Failed to load application details.'
+    )
+  }
 }
 
 // Future: GET /admin/reports  and  GET /admin/analytics
@@ -302,9 +325,3 @@ export function getReports() {
 export function exportReport(format) {
   return Promise.resolve({ format, status: 'exported' })
 }
-
-export const getDriveApplications = async (driveId) =>
-  applicationData.filter(app => app.driveId === Number(driveId))
-
-export const getApplicationById = async (applicationId) =>
-  applicationData.find(app => app.id === Number(applicationId))

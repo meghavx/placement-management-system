@@ -13,18 +13,18 @@ Future Features
 */
 
 export const APPLICATION_STATUS = {
-  APPLIED: 'Applied',
-  SHORTLISTED: 'Shortlisted',
-  INTERVIEW_SCHEDULED: 'Interview Scheduled',
-  SELECTED: 'Selected',
-  REJECTED: 'Rejected',
+  APPLIED: 'APPLIED',
+  SHORTLISTED: 'SHORTLISTED',
+  INTERVIEW_SCHEDULED: 'INTERVIEW_SCHEDULED',
+  SELECTED: 'SELECTED',
+  REJECTED: 'REJECTED',
 }
 
 // Consistent color mapping used by the Badge component everywhere.
 export const APPLICATION_STATUS_COLORS = {
-  [APPLICATION_STATUS.APPLIED]: 'blue',
-  [APPLICATION_STATUS.SHORTLISTED]: 'yellow',
-  [APPLICATION_STATUS.INTERVIEW_SCHEDULED]: 'purple',
-  [APPLICATION_STATUS.SELECTED]: 'green',
-  [APPLICATION_STATUS.REJECTED]: 'red',
+  APPLIED: 'blue',
+  SHORTLISTED: 'yellow',
+  INTERVIEW_SCHEDULED: 'purple',
+  SELECTED: 'green',
+  REJECTED: 'red',
 }

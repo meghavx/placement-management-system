@@ -18,14 +18,17 @@ Future:
 
 import { getStatusColor } from '../utils/getStatusColor'
 import { STATUS_COLOR_CLASSES } from '../constants/colors'
+import { formatApplicationStatus } from '../utils/formatApplicationStatus'
 
 export default function Badge({ label, color }) {
   const resolvedColor = color || getStatusColor(label)
-  const classes = STATUS_COLOR_CLASSES[resolvedColor] || STATUS_COLOR_CLASSES.gray
+  const classes = 
+    STATUS_COLOR_CLASSES[resolvedColor] || 
+    STATUS_COLOR_CLASSES.gray
 
   return (
     <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${classes}`}>
-      {label}
+      {formatApplicationStatus(label)}
     </span>
   )
 }
