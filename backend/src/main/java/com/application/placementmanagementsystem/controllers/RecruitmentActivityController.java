@@ -25,7 +25,7 @@ public class RecruitmentActivityController {
     private final RecruitmentActivityService recruitmentActivityService;
 
     @PostMapping
-    @PreAuthorize("hasRole('PLACEMENT_ADMIN')")
+    @PreAuthorize("hasRole('RECRUITER')")
     @Operation(summary = "Create Recruitment Activity")
     public ResponseEntity<ApiResponse<RecruitmentActivityResponse>> createActivity(
             @PathVariable Long driveId,
@@ -42,7 +42,7 @@ public class RecruitmentActivityController {
     }
 
     @PutMapping("/{activityId}")
-    @PreAuthorize("hasRole('PLACEMENT_ADMIN')")
+    @PreAuthorize("hasRole('RECRUITER')")
     @Operation(summary = "Update Recruitment Activity")
     public ResponseEntity<ApiResponse<RecruitmentActivityResponse>> updateActivity(
             @PathVariable Long driveId,

@@ -47,12 +47,12 @@ export const recruiterMenu = [
   },
   { label: 'Placement Drives', path: ROUTES.RECRUITER_VIEW_DRIVES, icon: Briefcase },
   { label: 'Create Drive', path: ROUTES.RECRUITER_CREATE_DRIVE, icon: UserPlus },
-  { label: 'Placement Drives', path: ROUTES.RECRUITER_VIEW_DRIVES, icon: Briefcase },
+  //{ label: 'Placement Drives', path: ROUTES.RECRUITER_VIEW_DRIVES, icon: Briefcase },
   { label: 'Applicants', path: ROUTES.RECRUITER_VIEW_APPLICANTS, icon: Users },
   { label: 'Shortlisted', path: ROUTES.RECRUITER_SHORTLIST, icon: ListChecks },
   { label: 'Interviews', path: ROUTES.RECRUITER_INTERVIEWS, icon: ClipboardList },
   { label: 'Results', path: ROUTES.RECRUITER_RESULTS, icon: FileText },
-  { label: 'Notifications', path: ROUTES.RECRUITER_NOTIFICATIONS, icon: Bell },
+  //{ label: 'Notifications', path: ROUTES.RECRUITER_NOTIFICATIONS, icon: Bell },
   // { label: 'Settings', path: '', icon: Settings },
 ]
 
