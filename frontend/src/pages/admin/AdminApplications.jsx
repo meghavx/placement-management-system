@@ -60,6 +60,8 @@ export default function AdminApplications() {
 
   const [viewApplication, setViewApplication] = useState(null)
 
+  const [statusFilter, setStatusFilter] = useState('ALL')
+
   useEffect(() => {
     const fetchApplications = async () => {
       try {
@@ -70,13 +72,10 @@ export default function AdminApplications() {
         notify('Failed to load applications')
       } finally {
         setLoading(false)
-      } finally {
-        setLoading(false)
       }
     }
 
     fetchApplications()
-  }, [])
   }, [])
 
   const filteredApplications = useMemo(() => {
@@ -188,14 +187,21 @@ const handleResumeDownload = async (studentId) => {
       />
     </div>
 
-  <div className="flex justify-end">
-    <SearchBar
-      value={searchTerm}
-      onChange={setSearchTerm}
-      placeholder="Search by student, roll number or company"
-      className="w-full md:max-w-sm"
-    />
-  </div>
+  <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <select
+        value={statusFilter}
+        onChange={(e) => setStatusFilter(e.target.value)}
+        className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+      >
+        <option value="ALL">Filter by Status</option>
+
+        {Object.entries(APPLICATION_STATUS).map(([key, label]) => (
+          <option key={key} value={key}>
+            {label}
+          </option>
+        ))}
+      </select>
+    </div>
   {loading ? (
       <SkeletonLoader rows={6} />
     ) : (

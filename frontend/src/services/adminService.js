@@ -352,13 +352,19 @@ export function exportReport(format) {
 //   return response.data.data
 // }
 
-// export const getApplicationById = async (applicationId) => {
-//   const response = await api.get(
-//     `/student/applications/${applicationId}`
-//   )
 
-//   return response.data.data
-// }
+export async function getDriveById(id) {
+  try {
+    const response = await apiClient.get(`/drives/${id}`)
+
+    return response.data.data
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      'Failed to load drive details.'
+    )
+  }
+}
 
 export const getPlacementDrives = async () => placementDriveManagementData
 
