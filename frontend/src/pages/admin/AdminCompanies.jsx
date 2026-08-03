@@ -42,6 +42,9 @@ import { useNotification } from '../../hooks/useNotification'
 
 import {
   getCompanies,
+  createCompany,
+  updateCompany,
+  updateCompanyStatus,
 } from '../../services/companyService'
 
 const EMPTY_FORM = {
@@ -57,19 +60,13 @@ export default function AdminCompanies() {
 
   const [companies, setCompanies] = useState([])
   const [loading, setLoading] = useState(true)
-
   const [viewCompany, setViewCompany] = useState(null)
-
-  const [companyModalOpen, setCompanyModalOpen] =
-    useState(false)
-
-  const [editingCompany, setEditingCompany] =
-    useState(null)
-
+  const [companyModalOpen, setCompanyModalOpen] = useState(false)
+  const [editingCompany, setEditingCompany] = useState(null)
+  const [statusCompany, setStatusCompany] = useState(null)
+  
   const [saving, setSaving] = useState(false)
-
   const [form, setForm] = useState(EMPTY_FORM)
-
   const [errors, setErrors] = useState({})
 
   useEffect(() => {
@@ -183,31 +180,66 @@ export default function AdminCompanies() {
     setSaving(true)
 
     try {
-      // Backend integration later:
-      // POST /companies
-      // PUT /companies/{id}
+      if (editingCompany) {
+        await updateCompany(editingCompany.id, form)
 
-      notify(
-        editingCompany
-          ? 'Company updated successfully.'
-          : 'Company created successfully.'
-      )
+        notify('Company updated successfully.')
+      } else {
+        const response = await createCompany(form)
+
+        notify(
+          response.message ||
+          'Company created successfully.'
+        )
+      }
+
+      await loadCompanies()
 
       setCompanyModalOpen(false)
 
       resetForm()
+    } catch (error) {
+      notify(
+        error.message ||
+        'Failed to save company.',
+        'error'
+      )
     } finally {
       setSaving(false)
     }
   }
 
-  async function handleToggleStatus(company) {
-    // Backend integration later:
-    // PATCH /companies/{id}/status
+  function handleToggleStatus(company) {
+    setStatusCompany(company)
+  }
 
-    notify(
-      `${company.company} status updated.`
-    )
+  async function confirmToggleStatus() {
+    if (!statusCompany) return
+
+    try {
+      await updateCompanyStatus(
+        statusCompany.id,
+        statusCompany.status !== 'Active'
+      )
+
+      notify(
+        `Company ${
+          statusCompany.status === 'Active'
+            ? 'deactivated'
+            : 'activated'
+        } successfully.`
+      )
+
+      await loadCompanies()
+
+      setStatusCompany(null)
+    } catch (error) {
+      notify(
+        error.message ||
+        'Failed to update company status.',
+        'error'
+      )
+    }
   }
 
   const columns = [
@@ -367,7 +399,6 @@ export default function AdminCompanies() {
                     <Badge label={viewCompany.status} />
                   </div>
                 </div>
-
               </div>
 
               <div>
@@ -490,6 +521,53 @@ export default function AdminCompanies() {
               </Button>
             </div>
           </form>
+        </Modal>
+
+        <Modal
+          open={!!statusCompany}
+          onClose={() => setStatusCompany(null)}
+          title={
+            statusCompany?.status === 'Active'
+              ? 'Deactivate Company'
+              : 'Activate Company'
+          }
+        >
+          <div className="space-y-6">
+            <p className="text-gray-700">
+              Are you sure you want to{' '}
+              <span className="font-semibold">
+                {statusCompany?.status === 'Active'
+                  ? 'deactivate'
+                  : 'activate'}
+              </span>{' '}
+              <span className="font-semibold">
+                {statusCompany?.company}
+              </span>
+              ?
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setStatusCompany(null)}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                variant={
+                  statusCompany?.status === 'Active'
+                    ? 'danger'
+                    : 'success'
+                }
+                onClick={confirmToggleStatus}
+              >
+                {statusCompany?.status === 'Active'
+                  ? 'Deactivate'
+                  : 'Activate'}
+              </Button>
+            </div>
+          </div>
         </Modal>
       </>
     )}

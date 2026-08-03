@@ -269,16 +269,6 @@ export function updateAdminDrive(driveId, updates) {
   return Promise.resolve({ id: driveId, ...updates })
 }
 
-// Future: GET /admin/eligibility
-export function getEligibilityCriteria() {
-  return Promise.resolve(eligibilityData)
-}
-
-// Future: PUT /admin/eligibility/{id}
-export function updateEligibilityCriteria(driveId, criteria) {
-  return Promise.resolve({ driveId, ...criteria })
-}
-
 // Future: GET /admin/applications
 export function getAllApplications() {
   return Promise.resolve(adminApplicationData)
@@ -293,35 +283,6 @@ export function getReports() {
 export function exportReport(format) {
   return Promise.resolve({ format, status: 'exported' })
 }
-
-// ================================
-// Placement Drives
-// ================================
-
-// export const getPlacementDrives = async () => {
-//   const response = await api.get('/drives')
-//   return response.data.data
-// }
-
-// // ================================
-// // Applications
-// // ================================
-
-// export const getDriveApplications = async (driveId) => {
-//   const response = await api.get(
-//     `/recruiter/drives/${driveId}/applications`
-//   )
-
-//   return response.data.data
-// }
-
-// export const getApplicationById = async (applicationId) => {
-//   const response = await api.get(
-//     `/student/applications/${applicationId}`
-//   )
-
-//   return response.data.data
-// }
 
 export const getPlacementDrives = async () => placementDriveManagementData
 
