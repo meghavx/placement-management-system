@@ -28,6 +28,7 @@ public class CompanyMapper {
                 .website(company.getWebsite())
                 .location(company.getLocation())
                 .description(company.getDescription())
+                .active(company.isActive())
                 .build();
     }
 }
