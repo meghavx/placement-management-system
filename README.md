@@ -6,6 +6,21 @@ It manages the placement lifecycle from student and recruiter management to plac
 
 The system is designed with a **modular and scalable architecture**, allowing the platform to be extended with additional placement features and broader institutional deployment in the future.
 
+## Screenshots
+
+<table>
+  <tr>
+    <td>
+          <img width="1440" height="900" alt="1" 
+            src="https://github.com/user-attachments/assets/b44bcbd9-f053-4de8-91b4-4cef620011fe" />
+    </td>
+    <td>
+          <img width="1440" height="900" alt="2" 
+            src="https://github.com/user-attachments/assets/89edfac6-bb67-48e9-a361-0b098a97055d" />
+    </td>
+  </tr>
+</table>
+
 ## Features
 
 * JWT-based authentication and role-based access control
